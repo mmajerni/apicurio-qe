@@ -24,17 +24,30 @@ import static org.assertj.core.api.Assertions.fail;
 
 @Slf4j
 public class ApicuritoTemplate {
+
     public static Template getTemplate() {
         try (InputStream is = new URL(TestConfiguration.templateUrl()).openStream()) {
             return OpenShiftUtils.client().templates().load(is).get();
         } catch (IOException ex) {
-            throw new IllegalArgumentException("Unable to read template ", ex);
+            throw new IllegalArgumentException("Unable to read apicurito template ", ex);
         }
+    }
+
+    public static KubernetesList getImageStreamList() {
+        try (InputStream is = new URL(TestConfiguration.templateInputStreamUrl()).openStream()) {
+            return OpenShiftUtils.client().lists().load(is).get();
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Unable to read input image stream list", ex);
+        }
+    }
+
+    public static void setInputStreams() {
+        TestConfiguration.printDivider("Setting up input streams");
+        OpenShiftUtils.getInstance().createResources(getImageStreamList());
     }
 
     public static void deployUsingTemplate() {
         TestConfiguration.printDivider("Deploying using template");
-        OpenShiftUtils.getInstance().cleanAndAssert();
 
         // get the template
         Template template = getTemplate();
@@ -44,6 +57,8 @@ public class ApicuritoTemplate {
         log.info("Deploying on address: https://" + TestConfiguration.openShiftNamespace() + "." + TestConfiguration.openShiftRouteSuffix());
         templateParams.put("OPENSHIFT_MASTER", TestConfiguration.openShiftUrl());
         templateParams.put("OPENSHIFT_PROJECT", TestConfiguration.openShiftNamespace());
+        templateParams.put("IMAGE_STREAM_NAMESPACE", TestConfiguration.openShiftNamespace());
+
         // process & create
         KubernetesList processedTemplate = OpenShiftUtils.getInstance().recreateAndProcessTemplate(template, templateParams);
         for (HasMetadata hasMetadata : processedTemplate.getItems()) {
@@ -55,9 +70,9 @@ public class ApicuritoTemplate {
 
     public static void cleanNamespace() {
         TestConfiguration.printDivider("Deleting namespace...");
-        OpenShiftUtils.client().apps().statefulSets().inNamespace(TestConfiguration.openShiftNamespace()).delete();
-        OpenShiftUtils.client().extensions().deployments().inNamespace(TestConfiguration.openShiftNamespace()).delete();
         try {
+            OpenShiftUtils.client().apps().statefulSets().inNamespace(TestConfiguration.openShiftNamespace()).delete();
+            OpenShiftUtils.client().extensions().deployments().inNamespace(TestConfiguration.openShiftNamespace()).delete();
             OpenShiftUtils.client().customResourceDefinitions().delete();
         } catch (KubernetesClientException ex) {
             // Probably user does not have permissions to delete.. a nice exception will be printed when deploying

@@ -16,6 +16,8 @@ import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @Slf4j
 public class CustomWebDriverProvider implements WebDriverProvider {
     public static final String DOWNLOAD_DIR = Paths.get("tmp" + File.separator + "download").toAbsolutePath().toString();
@@ -26,7 +28,6 @@ public class CustomWebDriverProvider implements WebDriverProvider {
     public WebDriver createDriver(DesiredCapabilities capabilities) {
         log.info("malphite - I am now inside CustomWebDriverProvider");
 
-
         if (TestConfiguration.apicuritoBrowser().contentEquals("chrome")) {
 
             return prepareChromeWebDriver();
@@ -35,7 +36,7 @@ public class CustomWebDriverProvider implements WebDriverProvider {
 
             // firefox needs to have DOWNLOAD_DIR path already created
             File dirPath = new File(DOWNLOAD_DIR);
-            dirPath.mkdirs();
+            assertThat(dirPath.mkdirs()).isTrue();
 
             return prepareFirefoxDriver();
         }
@@ -73,10 +74,7 @@ public class CustomWebDriverProvider implements WebDriverProvider {
         }
         //we know that based on filter there will be just one match
         log.info("We found out that you want to use driver: " + match[0].getAbsolutePath());
-
-
         return match[0].getAbsolutePath();
-
     }
 
     /**
@@ -89,12 +87,10 @@ public class CustomWebDriverProvider implements WebDriverProvider {
 
         System.setProperty("webdriver.chrome.driver", findDriverPath());
 
-
         Map<String, Object> preferences = new Hashtable<String, Object>();
         preferences.put("profile.default_content_settings.popups", 0);
         preferences.put("download.prompt_for_download", "false");
         preferences.put("download.default_directory", DOWNLOAD_DIR);
-
 
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("prefs", preferences);
@@ -109,7 +105,6 @@ public class CustomWebDriverProvider implements WebDriverProvider {
         */
 
         return new ChromeDriver(options);
-
     }
 
     /**
