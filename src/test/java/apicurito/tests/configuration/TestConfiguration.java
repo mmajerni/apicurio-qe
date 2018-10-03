@@ -20,6 +20,7 @@ public class TestConfiguration {
     public static final String OPENSHIFT_REINSTALL = "apicurito.config.openshift.reinstall";
 
     public static final String APICURITO_TEMPLATE_URL = "apicurito.config.template.url";
+    public static final String APICURITO_IS_TEMPLATE_URL = "apicurito.config.inputstream.template.url";
     public static final String APICURITO_UI_BROWSER = "apicurito.config.ui.browser";
     public static final String APICURITO_UI_URL = "apicurito.config.ui.url";
 
@@ -64,6 +65,10 @@ public class TestConfiguration {
 
     public static String templateUrl() {
         return get().readValue(APICURITO_TEMPLATE_URL, "https://raw.githubusercontent.com/jboss-fuse/application-templates/master/fuse-apicurito.yml");
+    }
+
+    public static String templateInputStreamUrl() {
+        return get().readValue(APICURITO_IS_TEMPLATE_URL, "https://raw.githubusercontent.com/jboss-fuse/application-templates/master/fis-image-streams.json");
     }
 
     public static String openShiftRouteSuffix() {

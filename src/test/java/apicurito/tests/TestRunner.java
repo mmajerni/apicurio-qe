@@ -21,8 +21,20 @@ import org.junit.runner.RunWith;
 public class TestRunner {
     @BeforeClass
     public static void beforeTests() {
+
+        if (OpenShiftUtils.xtf().getProject(TestConfiguration.openShiftNamespace()) == null) {
+            OpenShiftUtils.xtf().createProjectRequest(TestConfiguration.openShiftNamespace());
+            try {
+                Thread.sleep(10 * 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         if (Boolean.valueOf(TestConfiguration.doReinstall())) {
             ApicuritoTemplate.cleanNamespace();
+
+            ApicuritoTemplate.setInputStreams();
 
             ApicuritoTemplate.deployUsingTemplate();
 
