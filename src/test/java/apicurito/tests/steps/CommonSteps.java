@@ -1,29 +1,38 @@
 package apicurito.tests.steps;
 
 import apicurito.tests.configuration.TestConfiguration;
-import apicurito.tests.utils.slenide.OurSelenide;
+import apicurito.tests.utils.slenide.CommonUtils;
+import apicurito.tests.utils.slenide.ImportExportUtils;
 import com.codeborne.selenide.Selenide;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
 
+
+import java.io.File;
+
 import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.enabled;
 import static com.codeborne.selenide.Condition.visible;
-
 @Slf4j
 public class CommonSteps {
 
     @Given("^log into apicurito$")
     public void login() {
         Selenide.open(TestConfiguration.apicuritoUrl());
-        //String currentUrl = WebDriverRunner.getWebDriver().getCurrentUrl();
     }
 
     @When("^click on the \"([^\"]*)\" button$")
     public void clickOnButton(String buttonTitle) {
-        OurSelenide.getButtonWithTitle(buttonTitle, OurSelenide.getAppRoot()).shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).click();
+        CommonUtils.getButtonWithText(buttonTitle, CommonUtils.getAppRoot()).shouldBe(visible, enabled).shouldNotHave(attribute("disabled"))
+                .click();
+    }
+
+    @And("^set to \"([^\"]*)\" value \"([^\"]*)\"$")
+    public void setValueInLabel(String label, String value){
+        CommonUtils.getLabelWithName(label, CommonUtils.getAppRoot().shouldBe(visible,enabled).shouldNotHave(attribute("disabled")))
+                .setValue(value);
     }
 
     @And("^sleep for (\\d+) seconds$")
@@ -33,5 +42,13 @@ public class CommonSteps {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    @When("^import API \"([^\"]*)\"$")
+    public void importAPI(String pathtoFile) throws InterruptedException{
+        ImportExportUtils.importAPI(new File(pathtoFile));
+
+        //give jenkins more time so the integration shows up in the list //TODO
+        //TestUtils.sleepIgnoreInterrupt(TestConfiguration.getJenkinsDelay());
     }
 }
