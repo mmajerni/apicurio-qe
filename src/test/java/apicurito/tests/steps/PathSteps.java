@@ -4,9 +4,7 @@ import apicurito.tests.utils.slenide.*;
 import com.codeborne.selenide.SelenideElement;
 import cucumber.api.java.en.And;
 
-import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.enabled;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.*;
 
 public class PathSteps {
 
@@ -18,12 +16,12 @@ public class PathSteps {
      */
     @And("^create new \"([^\"]*)\" operation$")
     public void createNewOperation(String operation){
-        PathUtils.getCreateOperationButton(Operations.valueOf(operation), CommonUtils.getAppRoot().shouldBe(visible,enabled).shouldNotHave(attribute("disabled")))
+        PathUtils.getCreateOperationButton(Operations.valueOf(operation))
                 .click();
     }
 
-    @And("^update operation \"([^\"]*)\"$")
-    public void updateOperation(String operation){
+    @And("^select operation \"([^\"]*)\"$")
+    public void selectOperation(String operation){
         PathUtils.getOperationButton(Operations.valueOf(operation), CommonUtils.getAppRoot().shouldBe(visible,enabled).shouldNotHave(attribute("disabled")))
                 .click();
     }
@@ -36,17 +34,34 @@ public class PathSteps {
     @And("^set description \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
     public void setDescriptionPathParameter(String description, String parameter) {
         PathUtils.openPathDescription(parameter);
-        OperationUtils.clickToEditDescriptionTextArea(PARAMETERS_SECTION);
-        PARAMETERS_SECTION.$("ace-editor textarea").sendKeys(description);
-        CommonUtils.getButtonWithTitle("Save changes.", PARAMETERS_SECTION)
-                .click();
+        CommonUtils.setValueInTextArea(description, PARAMETERS_SECTION);
     }
 
-    @And("^set type \"([^\"]*)\" formatted as \"([^\"]*)\" for parameter \"([^\"]*)\"$")
-    public void setTypeFormattedAsForParameter(String type, String as, String parameter) {
+    @And("^set path parameter type \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
+    public void setPathParameterTypeForPathParameter(String type, String parameter) {
         PathUtils.openPathTypes(parameter);
-        PathUtils.setPathType(parameter, type);
-        PathUtils.setFormattedAs(parameter, as);
+        SelenideElement parameterElement = PARAMETERS_SECTION.$$("path-param-row")
+                .filter(text(parameter)).first();
+
+        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE.getButtonId(), type, parameterElement);
+    }
+
+    @And("^set path parameter type of \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
+    public void setPathParameterTypeOfForPathParameter(String of, String parameter) {
+        PathUtils.openPathTypes(parameter);
+        SelenideElement parameterElement = PARAMETERS_SECTION.$$("path-param-row")
+                .filter(text(parameter)).first();
+
+        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE_OF.getButtonId(), of, parameterElement);
+    }
+
+    @And("^set path parameter type as \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
+    public void setPathParameterTypeAsForPathParameter(String as, String parameter) {
+        PathUtils.openPathTypes(parameter);
+        SelenideElement parameterElement = PARAMETERS_SECTION.$$("path-param-row")
+                .filter(text(parameter)).first();
+
+        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE_AS.getButtonId(), as, parameterElement);
     }
 
     public enum Operations{

@@ -9,6 +9,7 @@ import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Condition;
+import org.openqa.selenium.By;
 
 import java.io.File;
 import java.util.List;
@@ -41,12 +42,13 @@ public class MainPageSteps {
 
     @And("^change API name to \"([^\"]*)\"$")
     public void changeAPINameTo(String newName){
-        SelenideElement se = CommonUtils.getAppRoot().$$("a").filter(attribute("class", "editor-title-bar-edit")).first();
+        SelenideElement se = CommonUtils.getAppRoot().$(By.className("editor-title-bar-edit"));
         se.hover();
         se.click();
+
         CommonUtils.getLabelWithName("title-input", CommonUtils.getAppRoot())
                 .setValue(newName);
-        CommonUtils.getButtonWithText("Save", CommonUtils.getAppRoot().$$("form").filter(attribute("name", "title-edit-form")).first())
+        CommonUtils.getButtonWithTitle("Save changes.", CommonUtils.getAppRoot().$("title-bar"))
                 .click();
     }
 
@@ -68,24 +70,22 @@ public class MainPageSteps {
 
     @And("^set API version to \"([^\"]*)\"$")
     public void setAPIVersionTo(String version) {
-        MainPageUtils.setVersion(version);
+        CommonUtils.setValueInLabel(version, CommonUtils.getAppRoot().$("info-section").$(By.className("version")), false);
     }
 
     @And("^change description to \"([^\"]*)\"$")
     public void changeDescriptionTo(String description) {
-        MainPageUtils.changeDescription(description);
+        CommonUtils.setValueInTextArea(description, CommonUtils.getAppRoot().$("info-section").$(By.className("description")));
     }
 
     @And("^add contact info$")
     public void addContactInfo(DataTable table) {
         CommonUtils.getClickableLink(CommonUtils.Sections.CONTACT, MainPageUtils.CONTACT_SECTION).click();
         for (List<String> dataRow : table.raw()) {
-            MainPageUtils.setContactInformation(dataRow.get(0), "name");
-            MainPageUtils.setContactInformation(dataRow.get(1), "email");
-            MainPageUtils.setContactInformation(dataRow.get(2), "url");
+            CommonUtils.setValueInLabel(dataRow.get(0), CommonUtils.getAppRoot().$("contact-section").$(By.className("name")), false);
+            CommonUtils.setValueInLabel(dataRow.get(1), CommonUtils.getAppRoot().$("contact-section").$(By.className("email")), false);
+            CommonUtils.setValueInLabel(dataRow.get(2), CommonUtils.getAppRoot().$("contact-section").$(By.className("url")), false);
         }
-        CommonUtils.getButtonWithText("OK", MainPageUtils.CONTACT_SECTION).click();
-
     }
 
     @And("^add license \"([^\"]*)\"$")
@@ -105,14 +105,16 @@ public class MainPageSteps {
         MainPageUtils.getPathWithName(path).click();
     }
 
-    @And("^set consumes to \"([^\"]*)\"$")
+    @And("^set consumes to \"([^\"]*)\"$")      //TODO this is add consume but application/json is still there --> delete it
     public void setConsumesTo(String consumes) {
-        MainPageUtils.setConsumesProduces(true, consumes);
+        log.info("Setting consumes to {}", consumes);
+        CommonUtils.setValueInLabel(consumes, MainPageUtils.getMainPageRoot().$(By.className("consumes")),true);
     }
 
-    @And("^set produces to \"([^\"]*)\"$")
+    @And("^set produces to \"([^\"]*)\"$")      //TODO this is add consume but application/json is still there --> delete it
     public void setProducesTo(String produces) {
-        MainPageUtils.setConsumesProduces(false, produces);
+        log.info("Setting produces to {}", produces);
+        CommonUtils.setValueInLabel(produces, MainPageUtils.getMainPageRoot().$(By.className("produces")),true);
     }
 
     @And("^create a new data type with link with$")

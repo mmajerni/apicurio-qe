@@ -13,7 +13,6 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.Rule;
 import org.openqa.selenium.By;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.codeborne.selenide.Condition.*;
@@ -41,14 +40,14 @@ public class VerificationSteps {
     @And("^check that API version is \"([^\"]*)\"$")
     public void checkThatAPIVersionIs(String expectedVersion) {
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
-        String version = MainPageUtils.getMainPageRoot().$("info-section").$$("span").filter(attribute("title", "Click to edit.")).first().getText();
+        String version = MainPageUtils.getMainPageRoot().$("info-section").$(By.className("version")).getText();
         collector.assertThat(version).as("Checking API version:").isEqualTo(expectedVersion);
     }
 
     @And("^check that API description is \"([^\"]*)\"$")
     public void checkThatAPIDescriptionIs(String expectedDescription) {
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
-        String description = MainPageUtils.getMainPageRoot().$("info-section").$$("div").filter(attribute("class", "section-field description")).first().getText();
+        String description = MainPageUtils.getMainPageRoot().$("info-section").$(By.className("description")).getText();
         collector.assertThat(description).as("Checking API descritpion:").isEqualTo(expectedDescription);
 
     }
@@ -56,14 +55,14 @@ public class VerificationSteps {
     @And("^check that API consume \"([^\"]*)\"$")
     public void checkThatAPIConsume(String expectedConsume){
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
-        String consume = MainPageUtils.getMainPageRoot().$$("div").filter(attribute("class", "section-field consumes")).first().getText();
+        String consume = MainPageUtils.getMainPageRoot().$(By.className("consumes")).getText();
         collector.assertThat(consume).as("Checking API consume:").isEqualTo(expectedConsume);
     }
 
     @And("^check that API produce \"([^\"]*)\"$")
     public void checkThatAPIProduce(String expectedProduce){
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
-        String produce = MainPageUtils.getMainPageRoot().$$("div").filter(attribute("class", "section-field produces")).first().getText();
+        String produce = MainPageUtils.getMainPageRoot().$(By.className("produces")).getText();
         collector.assertThat(produce).as("Checking API consume:").isEqualTo(expectedProduce);
     }
 
@@ -71,9 +70,9 @@ public class VerificationSteps {
     public void checkThatAPIContactInfoIs(DataTable table) {
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         for (List<String> dataRow : table.raw()) {
-            String name = MainPageUtils.getMainPageRoot().$("contact-section").$$("div").filter(attribute("class","section-field name" )).first().getText();
-            String email = MainPageUtils.getMainPageRoot().$("contact-section").$$("div").filter(attribute("class","section-field email" )).first().getText();
-            String url = MainPageUtils.getMainPageRoot().$("contact-section").$$("div").filter(attribute("class","section-field url" )).first().getText();
+            String name = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("name")).getText();
+            String email = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("email")).getText();
+            String url = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("url")).getText();
 
             collector.assertThat(name).as("Checking API contatct name:").isEqualTo(dataRow.get(0));
             collector.assertThat(email).as("Checking API contatct email:").isEqualTo(dataRow.get(1));
@@ -84,9 +83,9 @@ public class VerificationSteps {
     @And("^check that API license is \"([^\"]*)\"$")
     public void checkThatAPILicenseIs(String expectedLincense) {
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
-        ElementsCollection licenses = MainPageUtils.getMainPageRoot().$("#license-section-body").$$("button").filter(text("Change License"));
+        ElementsCollection licenses = MainPageUtils.getMainPageRoot().$("license-section").$$("button").filter(text("Change License"));
         if (licenses.size() == 1){
-            String license = MainPageUtils.getMainPageRoot().$("#license-section-body").$("h2").getText();
+            String license = MainPageUtils.getMainPageRoot().$("license-section").$("h2").getText();
             collector.assertThat(license).as("Checking API linces:").isEqualTo(expectedLincense);
         }else{
             collector.fail("License is not set!");
@@ -96,15 +95,15 @@ public class VerificationSteps {
     @And("^check that API have tag \"([^\"]*)\" with description \"([^\"]*)\"$")
     public void checkThatAPIHaveTagWithDescription(String expectedTag, String expectedDescription) {
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
-        ElementsCollection tagRows = MainPageUtils.getMainPageRoot().$("#tags-section-body").$$("tag-row");
+        ElementsCollection tagRows = MainPageUtils.getMainPageRoot().$("tags-section").$$("tag-row");
 
         if (tagRows.size() > 0 ) {
-            ElementsCollection tag = MainPageUtils.getMainPageRoot().$("#tags-section-body").$$("div").filter(attribute("class", "name")).filter((text(expectedTag)));
+            ElementsCollection tag = MainPageUtils.getMainPageRoot().$("tags-section").$$(By.className("name")).filter((text(expectedTag)));
 
             if (tag.size() == 0) {
                 collector.fail("Tag %s is not created!", expectedTag);
             } else {
-                String desc = tag.first().parent().$$("div").filter(attribute("class", "description")).first().getText();
+                String desc = tag.first().parent().$(By.className("description")).getText();
                 collector.assertThat(desc).as("Checking tag description:").isEqualTo(expectedDescription);
             }
         }else{
@@ -114,25 +113,21 @@ public class VerificationSteps {
 
     @And("^check that path \"([^\"]*)\" is created$")
     public void checkThatPathIsCreated(String expectedPathName) {
-        expectedPathName = expectedPathName.replace("/", "");
-
-        ElementsCollection selectedApi = MainPageUtils.getMainPageRoot().$$("a").filter(attribute("data-target")).first().$$("span").filter(attribute("class", "item-counter"));
-
-        if (selectedApi.size() == 1) {
-            ElementsCollection paths = MainPageUtils.getMainPageRoot().$("#path-section-body").findAll(By.xpath("//div[contains(@class, 'api-path ' )]"));//TODO xpath
-            List<String> list = new ArrayList<>();
-            for (SelenideElement path : paths){
-                list.add(path.getText());
-            }
-            collector.assertThat(list.contains(expectedPathName)).as("Checking if path is created:").isTrue();
-        }else{
-            collector.fail("Paths are not created!");
+        try {
+            Thread.sleep(1000L * 1);        //need to wait at least for a second because of Stale Element Reference Exception
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+        ElementsCollection paths  = MainPageUtils.getMainPageRoot().$$("section").filter(attribute("label", "Paths")).first()
+                .$$(By.className("api-path")).filter(exactText(expectedPathName));
+
+        collector.assertThat(paths.size()).as("Path %s is not created:", expectedPathName).isEqualTo(1);
     }
 
     @And("^check that data type \"([^\"]*)\" is created$")
     public void checkThatDataTypeIsCreated(String datatype) {
-        ElementsCollection types = MainPageUtils.getMainPageRoot().$("#definition-section-body").findAll(By.xpath("//div[contains(@class, 'api-definition ' )]")).filter(exactText(datatype));//TODO xpath
+        ElementsCollection types = MainPageUtils.getMainPageRoot().$$("section").filter(attribute("label", "Data Types")).first()
+                .$$(By.className("api-definition")).filter(exactText(datatype));
         collector.assertThat(types.size()).as("Data type %s is not created!", datatype).isEqualTo(1);
     }
 
@@ -149,8 +144,9 @@ public class VerificationSteps {
         }else{
             pathElement.click();
         }
-        ElementsCollection operations = PathUtils.getPathPageRoot().$$("div").filter(attribute("class","api-operation")).filter(text(operation));
-        collector.assertThat(operations.size()).as("Operation %s is not created", operation).isEqualTo(1);
+
+        ElementsCollection ec = PathUtils.getPathPageRoot().$$(By.cssSelector("div." + operation.toLowerCase() +"-tab.enabled"));
+        collector.assertThat(ec.size() == 1 ).as("Operation %s is not created", operation).isTrue();
     }
 
     @And("^check that path parameter \"([^\"]*)\" is created for path \"([^\"]*)\"$")
@@ -163,22 +159,22 @@ public class VerificationSteps {
             pathElement.click();
         }
 
-        SelenideElement parameterElement = PathUtils.getPathPageRoot().$("#path-parameters-section-body").$$("path-param-row").filter(matchText(parameter)).first();
+        SelenideElement parameterElement = PathUtils.getPathPageRoot().$("path-params-section").$$("path-param-row").filter(matchText(parameter)).first();
         collector.assertThat(parameterElement.$("div").getAttribute("class")).as("Path parameter %s is not created", parameter).doesNotContain("missing");
     }
 
     @And("^check that path parameter \"([^\"]*)\" has description \"([^\"]*)\"$")
     public void checkThatPathParameterHasDescription(String parameter, String description) {
-        SelenideElement descriptionElement = PathUtils.getPathPageRoot().$("#path-parameters-section-body").$$("path-param-row")        //TODO selected description will not work
-                .filter(matchText(parameter)).first().$$("div").filter(attribute("class", "description")).first();
+        SelenideElement descriptionElement = PathUtils.getPathPageRoot().$("path-params-section").$$("path-param-row")
+                .filter(matchText(parameter)).first().$(By.className("description"));
 
         collector.assertThat(descriptionElement.getText()).as("Description for path parameter %s is different", parameter).isEqualTo(description);
     }
 
     @And("^check that path parameter \"([^\"]*)\" has type \"([^\"]*)\" formatted as \"([^\"]*)\"$")
     public void checkThatPathParameterHasTypeFormattedAs(String parameter, String type, String as) {
-        SelenideElement summaryElement = PathUtils.getPathPageRoot().$("#path-parameters-section-body").$$("path-param-row")        //TODO selected summary will not work
-                .filter(matchText(parameter)).first().$$("div").filter(attribute("class", "summary")).first();
+        SelenideElement summaryElement = PathUtils.getPathPageRoot().$("path-params-section").$$("path-param-row")
+                .filter(matchText(parameter)).first().$(By.className("summary"));
 
         collector.assertThat(summaryElement.getText()).as("Parameter has not type %s formatted as %s", type, as).isEqualTo(type.toLowerCase() + " as " + as.toLowerCase());
                                                                                                                                         //TODO need support for array
@@ -192,19 +188,19 @@ public class VerificationSteps {
 
     @And("^check that operation summary is \"([^\"]*)\"$")
     public void checkThatOperationSummaryIs(String expectedSummary) {
-        String summary = OperationUtils.getOperationRoot().$$("div").filter(attribute("class", "section-field summary")).first().getText();
+        String summary = OperationUtils.getOperationRoot().$(By.className("summary")).getText();
         collector.assertThat(summary).as("Checking operation summary:").isEqualTo(expectedSummary);
     }
 
     @And("^check that operation ID is \"([^\"]*)\"$")
     public void checkThatOperationIDIs(String expectedID) {
-        String id = OperationUtils.getOperationRoot().$$("div").filter(attribute("class", "section-field operationId")).first().getText();
+        String id = OperationUtils.getOperationRoot().$(By.className("operationId")).getText();
         collector.assertThat(id).as("Checking operation ID:").isEqualTo(expectedID);
     }
 
     @And("^check that operation description is \"([^\"]*)\"$")
     public void checkThatOperationDescriptionIs(String expectedDescription) {
-        String description = OperationUtils.getOperationRoot().$$("div").filter(attribute("class", "section-field description")).first().getText();
+        String description = OperationUtils.getOperationRoot().$(By.className("description")).getText();
         collector.assertThat(description).as("Checking operation description:").isEqualTo(expectedDescription);
     }
 
@@ -216,42 +212,58 @@ public class VerificationSteps {
     @And("^check that operation tags are \"([^\"]*)\"$")
     public void checkThatOperationTagsAre(String expectedTags){
         String[] list = expectedTags.split(",");
-        ElementsCollection ec = OperationUtils.getOperationRoot().$$("span").filter(attribute("class", "label label-default"));
+        ElementsCollection ec = OperationUtils.getOperationRoot().$(By.className("tags")).$$(By.className("label-default"));
         for ( int i = 0; i < ec.size(); ++i ){
             collector.assertThat(ec.get(i).getText()).as("Checking %d. tag:",i+1).isEqualTo(list[i]);
         }
     }
 
-    @And("^check that exist response (\\d+) with description \"([^\"]*)\" and type \"([^\"]*)\" as \"([^\"]*)\"$")
-    public void checkThatExistResponseWithDescriptionAndTypeAs(Integer expectedResponse, String expectedDescription, String expectedType, String expectedAs) {
-        ElementsCollection rows = OperationUtils.getOperationRoot().$$("response-row").filter(text(expectedResponse.toString()));
-        if (rows.size() == 1 ){
-            String description =  rows.first().find(By.xpath("div/div/div[contains(@class, 'description')]")).getText();
-            collector.assertThat(description).as("Checking description:").isEqualTo(expectedDescription);
-
-            String types = rows.first().find(By.xpath("div/div/div[contains(@class, 'summary' )]")).getText();
-            collector.assertThat(types).as("Checking types:").isEqualTo(expectedType.toLowerCase() + " as " + expectedAs.toLowerCase());
-                                                                                                            //TODO need support for array
-                                                                                                            //TODO e.g. int32 will not work (different strings in summary)
-                                                                                                            //TODO if both type and as are the same ->fail
-        }else{
-            collector.fail("Response %s is not created!",expectedResponse);
-        }
-    }
-
     @And("^check that path parameter \"([^\"]*)\" is overridden$")
     public void checkThatPathParameterIsOverridden(String parameter) {
-        SelenideElement parameterElement = OperationUtils.getOperationRoot().$("#path-parameters-section-body").$$("path-param-row").filter(matchText(parameter)).first();
+        SelenideElement parameterElement = OperationUtils.getOperationRoot().$("path-params-section").$$("path-param-row").filter(matchText(parameter)).first();
         collector.assertThat(parameterElement.$("div").getAttribute("class")).as("Path parameter %s is not overridden", parameter).doesNotContain("overridable");
     }
 
     @And("^check that overridden path parameter \"([^\"]*)\" has description \"([^\"]*)\"$")
     public void checkThatOverriddenPathParameterHasDescription(String parameter, String description) {
-        SelenideElement descriptionElement = OperationUtils.getOperationRoot().$("#path-parameters-section-body").$$("path-param-row")        //TODO selected description will not work
-                .filter(matchText(parameter)).first().$$("div").filter(attribute("class", "description")).first();
+        SelenideElement descriptionElement = OperationUtils.getOperationRoot().$("path-params-section").$$("path-param-row")
+                .filter(matchText(parameter)).first().$(By.className("description"));
 
         collector.assertThat(descriptionElement.getText()).as("Description for path parameter %s is different", parameter).isEqualTo(description);
     }
+
+
+    @And("^check that exist response (\\d+)$")
+    public void checkThatExistResponse(Integer response) {
+        ElementsCollection rows = OperationUtils.getOperationRoot().$$(By.className("statusCode")).filter(text(response.toString()));
+        collector.assertThat(rows.size()).as("Response %d is not exist", response).isEqualTo(1);
+    }
+
+    @And("^check that description is \"([^\"]*)\" for response (\\d+)$")
+    public void checkThatDescriptionIsForResponse(String expectedDescription, Integer response) {
+        OperationUtils.selectResponse(response);
+        String description = OperationUtils.getOperationRoot().$("responses-section").$(By.className("response-description")).$(By.className("grow")).getText();
+        collector.assertThat(description).as("Checking description:").isEqualTo(expectedDescription);
+    }
+
+    @And("^check that type is \"([^\"]*)\" for response (\\d+)$")
+    public void checkThatTypeIsForResponse(String expectedType, Integer response) {
+        OperationUtils.selectResponse(response);
+        String type = OperationUtils.getOperationRoot().$("responses-section").$("#api-property-type").getText();
+        collector.assertThat(type).as("Type is %s but should be %s", type, expectedType).isEqualTo(expectedType);
+    }
+
+    @And("^check that type of is \"([^\"]*)\" for response (\\d+)$")
+    public void checkThatTypeOfIsForResponse(String expectedOf, Integer response) {
+        OperationUtils.selectResponse(response);
+        String of = OperationUtils.getOperationRoot().$("responses-section").$("#api-property-type-of").getText();
+        collector.assertThat(of).as("Type of is %s but should be %s", of, expectedOf).isEqualTo(expectedOf);
+    }
+
+    @And("^check that type as is \"([^\"]*)\" for response (\\d+)$")
+    public void checkThatTypeAsIsForResponse(String expectedAs, Integer response) {
+        OperationUtils.selectResponse(response);
+        String as = OperationUtils.getOperationRoot().$("responses-section").$("#api-property-type-as").getText();
+        collector.assertThat(as).as("Type as is %s but should be %s", as, expectedAs).isEqualTo(expectedAs);
+    }
 }
-
-

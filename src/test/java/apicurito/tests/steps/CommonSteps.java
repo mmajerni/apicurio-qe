@@ -23,16 +23,10 @@ public class CommonSteps {
         Selenide.open(TestConfiguration.apicuritoUrl());
     }
 
-    @When("^click on the \"([^\"]*)\" button$")
-    public void clickOnButton(String buttonTitle) {
-        CommonUtils.getButtonWithText(buttonTitle, CommonUtils.getAppRoot()).shouldBe(visible, enabled).shouldNotHave(attribute("disabled"))
+    @When("^create a new API$")
+    public void createANewApi() {
+        CommonUtils.getButtonWithText("New API", CommonUtils.getAppRoot()).shouldBe(visible, enabled).shouldNotHave(attribute("disabled"))
                 .click();
-    }
-
-    @And("^set to \"([^\"]*)\" value \"([^\"]*)\"$")
-    public void setValueInLabel(String label, String value){
-        CommonUtils.getLabelWithName(label, CommonUtils.getAppRoot().shouldBe(visible,enabled).shouldNotHave(attribute("disabled")))
-                .setValue(value);
     }
 
     @And("^sleep for (\\d+) seconds$")
