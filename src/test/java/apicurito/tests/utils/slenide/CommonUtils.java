@@ -3,6 +3,7 @@ package apicurito.tests.utils.slenide;
 import com.codeborne.selenide.SelenideElement;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 
 import static com.codeborne.selenide.CollectionCondition.sizeGreaterThanOrEqual;
 import static com.codeborne.selenide.Condition.*;
@@ -51,6 +52,36 @@ public class CommonUtils {
         return differentRoot.$$("div").filter(attribute("class", section.getSectionElementName())).first().$("button");
     }
 
+    public static void setValueInTextArea(String value, SelenideElement section){
+        log.info("Setting value {} in text area in section{}", value, section.getValue());
+
+        section.$$("div").filter(attribute("title", "Click to edit.")).first().click();
+
+        section.$("ace-editor textarea").sendKeys(Keys.CONTROL + "a");
+        section.$("ace-editor textarea").sendKeys(Keys.DELETE);
+        section.$("ace-editor textarea").sendKeys(value);
+
+        getButtonWithTitle("Save changes.", section).click();
+    }
+
+    public static void setValueInLabel(String value, SelenideElement section, boolean isPencilLabel){
+        log.info("Setting value {} in label in section{}", value, section.getValue());
+
+        if(isPencilLabel) {
+            section.$$("i").filter(attribute("title", "Click to edit.")).first().click();
+        }else{
+            section.$$("span").filter(attribute("title", "Click to edit.")).first().click();
+        }
+        getLabelWithType("text", section).setValue(value);
+        getButtonWithTitle("Save changes.", section).click();
+    }
+
+    public static void setDropDownValue(String buttonId, String value, SelenideElement section) {
+        log.info("Setting value {} in dropdown {} in section{}", value, buttonId, section.getValue());
+        section.$(buttonId).click();
+        section.$$("li").filter(text(value)).first().click();
+    }
+
     public enum Sections {
         PATH ("section path-section panel-group", "Add a path"),
         DATA_TYPES ("section definition-section panel-group", "Add a data type"),
@@ -75,6 +106,23 @@ public class CommonUtils {
 
         public String getA(){
             return this.a;
+        }
+    }
+
+    public enum DropdownButtons{
+        TYPE ("#api-property-type"),
+        TYPE_OF ("#api-property-type-of"),
+        TYPE_AS ("#api-property-type-as"),
+        REQUIRED ("#api-property-required");
+
+        private String buttonId;
+
+        DropdownButtons(String buttonId) {
+            this.buttonId = buttonId;
+        }
+
+        public String getButtonId() {
+            return this.buttonId;
         }
     }
 }
