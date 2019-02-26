@@ -1,8 +1,10 @@
 package apicurito.tests.steps;
-import apicurito.tests.utils.slenide.CommonUtils;
-import apicurito.tests.utils.slenide.DataTypeUtils;
+
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
+
+import apicurito.tests.utils.slenide.CommonUtils;
+import apicurito.tests.utils.slenide.DataTypeUtils;
 import cucumber.api.java.en.And;
 
 public class DataTypeSteps {
@@ -13,13 +15,13 @@ public class DataTypeSteps {
     private static SelenideElement EXAMPLE_SECTION = DataTypeUtils.getDataTypesRoot().$("definition-example-section");
 
     @And("^create data type property with name \"([^\"]*)\"$")
-    public void createDataTypeProperty(String property){
+    public void createDataTypeProperty(String property) {
         CommonUtils.getClickableLink(CommonUtils.Sections.PROPERTIES, PROPERTIES_SECTION).click();
         CommonUtils.getLabelWithName("name", DataTypeUtils.getDataTypesRoot()).setValue(property);
         CommonUtils.getButtonWithText("Save", CommonUtils.getAppRoot().$("property-editor")).click();
     }
 
-    @And("^set description \"([^\"]*)\" for property \"([^\"]*)\"$")
+    @And("^set description \"([^\"]*)\" for data type property \"([^\"]*)\"$")
     public void setDescriptionForProperty(String description, String property) {
         DataTypeUtils.openPropertyDescription(property);
         CommonUtils.setValueInTextArea(description, PROPERTIES_SECTION);
@@ -39,7 +41,6 @@ public class DataTypeSteps {
     public void setPropertyAsRequired(String property, boolean isRequired) {
         DataTypeUtils.openPropertyTypes(property);
         CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.REQUIRED.getButtonId(), isRequired ? "Required" : "Not Required", PROPERTIES_SECTION);
-
     }
 
     @And("^set property type \"([^\"]*)\" for property \"([^\"]*)\"$")

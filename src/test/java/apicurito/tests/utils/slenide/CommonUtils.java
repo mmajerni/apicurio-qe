@@ -1,13 +1,17 @@
 package apicurito.tests.utils.slenide;
 
-import com.codeborne.selenide.SelenideElement;
-import lombok.extern.slf4j.Slf4j;
+import static com.codeborne.selenide.CollectionCondition.sizeGreaterThanOrEqual;
+import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 
-import static com.codeborne.selenide.CollectionCondition.sizeGreaterThanOrEqual;
-import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selenide.$;
+import com.codeborne.selenide.SelenideElement;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CommonUtils {
@@ -37,22 +41,22 @@ public class CommonUtils {
 
     public static SelenideElement getLabelWithType(String labelType, SelenideElement differentRoot) {
         log.info("searching for label {}", labelType);
-        return differentRoot.shouldBe(visible).$$("input").filter(attribute("type" , labelType)).first();
+        return differentRoot.shouldBe(visible).$$("input").filter(attribute("type", labelType)).first();
     }
 
-    public static SelenideElement getClickableLink(Sections section, SelenideElement differentRoot){
+    public static SelenideElement getClickableLink(Sections section, SelenideElement differentRoot) {
         log.info("searching for link in section {}", section);
 
         return differentRoot.$$("a").find(text(section.getA()));
     }
 
-    public static SelenideElement getNewPlusSignButton(Sections section, SelenideElement differentRoot){
+    public static SelenideElement getNewPlusSignButton(Sections section, SelenideElement differentRoot) {
         log.info("searching for a new plus sign button for section {}", section);
 
         return differentRoot.$$("div").filter(attribute("class", section.getSectionElementName())).first().$("button");
     }
 
-    public static void setValueInTextArea(String value, SelenideElement section){
+    public static void setValueInTextArea(String value, SelenideElement section) {
         log.info("Setting value {} in text area in section{}", value, section.getValue());
 
         section.$$("div").filter(attribute("title", "Click to edit.")).first().click();
@@ -64,12 +68,12 @@ public class CommonUtils {
         getButtonWithTitle("Save changes.", section).click();
     }
 
-    public static void setValueInLabel(String value, SelenideElement section, boolean isPencilLabel){
+    public static void setValueInLabel(String value, SelenideElement section, boolean isPencilLabel) {
         log.info("Setting value {} in label in section{}", value, section.getValue());
 
-        if(isPencilLabel) {
+        if (isPencilLabel) {
             section.$$("i").filter(attribute("title", "Click to edit.")).first().click();
-        }else{
+        } else {
             section.$$("span").filter(attribute("title", "Click to edit.")).first().click();
         }
         getLabelWithType("text", section).setValue(value);
@@ -83,14 +87,15 @@ public class CommonUtils {
     }
 
     public enum Sections {
-        PATH ("section path-section panel-group", "Add a path"),
-        DATA_TYPES ("section definition-section panel-group", "Add a data type"),
-        RESPONSE ("section responses-section panel-group", "Add a response"),
-        CONTACT ("section contact-section panel-group", "Add contact info"),
-        LICENSE ("section license-section panel-group", "Set license"),
-        TAG ("section tags-section panel-group", "Add a tag"),
-        SCHEME ("section security-section panel-group", "Add a security scheme"),
-        PROPERTIES ("section security-requirements-section panel-group", "Add a property");
+        PATH("section path-section panel-group", "Add a path"),
+        DATA_TYPES("section definition-section panel-group", "Add a data type"),
+        RESPONSE("section responses-section panel-group", "Add a response"),
+        CONTACT("section contact-section panel-group", "Add contact info"),
+        LICENSE("section license-section panel-group", "Set license"),
+        TAG("section tags-section panel-group", "Add a tag"),
+        SCHEME("section security-section panel-group", "Add a security scheme"),
+        REQUIREMENT("section security-requirements-section panel-group", "Add security requirement"),
+        PROPERTIES("section security-requirements-section panel-group", "Add a property");
 
         private String sectionElementName;
         private String a;
@@ -104,16 +109,16 @@ public class CommonUtils {
             return this.sectionElementName;
         }
 
-        public String getA(){
+        public String getA() {
             return this.a;
         }
     }
 
-    public enum DropdownButtons{
-        TYPE ("#api-property-type"),
-        TYPE_OF ("#api-property-type-of"),
-        TYPE_AS ("#api-property-type-as"),
-        REQUIRED ("#api-property-required");
+    public enum DropdownButtons {
+        TYPE("#api-property-type"),
+        TYPE_OF("#api-property-type-of"),
+        TYPE_AS("#api-property-type-as"),
+        REQUIRED("#api-property-required");
 
         private String buttonId;
 
