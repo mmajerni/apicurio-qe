@@ -1,15 +1,17 @@
 package apicurito.tests;
 
-import apicurito.tests.configuration.TestConfiguration;
-import apicurito.tests.configuration.templates.ApicuritoTemplate;
-import apicurito.tests.utils.openshift.OpenShiftUtils;
-import com.codeborne.selenide.Configuration;
-import cucumber.api.CucumberOptions;
-import cucumber.api.junit.Cucumber;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
+
+import com.codeborne.selenide.Configuration;
+
+import apicurito.tests.configuration.TestConfiguration;
+import apicurito.tests.configuration.templates.ApicuritoTemplate;
+import apicurito.tests.utils.openshift.OpenShiftUtils;
+import cucumber.api.CucumberOptions;
+import cucumber.api.junit.Cucumber;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
@@ -46,7 +48,9 @@ public class TestRunner {
         //We will now use custom web driver
         //Configuration.browser = TestConfiguration.apicuritoBrowser();
         Configuration.browser = "apicurito.tests.configuration.CustomWebDriverProvider";
-        Configuration.browserSize = "1920x1080";
+        //TODO temporary workaround for jenkins job
+        //Configuration.browserSize = "1920x1080";
+
     }
 
     @AfterClass
