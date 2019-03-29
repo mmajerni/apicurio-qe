@@ -1,5 +1,18 @@
 package apicurito.tests.utils;
 
+import static org.assertj.core.api.Assertions.fail;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.util.concurrent.TimeUnit;
+
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import okhttp3.MediaType;
@@ -7,18 +20,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.util.concurrent.TimeUnit;
-
-import static org.assertj.core.api.Assertions.fail;
 
 @Slf4j
 public final class HttpUtils {
@@ -115,7 +116,7 @@ public final class HttpUtils {
 
     private static OkHttpClient getClient() {
         // Create a trust manager that does not validate certificate chains
-        final TrustManager[] trustAllCerts = new TrustManager[]{
+        final TrustManager[] trustAllCerts = new TrustManager[] {
                 new X509TrustManager() {
                     @Override
                     public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
@@ -127,7 +128,7 @@ public final class HttpUtils {
 
                     @Override
                     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return new java.security.cert.X509Certificate[]{};
+                        return new java.security.cert.X509Certificate[] {};
                     }
                 }
         };

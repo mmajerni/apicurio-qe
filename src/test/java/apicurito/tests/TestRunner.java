@@ -13,7 +13,6 @@ import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 @RunWith(Cucumber.class)
 @CucumberOptions(
@@ -21,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
         tags = {"not @manual", "not @wip", "not @ignore"},
         plugin = {"pretty", "html:target/cucumber/cucumber-html", "junit:target/cucumber/cucumber-junit.xml", "json:target/cucumber/cucumber-report.json"})
 public class TestRunner {
+
     @BeforeClass
     public static void beforeTests() {
 
@@ -50,7 +50,6 @@ public class TestRunner {
         Configuration.browser = "apicurito.tests.configuration.CustomWebDriverProvider";
         //TODO temporary workaround for jenkins job
         //Configuration.browserSize = "1920x1080";
-
     }
 
     @AfterClass

@@ -1,28 +1,32 @@
 package apicurito.tests.steps;
 
-import apicurito.tests.utils.slenide.*;
-import com.codeborne.selenide.SelenideElement;
-import cucumber.api.java.en.And;
+import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.enabled;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
 
-import static com.codeborne.selenide.Condition.*;
+import com.codeborne.selenide.SelenideElement;
+
+import apicurito.tests.utils.slenide.CommonUtils;
+import apicurito.tests.utils.slenide.PathUtils;
+import cucumber.api.java.en.And;
 
 public class PathSteps {
 
     private static SelenideElement PARAMETERS_SECTION = PathUtils.getPathPageRoot().$("path-params-section");
 
     /**
-     *
      * @param operation must be convertable to operation enum. See Operations enum
      */
     @And("^create new \"([^\"]*)\" operation$")
-    public void createNewOperation(String operation){
+    public void createNewOperation(String operation) {
         PathUtils.getCreateOperationButton(Operations.valueOf(operation))
                 .click();
     }
 
     @And("^select operation \"([^\"]*)\"$")
-    public void selectOperation(String operation){
-        PathUtils.getOperationButton(Operations.valueOf(operation), CommonUtils.getAppRoot().shouldBe(visible,enabled).shouldNotHave(attribute("disabled")))
+    public void selectOperation(String operation) {
+        PathUtils.getOperationButton(Operations.valueOf(operation), CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")))
                 .click();
     }
 
@@ -64,7 +68,7 @@ public class PathSteps {
         CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE_AS.getButtonId(), as, parameterElement);
     }
 
-    public enum Operations{
+    public enum Operations {
         GET,
         PUT,
         POST,

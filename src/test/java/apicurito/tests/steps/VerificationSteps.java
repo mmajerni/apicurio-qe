@@ -1,21 +1,27 @@
 package apicurito.tests.steps;
 
+import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.exactText;
+import static com.codeborne.selenide.Condition.matchText;
+import static com.codeborne.selenide.Condition.text;
+
+import org.junit.Rule;
+
+import org.assertj.core.api.SoftAssertions;
+import org.openqa.selenium.By;
+
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+
+import java.util.List;
+
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
 import apicurito.tests.utils.slenide.OperationUtils;
 import apicurito.tests.utils.slenide.PathUtils;
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
 import cucumber.api.DataTable;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
-import org.assertj.core.api.SoftAssertions;
-import org.junit.Rule;
-import org.openqa.selenium.By;
-
-import java.util.List;
-
-import static com.codeborne.selenide.Condition.*;
 
 public class VerificationSteps {
 
@@ -32,7 +38,7 @@ public class VerificationSteps {
      **********************************************************************/
 
     @And("^check that API name is \"([^\"]*)\"$")
-    public void checkThatAPINameIs(String expectedName)  {
+    public void checkThatAPINameIs(String expectedName) {
         String apiName = CommonUtils.getAppRoot().$("title-bar").$("h1").getText();
         collector.assertThat(apiName).as("Checking API name:").isEqualTo(expectedName);
     }
@@ -49,18 +55,17 @@ public class VerificationSteps {
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         String description = MainPageUtils.getMainPageRoot().$("info-section").$(By.className("description")).getText();
         collector.assertThat(description).as("Checking API descritpion:").isEqualTo(expectedDescription);
-
     }
 
     @And("^check that API consume \"([^\"]*)\"$")
-    public void checkThatAPIConsume(String expectedConsume){
+    public void checkThatAPIConsume(String expectedConsume) {
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         String consume = MainPageUtils.getMainPageRoot().$(By.className("consumes")).getText();
         collector.assertThat(consume).as("Checking API consume:").isEqualTo(expectedConsume);
     }
 
     @And("^check that API produce \"([^\"]*)\"$")
-    public void checkThatAPIProduce(String expectedProduce){
+    public void checkThatAPIProduce(String expectedProduce) {
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         String produce = MainPageUtils.getMainPageRoot().$(By.className("produces")).getText();
         collector.assertThat(produce).as("Checking API consume:").isEqualTo(expectedProduce);
@@ -84,10 +89,10 @@ public class VerificationSteps {
     public void checkThatAPILicenseIs(String expectedLincense) {
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         ElementsCollection licenses = MainPageUtils.getMainPageRoot().$("license-section").$$("button").filter(text("Change License"));
-        if (licenses.size() == 1){
+        if (licenses.size() == 1) {
             String license = MainPageUtils.getMainPageRoot().$("license-section").$("h2").getText();
             collector.assertThat(license).as("Checking API linces:").isEqualTo(expectedLincense);
-        }else{
+        } else {
             collector.fail("License is not set!");
         }
     }
@@ -97,7 +102,7 @@ public class VerificationSteps {
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         ElementsCollection tagRows = MainPageUtils.getMainPageRoot().$("tags-section").$$("tag-row");
 
-        if (tagRows.size() > 0 ) {
+        if (tagRows.size() > 0) {
             ElementsCollection tag = MainPageUtils.getMainPageRoot().$("tags-section").$$(By.className("name")).filter((text(expectedTag)));
 
             if (tag.size() == 0) {
@@ -106,7 +111,7 @@ public class VerificationSteps {
                 String desc = tag.first().parent().$(By.className("description")).getText();
                 collector.assertThat(desc).as("Checking tag description:").isEqualTo(expectedDescription);
             }
-        }else{
+        } else {
             collector.fail("Tags are not created!");
         }
     }
@@ -114,11 +119,11 @@ public class VerificationSteps {
     @And("^check that path \"([^\"]*)\" is created$")
     public void checkThatPathIsCreated(String expectedPathName) {
         try {
-            Thread.sleep(1000L * 1);        //need to wait at least for a second because of Stale Element Reference Exception
+            Thread.sleep(1000L);        //need to wait at least for a second because of Stale Element Reference Exception
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        ElementsCollection paths  = MainPageUtils.getMainPageRoot().$$("section").filter(attribute("label", "Paths")).first()
+        ElementsCollection paths = MainPageUtils.getMainPageRoot().$$("section").filter(attribute("label", "Paths")).first()
                 .$$(By.className("api-path")).filter(exactText(expectedPathName));
 
         collector.assertThat(paths.size()).as("Path %s is not created:", expectedPathName).isEqualTo(1);
@@ -138,24 +143,24 @@ public class VerificationSteps {
     @And("^check that operation \"([^\"]*)\" is created for path \"([^\"]*)\"$")
     public void checkThatOperationIsCreatedForPath(String operation, String path) {
         SelenideElement pathElement = MainPageUtils.getPathWithName(path);      //TODO private method to check that path is created
-        if(pathElement == null){
+        if (pathElement == null) {
             collector.assertThat(pathElement).as("Operation %s is not created because path %s is not found.", operation, path).isNotNull();
             return;
-        }else{
+        } else {
             pathElement.click();
         }
 
-        ElementsCollection ec = PathUtils.getPathPageRoot().$$(By.cssSelector("div." + operation.toLowerCase() +"-tab.enabled"));
-        collector.assertThat(ec.size() == 1 ).as("Operation %s is not created", operation).isTrue();
+        ElementsCollection ec = PathUtils.getPathPageRoot().$$(By.cssSelector("div." + operation.toLowerCase() + "-tab.enabled"));
+        collector.assertThat(ec.size() == 1).as("Operation %s is not created", operation).isTrue();
     }
 
     @And("^check that path parameter \"([^\"]*)\" is created for path \"([^\"]*)\"$")
     public void checkThatPathParameterIsCreatedForPath(String parameter, String path) {
         SelenideElement pathElement = MainPageUtils.getPathWithName(path);
-        if(pathElement == null){
+        if (pathElement == null) {
             collector.assertThat(pathElement).as("Parameter %s is not created because path %s is not found.", parameter, path).isNotNull();
             return;
-        }else{
+        } else {
             pathElement.click();
         }
 
@@ -177,9 +182,9 @@ public class VerificationSteps {
                 .filter(matchText(parameter)).first().$(By.className("summary"));
 
         collector.assertThat(summaryElement.getText()).as("Parameter has not type %s formatted as %s", type, as).isEqualTo(type.toLowerCase() + " as " + as.toLowerCase());
-                                                                                                                                        //TODO need support for array
-                                                                                                                                        //TODO e.g. int32 will not work (different strings in summary)
-                                                                                                                                        //TODO if both type and as are the same ->fail
+        //TODO need support for array
+        //TODO e.g. int32 will not work (different strings in summary)
+        //TODO if both type and as are the same ->fail
     }
 
     /**************************************************************
@@ -206,15 +211,15 @@ public class VerificationSteps {
 
     /**
      * Tags must be in same order
-     * @param expectedTags separate tags with ","
      *
+     * @param expectedTags separate tags with ","
      */
     @And("^check that operation tags are \"([^\"]*)\"$")
-    public void checkThatOperationTagsAre(String expectedTags){
+    public void checkThatOperationTagsAre(String expectedTags) {
         String[] list = expectedTags.split(",");
         ElementsCollection ec = OperationUtils.getOperationRoot().$(By.className("tags")).$$(By.className("label-default"));
-        for ( int i = 0; i < ec.size(); ++i ){
-            collector.assertThat(ec.get(i).getText()).as("Checking %d. tag:",i+1).isEqualTo(list[i]);
+        for (int i = 0; i < ec.size(); ++i) {
+            collector.assertThat(ec.get(i).getText()).as("Checking %d. tag:", i + 1).isEqualTo(list[i]);
         }
     }
 
@@ -231,7 +236,6 @@ public class VerificationSteps {
 
         collector.assertThat(descriptionElement.getText()).as("Description for path parameter %s is different", parameter).isEqualTo(description);
     }
-
 
     @And("^check that exist response (\\d+)$")
     public void checkThatExistResponse(Integer response) {
@@ -265,5 +269,38 @@ public class VerificationSteps {
         OperationUtils.selectResponse(response);
         String as = OperationUtils.getOperationRoot().$("responses-section").$("#api-property-type-as").getText();
         collector.assertThat(as).as("Type as is %s but should be %s", as, expectedAs).isEqualTo(expectedAs);
+    }
+
+    @And("^check that operation consumes \"([^\"]*)\"$")
+    public void checkThatOperationConsumes(String consumes) {
+        SelenideElement CONSUMES_SUBSECTION = OperationUtils.getOperationRoot().$(By.className("consumes")); //TODO in OperationStep is the same thing find better solution
+        collector.assertThat(CONSUMES_SUBSECTION.getText()).as("Overriden consumes should be %s but is %s", consumes, CONSUMES_SUBSECTION.getText()).isEqualTo(consumes);
+    }
+
+    @And("^check that operation produces \"([^\"]*)\"$")
+    public void checkThatOperationProduces(String produces) {
+        SelenideElement PRODUCES_SUBSECTION = OperationUtils.getOperationRoot().$(By.className("produces")); //TODO in OperationStep is the same thing find better solution
+        collector.assertThat(PRODUCES_SUBSECTION.getText()).as("Overriden consumes should be %s but is %s", produces, PRODUCES_SUBSECTION.getText()).isEqualTo(produces);
+    }
+
+    /**************************************************************
+     ********** SECURITY SUBSECTION verification steps ************
+     **************************************************************/
+    @And("^check security scheme$")
+    public void checkSecurityScheme(DataTable table) {
+        for (List<String> dataRow : table.raw()) {
+            ElementsCollection schemeElements = MainPageUtils.SECURITY_SECTION.$$("security-scheme-row").filter(text(dataRow.get(0))).filter(text(dataRow.get(1)));
+            collector.assertThat(schemeElements.size()).as("Scheme with name %s do not exist", dataRow.get(0)).isEqualTo(1);
+            if (!dataRow.get(2).isEmpty()) {
+                String description = schemeElements.first().$(By.className("description")).getText();
+                collector.assertThat(description).as("Description should be %s but is %s", dataRow.get(2), description).isEqualTo(dataRow.get(2));
+            }
+        }
+    }
+
+    @And("^check that API security requirement \"([^\"]*)\" exists$")
+    public void checkThatAPISecurityRequirementExists(String requirement) {
+        ElementsCollection requirementList = MainPageUtils.REQUIREMENTS_SECTION.$$(By.className("security-requirement")).filter(text(requirement));
+        collector.assertThat(requirementList.size()).as("Requirement %s do not exist", requirement).isEqualTo(1);
     }
 }

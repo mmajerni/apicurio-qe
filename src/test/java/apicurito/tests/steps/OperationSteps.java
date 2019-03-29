@@ -1,15 +1,20 @@
 package apicurito.tests.steps;
 
+import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.enabled;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+
+import org.openqa.selenium.By;
+
+import com.codeborne.selenide.SelenideElement;
+
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.OperationUtils;
-import com.codeborne.selenide.SelenideElement;
+import apicurito.tests.utils.slenide.PathUtils;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.When;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-
-import static com.codeborne.selenide.Condition.*;
-
 
 @Slf4j
 public class OperationSteps {
@@ -18,44 +23,46 @@ public class OperationSteps {
     private static SelenideElement OPERATION_ID_SUBSECTION = OperationUtils.getOperationRoot().$(By.className("operationId"));
     private static SelenideElement DESCRIPTION_SUBSECTION = OperationUtils.getOperationRoot().$(By.className("description"));
     private static SelenideElement TAGS_SUBSECTION = OperationUtils.getOperationRoot().$(By.className("tags"));
+    private static SelenideElement CONSUMES_SUBSECTION = OperationUtils.getOperationRoot().$(By.className("consumes"));
+    private static SelenideElement PRODUCES_SUBSECTION = OperationUtils.getOperationRoot().$(By.className("produces"));
     private static SelenideElement RESPONSE_SECTION = OperationUtils.getOperationRoot().$("responses-section");
 
-    @When("^set summary \"([^\"]*)\"$")
-    public void setSummary(String summary){
+    @When("^set operation summary \"([^\"]*)\"$")
+    public void setSummary(String summary) {
         CommonUtils.setValueInLabel(summary, SUMMARY_SUBSECTION, false);
     }
 
     @And("^set operation id \"([^\"]*)\"$")
-    public void setOperationId(String operationId){
+    public void setOperationId(String operationId) {
         CommonUtils.setValueInLabel(operationId, OPERATION_ID_SUBSECTION, false);
     }
 
-    @And("^set description \"([^\"]*)\"$")
-    public void setDescription(String description){
+    @And("^set operation description \"([^\"]*)\"$")
+    public void setDescription(String description) {
         CommonUtils.setValueInTextArea(description, DESCRIPTION_SUBSECTION);
     }
 
-    @And("^set tags \"([^\"]*)\"$")
+    @And("^set operation tags \"([^\"]*)\"$")
     public void setTags(String tags) {
         CommonUtils.setValueInLabel(tags, TAGS_SUBSECTION, true);
     }
 
     @And("^set response (\\d+) with clickable link$")
-    public void setResponseWithLink(Integer response){
-        CommonUtils.getClickableLink(CommonUtils.Sections.RESPONSE, CommonUtils.getAppRoot().shouldBe(visible,enabled).shouldNotHave(attribute("disabled")))
+    public void setResponseWithLink(Integer response) {
+        CommonUtils.getClickableLink(CommonUtils.Sections.RESPONSE, CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")))
                 .click();
         OperationUtils.setResponseStatusCode(response);
     }
 
     @And("^set response (\\d+) with plus sign$")
-    public void setResponseWithPlusSign(Integer response){
-        CommonUtils.getNewPlusSignButton(CommonUtils.Sections.RESPONSE, CommonUtils.getAppRoot().shouldBe(visible,enabled).shouldNotHave(attribute("disabled")))
+    public void setResponseWithPlusSign(Integer response) {
+        CommonUtils.getNewPlusSignButton(CommonUtils.Sections.RESPONSE, CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")))
                 .click();
         OperationUtils.setResponseStatusCode(response);
     }
 
     @And("^set response description \"([^\"]*)\" for response (\\d+)$")
-    public void setDescriptionForResponse(String description, Integer response){
+    public void setDescriptionForResponse(String description, Integer response) {
         OperationUtils.selectResponse(response);
         CommonUtils.setValueInTextArea(description, RESPONSE_SECTION);
     }
@@ -93,5 +100,25 @@ public class OperationSteps {
     public void setResponseTypeAs(String as, Integer response) {
         OperationUtils.selectResponse(response);
         CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE_AS.getButtonId(), as, RESPONSE_SECTION);
+    }
+
+    @And("^override consumes with \"([^\"]*)\" for operation \"([^\"]*)\"$")
+    public void overrideConsumesWithForOperation(String consumes, String operation) {
+        PathUtils.getOperationButton(PathSteps.Operations.valueOf(operation), OperationUtils.getOperationRoot())
+                .click();
+
+        CommonUtils.getButtonWithText("Override", CONSUMES_SUBSECTION)
+                .click();
+        CommonUtils.setValueInLabel(consumes, CONSUMES_SUBSECTION, true);
+    }
+
+    @And("^override produces with \"([^\"]*)\" for operation \"([^\"]*)\"$")
+    public void overrideProducesWithForOperation(String produces, String operation) {
+        PathUtils.getOperationButton(PathSteps.Operations.valueOf(operation), OperationUtils.getOperationRoot())
+                .click();
+
+        CommonUtils.getButtonWithText("Override", PRODUCES_SUBSECTION)
+                .click();
+        CommonUtils.setValueInLabel(produces, PRODUCES_SUBSECTION, true);
     }
 }
