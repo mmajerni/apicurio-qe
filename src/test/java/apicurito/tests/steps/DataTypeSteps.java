@@ -1,63 +1,66 @@
 package apicurito.tests.steps;
 
+import org.openqa.selenium.By;
+
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.DataTypeUtils;
-import cucumber.api.java.en.And;
+import cucumber.api.java.en.When;
 
 public class DataTypeSteps {
 
-    private static SelenideElement PROPERTIES_SECTION = DataTypeUtils.getDataTypesRoot().$$("section")
+    public static SelenideElement PROPERTIES_SECTION = DataTypeUtils.getDataTypesRoot().$$("section")
             .filter(Condition.attribute("label", "PROPERTIES")).first();
-    private static SelenideElement INFO_SECTION = DataTypeUtils.getDataTypesRoot().$("definition-info-section");
-    private static SelenideElement EXAMPLE_SECTION = DataTypeUtils.getDataTypesRoot().$("definition-example-section");
 
-    @And("^create data type property with name \"([^\"]*)\"$")
+    public static By INFO_SECTION = By.cssSelector("definition-info-section");
+    public static By EXAMPLE_SECTION = By.cssSelector("definition-example-section");
+
+    @When("^create data type property with name \"([^\"]*)\"$")
     public void createDataTypeProperty(String property) {
         CommonUtils.getClickableLink(CommonUtils.Sections.PROPERTIES, PROPERTIES_SECTION).click();
         CommonUtils.getLabelWithName("name", DataTypeUtils.getDataTypesRoot()).setValue(property);
         CommonUtils.getButtonWithText("Save", CommonUtils.getAppRoot().$("property-editor")).click();
     }
 
-    @And("^set description \"([^\"]*)\" for data type property \"([^\"]*)\"$")
+    @When("^set description \"([^\"]*)\" for data type property \"([^\"]*)\"$")
     public void setDescriptionForProperty(String description, String property) {
         DataTypeUtils.openPropertyDescription(property);
         CommonUtils.setValueInTextArea(description, PROPERTIES_SECTION);
     }
 
-    @And("^set data type description \"([^\"]*)\"$")
+    @When("^set data type description \"([^\"]*)\"$")
     public void setDataTypeDescription(String description) {
-        CommonUtils.setValueInTextArea(description, INFO_SECTION);
+        CommonUtils.setValueInTextArea(description, DataTypeUtils.getDataTypesRoot().$(INFO_SECTION));
     }
 
-    @And("^set data type example \"([^\"]*)\"$")
+    @When("^set data type example \"([^\"]*)\"$")
     public void setDataTypeExample(String example) {
-        CommonUtils.setValueInTextArea(example, EXAMPLE_SECTION);
+        CommonUtils.setValueInTextArea(example, DataTypeUtils.getDataTypesRoot().$(EXAMPLE_SECTION));
     }
 
-    @And("^set property \"([^\"]*)\" as required \"([^\"]*)\"$")
-    public void setPropertyAsRequired(String property, boolean isRequired) {
+    @When("^set property \"([^\"]*)\" as \"([^\"]*)\"$")
+    public void setPropertyAsRequired(String property, String isRequired) {
         DataTypeUtils.openPropertyTypes(property);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.REQUIRED.getButtonId(), isRequired ? "Required" : "Not Required", PROPERTIES_SECTION);
+        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_REQUIRED.getButtonId(), isRequired, PROPERTIES_SECTION);
     }
 
-    @And("^set property type \"([^\"]*)\" for property \"([^\"]*)\"$")
+    @When("^set property type \"([^\"]*)\" for property \"([^\"]*)\"$")
     public void setPropertyTypeForProperty(String type, String property) {
         DataTypeUtils.openPropertyTypes(property);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE.getButtonId(), type, PROPERTIES_SECTION);
+        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId(), type, PROPERTIES_SECTION);
     }
 
-    @And("^set property type of \"([^\"]*)\" for property \"([^\"]*)\"$")
+    @When("^set property type of \"([^\"]*)\" for property \"([^\"]*)\"$")
     public void setPropertyTypeOfForProperty(String of, String property) {
         DataTypeUtils.openPropertyTypes(property);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE_OF.getButtonId(), of, PROPERTIES_SECTION);
+        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId(), of, PROPERTIES_SECTION);
     }
 
-    @And("^set property type as \"([^\"]*)\" for property \"([^\"]*)\"$")
+    @When("^set property type as \"([^\"]*)\" for property \"([^\"]*)\"$")
     public void setPropertyTypeAsForProperty(String as, String property) {
         DataTypeUtils.openPropertyTypes(property);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE_AS.getButtonId(), as, PROPERTIES_SECTION);
+        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId(), as, PROPERTIES_SECTION);
     }
 }

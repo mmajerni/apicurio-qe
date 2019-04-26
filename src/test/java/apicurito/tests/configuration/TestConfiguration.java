@@ -1,13 +1,13 @@
 package apicurito.tests.configuration;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class TestConfiguration {
@@ -25,6 +25,8 @@ public class TestConfiguration {
     public static final String APICURITO_UI_URL = "apicurito.config.ui.url";
 
     public static final String TESTSUITE_TIMEOUT = "apicurito.config.timeout";
+
+    public static final String APP_ROOT = "apicurito.config.app.root";
 
     private static final TestConfiguration INSTANCE = new TestConfiguration();
 
@@ -93,6 +95,10 @@ public class TestConfiguration {
 
     public static String doReinstall() {
         return get().readValue(OPENSHIFT_REINSTALL, "true");
+    }
+
+    public static String getAppRoot() {
+        return get().readValue(APP_ROOT, "app-root");
     }
 
     private Properties defaultValues() {

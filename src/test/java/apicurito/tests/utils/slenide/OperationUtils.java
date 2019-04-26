@@ -40,4 +40,9 @@ public class OperationUtils {
         SelenideElement param = getOperationRoot().$$("path-param-row").filter(text(parameter)).first();
         CommonUtils.getButtonWithText("Override", param).click();
     }
+
+    public static void deleteOperation() {
+        getOperationRoot().$(By.className("actions")).shouldBe(visible).click();
+        MainPageUtils.getDropdownMenuItem("Delete Operation").shouldBe(visible).click();
+    }
 }

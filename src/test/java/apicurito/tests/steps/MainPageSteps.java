@@ -14,8 +14,8 @@ import java.util.List;
 
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
-import cucumber.api.DataTable;
-import cucumber.api.java.en.And;
+import cucumber.api.java.en.When;
+import io.cucumber.datatable.DataTable;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -23,9 +23,9 @@ public class MainPageSteps {
     /**
      * Second column: if true then create with link else create with plus sign.
      */
-    @And("^create a new path with link$")
+    @When("^create a new path with link$")
     public void createNewPathWithLink(DataTable table) {
-        for (List<String> dataRow : table.raw()) {
+        for (List<String> dataRow : table.cells()) {
             if (Boolean.valueOf(dataRow.get(1))) {
                 CommonUtils.getClickableLink(CommonUtils.Sections.PATH, CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")))
                         .click();
@@ -41,7 +41,13 @@ public class MainPageSteps {
         }
     }
 
-    @And("^change API name to \"([^\"]*)\"$")
+    @When("^delete path \"([^\"]*)\"$")
+    public void deletePath(String path) {
+        MainPageUtils.getPathWithName(path).contextClick();
+        MainPageUtils.getDropdownMenuItem("Delete").shouldBe(visible).click();
+    }
+
+    @When("^change API name to \"([^\"]*)\"$")
     public void changeAPINameTo(String newName) {
         SelenideElement se = CommonUtils.getAppRoot().$(By.className("editor-title-bar-edit"));
         se.hover();
@@ -53,50 +59,50 @@ public class MainPageSteps {
                 .click();
     }
 
-    @And("^set API version to \"([^\"]*)\"$")
+    @When("^set API version to \"([^\"]*)\"$")
     public void setAPIVersionTo(String version) {
         CommonUtils.setValueInLabel(version, CommonUtils.getAppRoot().$("info-section").$(By.className("version")), false);
     }
 
-    @And("^change description to \"([^\"]*)\"$")
+    @When("^change description to \"([^\"]*)\"$")
     public void changeDescriptionTo(String description) {
         CommonUtils.setValueInTextArea(description, CommonUtils.getAppRoot().$("info-section").$(By.className("description")));
     }
 
-    @And("^add contact info$")
+    @When("^add contact info$")
     public void addContactInfo(DataTable table) {
         CommonUtils.getClickableLink(CommonUtils.Sections.CONTACT, MainPageUtils.CONTACT_SECTION).click();
-        for (List<String> dataRow : table.raw()) {
+        for (List<String> dataRow : table.cells()) {
             CommonUtils.setValueInLabel(dataRow.get(0), CommonUtils.getAppRoot().$("contact-section").$(By.className("name")), false);
             CommonUtils.setValueInLabel(dataRow.get(1), CommonUtils.getAppRoot().$("contact-section").$(By.className("email")), false);
             CommonUtils.setValueInLabel(dataRow.get(2), CommonUtils.getAppRoot().$("contact-section").$(By.className("url")), false);
         }
     }
 
-    @And("^add license \"([^\"]*)\"$")
+    @When("^add license \"([^\"]*)\"$")
     public void addLicense(String license) {
         CommonUtils.getClickableLink(CommonUtils.Sections.LICENSE, MainPageUtils.LICENSE_SECTION).click();
         MainPageUtils.setLicense(license);
     }
 
-    @And("^add tag \"([^\"]*)\" with description \"([^\"]*)\"$")
+    @When("^add tag \"([^\"]*)\" with description \"([^\"]*)\"$")
     public void addTagWithDescription(String tag, String description) {
         CommonUtils.getClickableLink(CommonUtils.Sections.TAG, MainPageUtils.TAGS_SECTION).click();
         MainPageUtils.addTag(tag, description);
     }
 
-    @And("^select path \"([^\"]*)\"$")
+    @When("^select path \"([^\"]*)\"$")
     public void selectPath(String path) {
         MainPageUtils.getPathWithName(path).click();
     }
 
-    @And("^set consumes to \"([^\"]*)\"$")      //TODO this is add consume but application/json is still there --> delete it
+    @When("^set consumes to \"([^\"]*)\"$")      //TODO this is add consume but application/json is still there --> delete it
     public void setConsumesTo(String consumes) {
         log.info("Setting consumes to {}", consumes);
         CommonUtils.setValueInLabel(consumes, MainPageUtils.getMainPageRoot().$(By.className("consumes")), true);
     }
 
-    @And("^set produces to \"([^\"]*)\"$")      //TODO this is add consume but application/json is still there --> delete it
+    @When("^set produces to \"([^\"]*)\"$")      //TODO this is add consume but application/json is still there --> delete it
     public void setProducesTo(String produces) {
         log.info("Setting produces to {}", produces);
         CommonUtils.setValueInLabel(produces, MainPageUtils.getMainPageRoot().$(By.className("produces")), true);
@@ -105,9 +111,9 @@ public class MainPageSteps {
     /**
      * @param table parameters: Name | Description | boolean if should be created with REST resources | boolean if should be created with Link |
      */
-    @And("^create a new data type with link$")
+    @When("^create a new data type with link$")
     public void createANewDataType(DataTable table) {
-        for (List<String> dataRow : table.raw()) {
+        for (List<String> dataRow : table.cells()) {
 
             if (Boolean.valueOf(dataRow.get(3))) {
                 CommonUtils.getClickableLink(CommonUtils.Sections.DATA_TYPES, CommonUtils.getAppRoot()).click();
@@ -119,25 +125,20 @@ public class MainPageSteps {
         }
     }
 
-    @And("^search path or data type with substring \"([^\"]*)\"$")
+    @When("^search path or data type with substring \"([^\"]*)\"$")
     public void searchPathOrDataTypeWithSubstring(String substring) {
         MainPageUtils.putSearchSubstring(substring);
     }
 
-    @And("^cancel searching$")
-    public void cancelSearching() {
-        MainPageUtils.cancelSearching();
-    }
-
-    @And("^select data type \"([^\"]*)\"$")
+    @When("^select data type \"([^\"]*)\"$")
     public void selectDataType(String dataTypeName) {
         MainPageUtils.getDataTypeWithName(dataTypeName).click();
     }
 
-    @And("^create basic security scheme with values$")
+    @When("^create basic security scheme with values$")
     public void createBasicSecuritySchemeWithValues(DataTable table) {
-        for (List<String> dataRow : table.raw()) {
-            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.SECURITY_SECTION)
+        for (List<String> dataRow : table.cells()) {
+            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.getMainPageRoot().$(MainPageUtils.SECURITY_SECTION))
                     .click();
             SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$("security-scheme-editor");
 
@@ -155,10 +156,10 @@ public class MainPageSteps {
         }
     }
 
-    @And("^create API Key security scheme with values$")
+    @When("^create API Key security scheme with values$")
     public void createAPIKeySecuritySchemeWithValues(DataTable table) {
-        for (List<String> dataRow : table.raw()) {
-            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.SECURITY_SECTION)
+        for (List<String> dataRow : table.cells()) {
+            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.getMainPageRoot().$(MainPageUtils.SECURITY_SECTION))
                     .click();
             SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$("security-scheme-editor");
 
@@ -183,10 +184,10 @@ public class MainPageSteps {
         }
     }
 
-    @And("^create OAuth security scheme with values$")
+    @When("^create OAuth security scheme with values$")
     public void createOAuthSecuritySchemeWithValues(DataTable table) {
-        for (List<String> dataRow : table.raw()) {
-            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.SECURITY_SECTION)
+        for (List<String> dataRow : table.cells()) {
+            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.getMainPageRoot().$(MainPageUtils.SECURITY_SECTION))
                     .click();
             SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$("security-scheme-editor");
 
@@ -216,13 +217,13 @@ public class MainPageSteps {
         }
     }
 
-    @And("^create security requirement with schemes$")
+    @When("^create security requirement with schemes$")
     public void createSecurityRequirementWithSchemes(DataTable table) {
-        CommonUtils.getNewPlusSignButton(CommonUtils.Sections.REQUIREMENT, MainPageUtils.REQUIREMENTS_SECTION)
+        CommonUtils.getNewPlusSignButton(CommonUtils.Sections.REQUIREMENT, MainPageUtils.getMainPageRoot().$(MainPageUtils.REQUIREMENTS_SECTION))
                 .click();
         SelenideElement requirementEditor = MainPageUtils.getMainPageRoot().$("security-requirement-editor");
 
-        for (List<String> dataRow : table.raw()) {
+        for (List<String> dataRow : table.cells()) {
             ElementsCollection listOfSchemes = requirementEditor.$$(By.className("list-group-item"));
             for (SelenideElement scheme : listOfSchemes) {
                 if (scheme.$(By.className("name")).getText().equals(dataRow.get(0)) && !scheme.getAttribute("class").contains("active")) {
@@ -235,30 +236,30 @@ public class MainPageSteps {
                 .click();
     }
 
-    @And("^add scopes to security requirement \"([^\"]*)\" and OAuth scheme \"([^\"]*)\"$")
+    @When("^add scopes to security requirement \"([^\"]*)\" and OAuth scheme \"([^\"]*)\"$")
     public void addScopesToSecurityRequirementAndOAuthScheme(String requirementName, String schemeName, DataTable table) {
-        SelenideElement requirement = MainPageUtils.REQUIREMENTS_SECTION.$$(By.className("security-requirement")).filter(text(requirementName)).first();
+        SelenideElement requirement = MainPageUtils.getMainPageRoot().$(MainPageUtils.REQUIREMENTS_SECTION).$$(By.className("security-requirement")).filter(text(requirementName)).first();
         requirement.$("button").click();
         requirement.$("a").shouldHave(text("Edit")).click();
 
         SelenideElement requirementEditor = MainPageUtils.getMainPageRoot().$("security-requirement-editor");
         SelenideElement scheme = requirementEditor.$$(By.className("list-group-item")).filter(text(schemeName)).first();
         scheme.$(By.className("list-view-pf-expand")).$("span").click();
-        for (List<String> dataRow : table.raw()) {
+        for (List<String> dataRow : table.cells()) {
             scheme.$$(By.className("scope")).filter(text(dataRow.get(0))).first().$("input").click();
         }
         CommonUtils.getButtonWithText("Save", requirementEditor)
                 .click();
     }
 
-    @And("^add scopes to scheme \"([^\"]*)\"$")
+    @When("^add scopes to scheme \"([^\"]*)\"$")
     public void addScopesToScheme(String scheme, DataTable table) {
-        SelenideElement schemeElement = MainPageUtils.SECURITY_SECTION.$$("security-scheme-row").filter(text(scheme)).first();
+        SelenideElement schemeElement = MainPageUtils.getMainPageRoot().$(MainPageUtils.SECURITY_SECTION).$$("security-scheme-row").filter(text(scheme)).first();
         schemeElement.$("button").click();
         schemeElement.$("a").shouldHave(text("Edit")).click();
 
         SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$("security-scheme-editor");
-        for (List<String> dataRow : table.raw()) {
+        for (List<String> dataRow : table.cells()) {
             CommonUtils.getButtonWithText("Add Scope", schemeEditor).click();
             ElementsCollection scopeElements = schemeEditor.$$(By.className("scope"));
 

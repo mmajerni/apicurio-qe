@@ -15,7 +15,6 @@ import java.io.File;
 import apicurito.tests.configuration.TestConfiguration;
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.ImportExportUtils;
-import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -35,7 +34,7 @@ public class CommonSteps {
                 .click();
     }
 
-    @And("^sleep for (\\d+) seconds$")
+    @Then("^sleep for (\\d+) seconds$")
     public void sleepFor(int seconds) {
         try {
             Thread.sleep(1000L * seconds);
