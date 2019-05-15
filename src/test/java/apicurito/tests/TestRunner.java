@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 
 import com.codeborne.selenide.Configuration;
 
+import apicurito.tests.configuration.Component;
 import apicurito.tests.configuration.TestConfiguration;
 import apicurito.tests.configuration.templates.ApicuritoTemplate;
 import apicurito.tests.utils.openshift.OpenShiftUtils;
@@ -25,7 +26,10 @@ public class TestRunner {
     public static void beforeTests() {
 
         if (OpenShiftUtils.xtf().getProject(TestConfiguration.openShiftNamespace()) == null) {
-            OpenShiftUtils.xtf().createProjectRequest(TestConfiguration.openShiftNamespace());
+            log.info("Creating new project " + TestConfiguration.openShiftNamespace());
+            final String output = OpenShiftUtils.binary().execute(
+                    "new-project", TestConfiguration.openShiftNamespace()
+            );
             try {
                 Thread.sleep(10 * 1000);
             } catch (InterruptedException e) {
@@ -35,12 +39,13 @@ public class TestRunner {
 
         if (Boolean.valueOf(TestConfiguration.doReinstall())) {
             ApicuritoTemplate.cleanNamespace();
-
             ApicuritoTemplate.setInputStreams();
-
-            ApicuritoTemplate.deployUsingTemplate();
-
-            ApicuritoTemplate.waitForApicurito();
+            ApicuritoTemplate.deploy();
+            if (TestConfiguration.useOperator()) {
+                ApicuritoTemplate.waitForApicurito("apicurito_cr", 3, Component.SERVICE);
+            } else {
+                ApicuritoTemplate.waitForApicurito("component", 1, Component.UI);
+            }
         }
 
         //set up Selenide
@@ -58,6 +63,7 @@ public class TestRunner {
         if (TestConfiguration.namespaceCleanupAfter()) {
             TestConfiguration.printDivider("Cleaning namespace after tests");
             OpenShiftUtils.getInstance().clean();
+            OpenShiftUtils.getInstance().waiters().isProjectClean().waitFor();
         }
     }
 }

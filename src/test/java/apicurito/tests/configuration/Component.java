@@ -5,8 +5,9 @@ import lombok.Getter;
 @Getter
 public enum Component {
 
-    GENERATOR("fuse-apicurito-generator"),
-    UI("apicurito-ui");
+    UI("apicurito-ui"),
+
+    SERVICE("apicurito-service");
 
     private final String name;
 

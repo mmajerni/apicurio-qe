@@ -1,8 +1,18 @@
 package apicurito.tests.utils.openshift;
 
+import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Java6Assertions.assertThat;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.IOException;
+import java.util.Optional;
+
 import apicurito.tests.configuration.TestConfiguration;
 import apicurito.tests.utils.HttpUtils;
-import cz.xtf.openshift.OpenShiftUtil;
+import cz.xtf.core.openshift.OpenShift;
+import cz.xtf.core.openshift.OpenShiftBinary;
+import cz.xtf.core.openshift.OpenShifts;
 import io.fabric8.kubernetes.api.model.DoneablePod;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -14,28 +24,29 @@ import io.fabric8.openshift.client.OpenShiftConfigBuilder;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Headers;
 import okhttp3.Response;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.IOException;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.fail;
-import static org.assertj.core.api.Java6Assertions.assertThat;
 
 @Slf4j
 public final class OpenShiftUtils {
 
-    private static OpenShiftUtil xtfUtils = null;
+    private static OpenShift xtfUtils = null;
+    private static OpenShiftBinary binary = null;
 
-    public static OpenShiftUtil getInstance() {
+    public static OpenShift getInstance() {
         if (xtfUtils == null) {
             new OpenShiftUtils();
         }
         return xtfUtils;
     }
 
-    public static OpenShiftUtil xtf() {
+    public static OpenShift xtf() {
         return getInstance();
+    }
+
+    public static OpenShiftBinary binary() {
+        if (binary == null) {
+            binary = OpenShifts.masterBinary(TestConfiguration.openShiftNamespace());
+        }
+        return binary;
     }
 
     private OpenShiftUtils() {
@@ -50,12 +61,16 @@ public final class OpenShiftUtils {
                 //otherwise f8 client should be able to leverage ~/.kube/config or mounted secrets
                 openShiftConfigBuilder.withOauthToken(TestConfiguration.openShiftToken());
             }
-            xtfUtils = new OpenShiftUtil(openShiftConfigBuilder.build());
+            xtfUtils = new OpenShift(openShiftConfigBuilder.build());
         }
     }
 
+    /**
+     * @deprecated use OpenshiftUtils.getInstance()
+     */
+    @Deprecated
     public static NamespacedOpenShiftClient client() {
-        return getInstance().client();
+        return getInstance();
     }
 
     public static LocalPortForward portForward(Pod pod, int remotePort, int localPort) {
@@ -159,7 +174,7 @@ public final class OpenShiftUtils {
                 url,
                 body,
                 "application/json",
-                Headers.of("Authorization", "Bearer " + OpenShiftUtils.client().getConfiguration().getOauthToken())
+                Headers.of("Authorization", "Bearer " + OpenShiftUtils.getInstance().getConfiguration().getOauthToken())
         );
         log.debug("Response code: " + response.code());
         try {

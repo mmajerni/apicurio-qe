@@ -1,44 +1,24 @@
 package apicurito.tests.utils.openshift;
 
-import cz.xtf.openshift.OpenShiftUtil;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodCondition;
-import io.fabric8.openshift.api.model.Build;
-import lombok.extern.slf4j.Slf4j;
+import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Java6Assertions.assertThat;
 
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import static org.assertj.core.api.Assertions.fail;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodCondition;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class OpenShiftWaitUtils {
 
-    protected static final OpenShiftUtil openshift = OpenShiftUtils.getInstance();
-    public static final long DEFAULT_WAIT_INTERVAL = 1000L; // one second
-
-    public static boolean hasBuildFailed(Predicate<Build> filter) {
-        final AtomicBoolean ret = new AtomicBoolean(false);
-
-        openshift.getBuilds().stream().filter(filter).forEach(build -> {
-            if ("Failed".equals(build.getStatus().getPhase())) {
-                ret.set(true);
-            }
-        });
-
-        return ret.get();
-    }
-
-    public static boolean hasAnyBuildFailed() {
-        return hasBuildFailed(_x -> true);
-    }
+    private static final long DEFAULT_WAIT_INTERVAL = 1000L; // one second
 
     public static boolean isPodReady(Pod pod) {
         if (pod.getStatus().getConditions() != null) {
@@ -72,11 +52,11 @@ public class OpenShiftWaitUtils {
     }
 
     private static boolean _areExactlyNPodsRunning(Predicate<Pod> podFilter, int n) {
-        return openshift.getPods().stream().filter(podFilter).filter(OpenShiftWaitUtils::isPodRunning).count() == n;
+        return OpenShiftUtils.getInstance().getPods().stream().filter(podFilter).filter(OpenShiftWaitUtils::isPodRunning).count() == n;
     }
 
     private static boolean _areExactlyNPods(Predicate<Pod> podFilter, int n) {
-        return openshift.getPods().stream().filter(podFilter).count() == n;
+        return OpenShiftUtils.getInstance().getPods().stream().filter(podFilter).count() == n;
     }
 
     public static BooleanSupplier areExactlyNPods(String podPartialName, int n) {
@@ -84,15 +64,15 @@ public class OpenShiftWaitUtils {
     }
 
     private static boolean _areNPodsReady(Predicate<Pod> podFilter, int n) {
-        return openshift.getPods().stream().filter(podFilter).filter(OpenShiftWaitUtils::isPodReady).count() >= n;
+        return OpenShiftUtils.getInstance().getPods().stream().filter(podFilter).filter(OpenShiftWaitUtils::isPodReady).count() >= n;
     }
 
     private static boolean _areExactlyNPodsReady(Predicate<Pod> podFilter, int n) {
-        return openshift.getPods().stream().filter(podFilter).filter(OpenShiftWaitUtils::isPodReady).count() == n;
+        return OpenShiftUtils.getInstance().getPods().stream().filter(podFilter).filter(OpenShiftWaitUtils::isPodReady).count() == n;
     }
 
     private static boolean hasAnyPodRestarted(Predicate<Pod> podFilter) {
-        return openshift.getPods().stream().filter(podFilter).filter(OpenShiftWaitUtils::hasPodRestarted).count() > 0;
+        return OpenShiftUtils.getInstance().getPods().stream().filter(podFilter).filter(OpenShiftWaitUtils::hasPodRestarted).count() > 0;
     }
 
     public static boolean isAPodReady(Predicate<Pod> podFilter) {
@@ -140,7 +120,7 @@ public class OpenShiftWaitUtils {
     }
 
     public static BooleanSupplier areNoPodsPresent(Predicate<Pod> podFilter) {
-        return () -> openshift.getPods().stream().filter(podFilter).count() == 0;
+        return () -> OpenShiftUtils.getInstance().getPods().stream().filter(podFilter).count() == 0;
     }
 
     public static BooleanSupplier hasPodRestarted(String appName) {
@@ -156,7 +136,7 @@ public class OpenShiftWaitUtils {
     }
 
     public static BooleanSupplier hasPodRestartedAtLeastNTimes(Predicate<Pod> podFilter, int n) {
-        return () -> openshift.getPods().stream().filter(podFilter).filter(p -> OpenShiftWaitUtils.hasPodRestartedAtLeastNTimes(p, n)).count() > 0;
+        return () -> OpenShiftUtils.getInstance().getPods().stream().filter(podFilter).filter(p -> OpenShiftWaitUtils.hasPodRestartedAtLeastNTimes(p, n)).count() > 0;
     }
 
     public static BooleanSupplier conditionTrueForNIterations(BooleanSupplier condition, int iters) {
@@ -173,7 +153,8 @@ public class OpenShiftWaitUtils {
         };
     }
 
-    public static <X> boolean waitFor(Supplier<X> supplier, Function<X, Boolean> trueCondition, Function<X, Boolean> failCondition, long interval, long timeout) throws InterruptedException, TimeoutException {
+    public static <X> boolean waitFor(Supplier<X> supplier, Function<X, Boolean> trueCondition, Function<X, Boolean> failCondition, long interval,
+            long timeout) throws InterruptedException, TimeoutException {
         timeout = System.currentTimeMillis() + timeout;
 
         while (System.currentTimeMillis() < timeout) {
@@ -194,7 +175,8 @@ public class OpenShiftWaitUtils {
         throw new TimeoutException();
     }
 
-    public static boolean waitFor(BooleanSupplier condition, BooleanSupplier failCondition, long interval, long timeout) throws InterruptedException, TimeoutException {
+    public static boolean waitFor(BooleanSupplier condition, BooleanSupplier failCondition, long interval, long timeout)
+            throws InterruptedException, TimeoutException {
 
         timeout = System.currentTimeMillis() + timeout;
 
@@ -247,7 +229,7 @@ public class OpenShiftWaitUtils {
 
         String podPartialNextName = podPartialName + "-" + nextNr;
         log.info("Waiting for {} pod is reloaded", podPartialNextName);
-        waitFor(() -> (areExactlyNPods(podPartialNextName, 1).getAsBoolean()));
+        waitFor(() -> areExactlyNPods(podPartialNextName, 1).getAsBoolean());
         log.info("Pod {} is READY!", podPartialName);
     }
 
@@ -255,7 +237,7 @@ public class OpenShiftWaitUtils {
      * Method waits until pod with @param podPartialName appears
      * Build and deploy pods are ignored
      *
-     * @param podPartialName
+     * @param podPartialName pod partial name
      */
     public static void waitUntilPodAppears(String podPartialName) {
         try {

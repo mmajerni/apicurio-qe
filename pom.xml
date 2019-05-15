@@ -17,7 +17,7 @@
         <log4j.over.slf4j.version>1.7.25</log4j.over.slf4j.version>
         <lombok.version>1.16.18</lombok.version>
         <logback.classic.version>1.2.3</logback.classic.version>
-        <xtf.utilities.version>0.6</xtf.utilities.version>
+        <xtf.utilities.version>0.13-SNAPSHOT</xtf.utilities.version>
         <assertj.version>3.11.1</assertj.version>
         <commons-lang3.version>3.7</commons-lang3.version>
         <selenide.version>4.14.2</selenide.version>
@@ -25,8 +25,16 @@
         <maven.clean.plugin.version>3.0.0</maven.clean.plugin.version>
         <apache.http.commons.version>4.5.3</apache.http.commons.version>
         <guava.version>23.0</guava.version>
+        <openshift.client.version>4.3.0</openshift.client.version>
 
+        <!-- leave driver versions empty to use latest driver -->
+        <!-- Find supported webdriver version for your chrome browser here:
+        http://chromedriver.chromium.org/downloads -->
+        <chrome.driver.version></chrome.driver.version>
 
+        <!-- Find supported webdriver version for your firefox browser here:
+        https://firefox-source-docs.mozilla.org/testing/geckodriver/geckodriver/Support.html -->
+        <firefox.driver.version></firefox.driver.version>
     </properties>
 
     <dependencies>
@@ -62,18 +70,8 @@
 
         <dependency>
             <groupId>cz.xtf</groupId>
-            <artifactId>utilities</artifactId>
+            <artifactId>core</artifactId>
             <version>${xtf.utilities.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-java</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.seleniumhq.selenium</groupId>
-                    <artifactId>selenium-remote-driver</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
@@ -116,6 +114,12 @@
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-core</artifactId>
             <version>${cucumber.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>openshift-client</artifactId>
+            <version>${openshift.client.version}</version>
         </dependency>
 
     </dependencies>
@@ -166,9 +170,11 @@
                     <drivers>
                         <driver>
                             <name>chromedriver</name>
+                            <version>${chrome.driver.version}</version>
                         </driver>
                         <driver>
                             <name>geckodriver</name>
+                            <version>${firefox.driver.version}</version>
                         </driver>
                     </drivers>
                 </configuration>
