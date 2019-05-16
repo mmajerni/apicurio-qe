@@ -9,15 +9,20 @@ import static com.codeborne.selenide.Selenide.$;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 
+import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
+import java.util.List;
+
+import apicurito.tests.configuration.TestConfiguration;
+import io.cucumber.datatable.DataTable;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CommonUtils {
 
     public static SelenideElement getAppRoot() {
-        return $(By.tagName("app-root")).shouldBe(visible);
+        return $(By.cssSelector(TestConfiguration.getAppRoot())).shouldBe(visible);
     }
 
     public static SelenideElement getButtonWithText(String buttonText, SelenideElement differentRoot) {
@@ -44,6 +49,10 @@ public class CommonUtils {
         return differentRoot.shouldBe(visible).$$("input").filter(attribute("type", labelType)).first();
     }
 
+    public static SelenideElement getClickableLink(Sections section, By differentRoot) {
+        return getClickableLink(section, CommonUtils.getAppRoot().$(differentRoot));
+    }
+
     public static SelenideElement getClickableLink(Sections section, SelenideElement differentRoot) {
         log.info("searching for link in section {}", section);
 
@@ -57,7 +66,7 @@ public class CommonUtils {
     }
 
     public static void setValueInTextArea(String value, SelenideElement section) {
-        log.info("Setting value {} in text area in section{}", value, section.getValue());
+        log.info("Setting value {} into text area in section {}", value, section.getAttribute("class"));
 
         section.$$("div").filter(attribute("title", "Click to edit.")).first().click();
 
@@ -69,7 +78,7 @@ public class CommonUtils {
     }
 
     public static void setValueInLabel(String value, SelenideElement section, boolean isPencilLabel) {
-        log.info("Setting value {} in label in section{}", value, section.getValue());
+        log.info("Setting value {} into label in section {}", value, section.getAttribute("class"));
 
         if (isPencilLabel) {
             section.$$("i").filter(attribute("title", "Click to edit.")).first().click();
@@ -81,9 +90,54 @@ public class CommonUtils {
     }
 
     public static void setDropDownValue(String buttonId, String value, SelenideElement section) {
-        log.info("Setting value {} in dropdown {} in section{}", value, buttonId, section.getValue());
+        log.info("Setting value {} in dropdown {} in section {}", value, buttonId, section.getAttribute("class"));
         section.$(buttonId).click();
         section.$$("li").filter(text(value)).first().click();
+    }
+
+    /**
+     * It works for creating: Query parameters (both), Header parameters (both), Reqest form data, Data type property
+     */
+    public static void fillEntityEditorForm(DataTable table) {
+        SelenideElement newDataFormPage = MainPageUtils.getMainPageRoot().$("#entity-editor-form");
+
+        for (List<String> dataRow : table.cells()) {
+            newDataFormPage.$("#qp_name").setValue(dataRow.get(0));
+
+            if (!dataRow.get(1).isEmpty()) {
+                newDataFormPage.$("ace-editor textarea").sendKeys(dataRow.get(1));
+            }
+
+            if (!dataRow.get(2).isEmpty()) {
+                CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PARAM_REQUIRED.getButtonId(), dataRow.get(2), newDataFormPage);
+            }
+
+            if (!dataRow.get(3).isEmpty()) {
+                CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PARAM_TYPE.getButtonId(), dataRow.get(3), newDataFormPage);
+            }
+
+            if (!dataRow.get(4).isEmpty()) {
+                CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PARAM_TYPE_OF.getButtonId(), dataRow.get(4), newDataFormPage);
+            }
+
+            if (!dataRow.get(5).isEmpty()) {
+                CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PARAM_TYPE_AS.getButtonId(), dataRow.get(5), newDataFormPage);
+            }
+
+            CommonUtils.getButtonWithText("Save", newDataFormPage).click();
+        }
+    }
+
+    /**
+     * Opens collapsed section. If section is already opened do nothing.
+     *
+     * @param section which should be opened
+     */
+    public static void openCollapsedSection(By section) {
+        ElementsCollection collapsedSection = OperationUtils.getOperationRoot().$(section).$$("a").filter(attribute("class", "collapsed"));
+        if (collapsedSection.size() > 0) {
+            collapsedSection.first().click();
+        }
     }
 
     public enum Sections {
@@ -115,10 +169,15 @@ public class CommonUtils {
     }
 
     public enum DropdownButtons {
-        TYPE("#api-property-type"),
-        TYPE_OF("#api-property-type-of"),
-        TYPE_AS("#api-property-type-as"),
-        REQUIRED("#api-property-required");
+        PROPERTY_TYPE("#api-property-type"),
+        PROPERTY_TYPE_OF("#api-property-type-of"),
+        PROPERTY_TYPE_AS("#api-property-type-as"),
+        PROPERTY_REQUIRED("#api-property-required"),
+
+        PARAM_REQUIRED("#api-param-required"),
+        PARAM_TYPE("#api-param-type"),
+        PARAM_TYPE_OF("#api-param-type-of"),
+        PARAM_TYPE_AS("#api-param-type-as");
 
         private String buttonId;
 

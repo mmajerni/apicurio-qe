@@ -18,7 +18,7 @@ public class DataTypeUtils {
     }
 
     public static void openPropertyDescription(String property) {
-        log.info("Opening property description for property {}", property);
+        log.info("Opening property description for property {}", property);     //TODO rewrite it will not work in some cases
 
         getDataTypesRoot().$$("property-row")
                 .filter(text(property)).first()

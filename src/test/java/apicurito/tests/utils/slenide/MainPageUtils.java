@@ -15,12 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MainPageUtils {
 
-    public static SelenideElement INFO_SECTION = getMainPageRoot().$("info-section");
-    public static SelenideElement CONTACT_SECTION = getMainPageRoot().$("contact-section");
-    public static SelenideElement LICENSE_SECTION = getMainPageRoot().$("license-section");
-    public static SelenideElement TAGS_SECTION = getMainPageRoot().$("tags-section");
-    public static SelenideElement SECURITY_SECTION = getMainPageRoot().$("security-schemes-section");
-    public static SelenideElement REQUIREMENTS_SECTION = getMainPageRoot().$("security-requirements-section");
+    public static final By INFO_SECTION = By.cssSelector("info-section");
+    public static final By CONTACT_SECTION = By.cssSelector("contact-section");
+    public static final By LICENSE_SECTION = By.cssSelector("license-section");
+    public static final By TAGS_SECTION = By.cssSelector("tags-section");
+    public static final By SECURITY_SECTION = By.cssSelector("security-schemes-section");
+    public static final By REQUIREMENTS_SECTION = By.cssSelector("security-requirements-section");
 
     public static SelenideElement getMainPageRoot() {
         return $("editor").shouldBe(visible);
@@ -29,16 +29,16 @@ public class MainPageUtils {
     public static void setLicense(String license) {
         log.info("Setting license to {}", license);
 
-        SelenideElement parentElement = LICENSE_SECTION.$$("a").filter(text(license)).first().parent().parent();
+        SelenideElement parentElement = getMainPageRoot().$(LICENSE_SECTION).$$("a").filter(text(license)).first().parent().parent();
         parentElement.$$("button").filter(text("Use This License")).first().click();
     }
 
     public static void addTag(String tag, String description) {
         log.info("Adding tag {} with description {}", tag, description);
 
-        TAGS_SECTION.$("#tag").setValue(tag);
-        TAGS_SECTION.$("#description").setValue(description);
-        CommonUtils.getButtonWithText("Add", TAGS_SECTION).click();
+        getMainPageRoot().$(TAGS_SECTION).$("#tag").setValue(tag);
+        getMainPageRoot().$(TAGS_SECTION).$("#description").setValue(description);
+        CommonUtils.getButtonWithText("Add", getMainPageRoot().$(TAGS_SECTION)).click();
     }
 
     public static SelenideElement getPathWithName(String pathName) {
@@ -68,11 +68,10 @@ public class MainPageUtils {
         log.info("Creating data type with name {} and description {} and rest resources are {}", name, description, isRest);
 
         CommonUtils.getLabelWithName("name", CommonUtils.getAppRoot()).setValue(name);
-        //TODO CommonUtils.getAppRoot().$("textarea").setValue(description);
         if (isRest) {
             CommonUtils.getAppRoot().$$("div").filter(attribute("class", "create-option")).filter(text("REST Resource")).first().click();
         }
-        CommonUtils.getButtonWithText("Save", CommonUtils.getAppRoot().$("#server-entity-form")).click();
+        CommonUtils.getButtonWithText("Save", CommonUtils.getAppRoot().$("#entity-editor-form")).click();
     }
 
     public static void putSearchSubstring(String substring) {
@@ -80,9 +79,10 @@ public class MainPageUtils {
         CommonUtils.getAppRoot().$("#masterSearch").setValue(substring);
     }
 
-    public static void cancelSearching() {
-        log.info("Canceling searching");
-
-        CommonUtils.getAppRoot().$("search").$$("button").filter(attribute("class", "clear")).first().click();
+    public static SelenideElement getDropdownMenuItem(String name) {
+        return CommonUtils.getAppRoot()
+                .$$(By.cssSelector(".dropdown-menu li span"))
+                .filter(text(name))
+                .shouldHaveSize(1).first();
     }
 }

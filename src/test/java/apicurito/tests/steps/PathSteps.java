@@ -9,7 +9,7 @@ import com.codeborne.selenide.SelenideElement;
 
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.PathUtils;
-import cucumber.api.java.en.And;
+import cucumber.api.java.en.When;
 
 public class PathSteps {
 
@@ -18,54 +18,54 @@ public class PathSteps {
     /**
      * @param operation must be convertable to operation enum. See Operations enum
      */
-    @And("^create new \"([^\"]*)\" operation$")
+    @When("^create new \"([^\"]*)\" operation$")
     public void createNewOperation(String operation) {
         PathUtils.getCreateOperationButton(Operations.valueOf(operation))
                 .click();
     }
 
-    @And("^select operation \"([^\"]*)\"$")
+    @When("^select operation \"([^\"]*)\"$")
     public void selectOperation(String operation) {
         PathUtils.getOperationButton(Operations.valueOf(operation), CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")))
                 .click();
     }
 
-    @And("^create path parameter \"([^\"]*)\"$")
+    @When("^create path parameter \"([^\"]*)\"$")
     public void createPathParameter(String parameter) {
         PathUtils.createPathParameter(parameter);
     }
 
-    @And("^set description \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
+    @When("^set description \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
     public void setDescriptionPathParameter(String description, String parameter) {
         PathUtils.openPathDescription(parameter);
         CommonUtils.setValueInTextArea(description, PARAMETERS_SECTION);
     }
 
-    @And("^set path parameter type \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
+    @When("^set path parameter type \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
     public void setPathParameterTypeForPathParameter(String type, String parameter) {
         PathUtils.openPathTypes(parameter);
         SelenideElement parameterElement = PARAMETERS_SECTION.$$("path-param-row")
                 .filter(text(parameter)).first();
 
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE.getButtonId(), type, parameterElement);
+        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId(), type, parameterElement);
     }
 
-    @And("^set path parameter type of \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
+    @When("^set path parameter type of \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
     public void setPathParameterTypeOfForPathParameter(String of, String parameter) {
         PathUtils.openPathTypes(parameter);
         SelenideElement parameterElement = PARAMETERS_SECTION.$$("path-param-row")
                 .filter(text(parameter)).first();
 
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE_OF.getButtonId(), of, parameterElement);
+        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId(), of, parameterElement);
     }
 
-    @And("^set path parameter type as \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
+    @When("^set path parameter type as \"([^\"]*)\" for path parameter \"([^\"]*)\"$")
     public void setPathParameterTypeAsForPathParameter(String as, String parameter) {
         PathUtils.openPathTypes(parameter);
         SelenideElement parameterElement = PARAMETERS_SECTION.$$("path-param-row")
                 .filter(text(parameter)).first();
 
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.TYPE_AS.getButtonId(), as, parameterElement);
+        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId(), as, parameterElement);
     }
 
     public enum Operations {
@@ -75,6 +75,7 @@ public class PathSteps {
         DELETE,
         OPTIONS,
         HEAD,
-        PATCH
+        PATCH,
+        TRACE
     }
 }
