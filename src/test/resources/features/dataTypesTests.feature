@@ -10,7 +10,7 @@ Feature: Test everything on data types page
 
   @twoDataTypes
   Scenario: create 2 data types with/without rest
-    When create a new data type with link
+    When create a new data type by link
       | data1 | best data type ever | false | true  |
       | data2 | desc                | true  | false |
 

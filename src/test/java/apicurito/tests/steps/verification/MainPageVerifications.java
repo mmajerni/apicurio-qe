@@ -1,5 +1,7 @@
 package apicurito.tests.steps.verification;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Condition.text;
@@ -18,16 +20,16 @@ import io.cucumber.datatable.DataTable;
 public class MainPageVerifications {
 
     @Then("^check that API name is \"([^\"]*)\"$")
-    public void checkThatAPINameIs(String expectedName) {
+    public void checkThatAPINameIs(String expectedName) {       //NEW
         String apiName = CommonUtils.getAppRoot().$("title-bar").$("h1").getText();
-        CollectorHelper.getCollector().assertThat(apiName).as("Checking API name:").isEqualTo(expectedName);
+        assertThat(apiName).as("Checking API name:").isEqualTo(expectedName);
     }
 
     @Then("^check that API version is \"([^\"]*)\"$")
-    public void checkThatAPIVersionIs(String expectedVersion) {
+    public void checkThatAPIVersionIs(String expectedVersion) {     //NEW
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         String version = MainPageUtils.getMainPageRoot().$("info-section").$(By.className("version")).getText();
-        CollectorHelper.getCollector().assertThat(version).as("Checking API version:").isEqualTo(expectedVersion);
+        assertThat(version).as("Checking API version:").isEqualTo(expectedVersion);
     }
 
     @Then("^check that API description is \"([^\"]*)\"$")
@@ -38,17 +40,17 @@ public class MainPageVerifications {
     }
 
     @Then("^check that API consume \"([^\"]*)\"$")
-    public void checkThatAPIConsume(String expectedConsume) {               //TODO
+    public void checkThatAPIConsume(String expectedConsume) {               //TODO      //NEW
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         String consume = MainPageUtils.getMainPageRoot().$(By.className("consumes")).getText();
-        CollectorHelper.getCollector().assertThat(consume).as("Checking API consumes:").isEqualTo(expectedConsume);
+        assertThat(consume).as("Checking API consumes:").isEqualTo(expectedConsume);
     }
 
     @Then("^check that API produce \"([^\"]*)\"$")
-    public void checkThatAPIProduce(String expectedProduce) {
+    public void checkThatAPIProduce(String expectedProduce) {       //NEW
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         String produce = MainPageUtils.getMainPageRoot().$(By.className("produces")).getText();
-        CollectorHelper.getCollector().assertThat(produce).as("Checking API produces:").isEqualTo(expectedProduce);
+        assertThat(produce).as("Checking API produces:").isEqualTo(expectedProduce);
     }
 
     @Then("^check that API contact info is$")
@@ -97,7 +99,7 @@ public class MainPageVerifications {
     }
 
     @Then("^check that path \"([^\"]*)\" is created$")
-    public void checkThatPathIsCreated(String expectedPathName) {
+    public void checkThatPathIsCreated(String expectedPathName) {       //NEW
         try {
             Thread.sleep(1000L);        //need to wait at least for a second because of Stale Element Reference Exception
         } catch (InterruptedException e) {
@@ -106,14 +108,14 @@ public class MainPageVerifications {
         ElementsCollection paths = MainPageUtils.getMainPageRoot().$$("section").filter(attribute("label", "Paths")).first()
                 .$$(By.className("api-path")).filter(exactText(expectedPathName));
 
-        CollectorHelper.getCollector().assertThat(paths.size()).as("Path %s is not created:", expectedPathName).isEqualTo(1);
+        assertThat(paths.size()).as("Path %s is not created:", expectedPathName).isEqualTo(1);
     }
 
     @Then("^check that data type \"([^\"]*)\" is created$")
-    public void checkThatDataTypeIsCreated(String datatype) {
+    public void checkThatDataTypeIsCreated(String datatype) {       //NEW
         ElementsCollection types = MainPageUtils.getMainPageRoot().$$("section").filter(attribute("label", "Data Types")).first()
                 .$$(By.className("api-definition")).filter(exactText(datatype));
-        CollectorHelper.getCollector().assertThat(types.size()).as("Data type %s is not created!", datatype).isEqualTo(1);
+        assertThat(types.size()).as("Data type %s is not created!", datatype).isEqualTo(1);
     }
 
     /**************************************************************

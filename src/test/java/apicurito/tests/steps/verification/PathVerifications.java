@@ -1,5 +1,7 @@
 package apicurito.tests.steps.verification;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import static com.codeborne.selenide.Condition.matchText;
 
 import org.openqa.selenium.By;
@@ -13,7 +15,7 @@ import cucumber.api.java.en.Then;
 
 public class PathVerifications {
 
-    @Then("^check that operation \"([^\"]*)\" is created for path \"([^\"]*)\"$")
+    @Then("^check that operation \"([^\"]*)\" is created for path \"([^\"]*)\"$")       //NEW
     public void checkThatOperationIsCreatedForPath(String operation, String path) {
         SelenideElement pathElement = MainPageUtils.getPathWithName(path);      //TODO private method to check that path is created
         if (pathElement == null) {
@@ -24,7 +26,7 @@ public class PathVerifications {
         }
 
         ElementsCollection ec = PathUtils.getPathPageRoot().$$(By.cssSelector("div." + operation.toLowerCase() + "-tab.enabled"));
-        CollectorHelper.getCollector().assertThat(ec.size() == 1).as("Operation %s is not created", operation).isTrue();
+        assertThat(ec.size() == 1).as("Operation %s is not created", operation).isTrue();
     }
 
     @Then("^check that path parameter \"([^\"]*)\" is created for path \"([^\"]*)\"$")
