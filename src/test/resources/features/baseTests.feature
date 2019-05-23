@@ -14,7 +14,7 @@ Feature: Basic tests
       | MyPathByLink | true  |
       | MyPathByPlus | false |
 
-    And create a new data type with link
+    And create a new data type by link
       | NewDataLink | best data type ever | false | true  |
       | NewDataPlus | best data type ever | false | false |
 

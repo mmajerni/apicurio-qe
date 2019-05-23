@@ -111,7 +111,7 @@ public class MainPageSteps {
     /**
      * @param table parameters: Name | Description | boolean if should be created with REST resources | boolean if should be created with Link |
      */
-    @When("^create a new data type with link$")
+    @When("^create a new data type by link$")
     public void createANewDataType(DataTable table) {
         for (List<String> dataRow : table.cells()) {
 

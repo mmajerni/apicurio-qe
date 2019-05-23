@@ -47,7 +47,7 @@ Feature: Test everything on main page
       | Mypaths24 | false |
       | DataType1 | false |
 
-    And create a new data type with link
+    And create a new data type by link
       | DataType1  | desc | false | false |
       | DataType2  | desc | false | false |
       | DataTypex  | desc | false | false |
