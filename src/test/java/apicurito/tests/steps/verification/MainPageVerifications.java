@@ -1,6 +1,7 @@
 package apicurito.tests.steps.verification;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.exactText;
@@ -54,28 +55,29 @@ public class MainPageVerifications {
     }
 
     @Then("^check that API contact info is$")
-    public void checkThatAPIContactInfoIs(DataTable table) {
+    public void checkThatAPIContactInfoIs(DataTable table) {        //NEW
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         for (List<String> dataRow : table.cells()) {
             String name = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("name")).getText();
-            String email = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("email")).getText();
-            String url = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("url")).getText();
+            assertThat(name).as("Checking API contatct name:").isEqualTo(dataRow.get(0));
 
-            CollectorHelper.getCollector().assertThat(name).as("Checking API contatct name:").isEqualTo(dataRow.get(0));
-            CollectorHelper.getCollector().assertThat(email).as("Checking API contatct email:").isEqualTo(dataRow.get(1));
-            CollectorHelper.getCollector().assertThat(url).as("Checking API contatct url:").isEqualTo(dataRow.get(2));
+            String email = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("email")).getText();
+            assertThat(email).as("Checking API contatct email:").isEqualTo(dataRow.get(1));
+
+            String url = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("url")).getText();
+            assertThat(url).as("Checking API contatct url:").isEqualTo(dataRow.get(2));
         }
     }
 
     @Then("^check that API license is \"([^\"]*)\"$")
-    public void checkThatAPILicenseIs(String expectedLincense) {
+    public void checkThatAPILicenseIs(String expectedLincense) {        //NEW
         CommonUtils.getAppRoot().$("title-bar").$("h1").click();
         ElementsCollection licenses = MainPageUtils.getMainPageRoot().$("license-section").$$("button").filter(text("Change License"));
         if (licenses.size() == 1) {
             String license = MainPageUtils.getMainPageRoot().$("license-section").$("h2").getText();
-            CollectorHelper.getCollector().assertThat(license).as("Checking API linces:").isEqualTo(expectedLincense);
+            assertThat(license).as("Checking API linces:").isEqualTo(expectedLincense);
         } else {
-            CollectorHelper.getCollector().fail("License is not set!");
+            fail("License is not set!");
         }
     }
 
@@ -88,13 +90,13 @@ public class MainPageVerifications {
             ElementsCollection tag = MainPageUtils.getMainPageRoot().$("tags-section").$$(By.className("name")).filter((text(expectedTag)));
 
             if (tag.size() == 0) {
-                CollectorHelper.getCollector().fail("Tag %s is not created!", expectedTag);
+                fail("Tag %s is not created!", expectedTag);
             } else {
                 String desc = tag.first().parent().$(By.className("description")).getText();
-                CollectorHelper.getCollector().assertThat(desc).as("Checking tag description:").isEqualTo(expectedDescription);
+                assertThat(desc).as("Checking tag description:").isEqualTo(expectedDescription);
             }
         } else {
-            CollectorHelper.getCollector().fail("Tags are not created!");
+            fail("Tags are not created!");
         }
     }
 
@@ -122,13 +124,13 @@ public class MainPageVerifications {
      ********** SECURITY SUBSECTION verification steps ************
      **************************************************************/
     @Then("^check security scheme$")
-    public void checkSecurityScheme(DataTable table) {
+    public void checkSecurityScheme(DataTable table) {      //NEW
         for (List<String> dataRow : table.cells()) {
             ElementsCollection schemeElements = MainPageUtils.getMainPageRoot().$(MainPageUtils.SECURITY_SECTION).$$("security-scheme-row").filter(text(dataRow.get(0))).filter(text(dataRow.get(1)));
-            CollectorHelper.getCollector().assertThat(schemeElements.size()).as("Scheme with name %s do not exist", dataRow.get(0)).isEqualTo(1);
+            assertThat(schemeElements.size()).as("Scheme with name %s do not exist", dataRow.get(0)).isEqualTo(1);
             if (!dataRow.get(2).isEmpty()) {
                 String description = schemeElements.first().$(By.className("description")).getText();
-                CollectorHelper.getCollector().assertThat(description).as("Description should be %s but is %s", dataRow.get(2), description).isEqualTo(dataRow.get(2));
+                assertThat(description).as("Description should be %s but is %s", dataRow.get(2), description).isEqualTo(dataRow.get(2));
             }
         }
     }
