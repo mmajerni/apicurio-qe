@@ -20,61 +20,76 @@ import io.cucumber.datatable.DataTable;
 
 public class MainPageVerifications {
 
+    private static class MainPageElements {
+        private static By TITLE_BAR = By.cssSelector("title-bar");
+        private static By H1 = By.cssSelector("h1");
+
+        private static By INFO_SECTION = By.cssSelector("info-section");
+        private static By CONTACT_SECTION = By.cssSelector("contact-section");
+        private static By LICENSE_SECTION = By.cssSelector("license-section");
+        private static By TAGS_SECTION = By.cssSelector("tags-section");
+        private static By SECURITY_SECTION = By.cssSelector("security-schemes-section");
+        private static By REQUIREMENTS_SECTION = By.cssSelector("security-requirements-section");
+
+        private static By DESCRIPTION = By.className("description");
+        private static By SECTION = By.cssSelector("section");
+    }
+
     @Then("^check that API name is \"([^\"]*)\"$")
     public void checkThatAPINameIs(String expectedName) {       //NEW
-        String apiName = CommonUtils.getAppRoot().$("title-bar").$("h1").getText();
+        String apiName = CommonUtils.getAppRoot().$(MainPageElements.TITLE_BAR).$(MainPageElements.H1).getText();
         assertThat(apiName).as("Checking API name:").isEqualTo(expectedName);
     }
 
     @Then("^check that API version is \"([^\"]*)\"$")
     public void checkThatAPIVersionIs(String expectedVersion) {     //NEW
-        CommonUtils.getAppRoot().$("title-bar").$("h1").click();
-        String version = MainPageUtils.getMainPageRoot().$("info-section").$(By.className("version")).getText();
+        openMainPage();
+        String version = MainPageUtils.getMainPageRoot().$(MainPageElements.INFO_SECTION).$(By.className("version")).getText();
         assertThat(version).as("Checking API version:").isEqualTo(expectedVersion);
     }
 
     @Then("^check that API description is \"([^\"]*)\"$")
     public void checkThatAPIDescriptionIs(String expectedDescription) {     //TODO
-        CommonUtils.getAppRoot().$("title-bar").$("h1").click();
-        String description = MainPageUtils.getMainPageRoot().$("info-section").$(By.className("description")).getText();
+        openMainPage();
+        String description = MainPageUtils.getMainPageRoot().$(MainPageElements.INFO_SECTION).$(MainPageElements.DESCRIPTION).getText();
         CollectorHelper.getCollector().assertThat(description).as("Checking API descritpion:").isEqualTo(expectedDescription);
     }
 
     @Then("^check that API consume \"([^\"]*)\"$")
     public void checkThatAPIConsume(String expectedConsume) {               //TODO      //NEW
-        CommonUtils.getAppRoot().$("title-bar").$("h1").click();
+        openMainPage();
         String consume = MainPageUtils.getMainPageRoot().$(By.className("consumes")).getText();
         assertThat(consume).as("Checking API consumes:").isEqualTo(expectedConsume);
     }
 
     @Then("^check that API produce \"([^\"]*)\"$")
     public void checkThatAPIProduce(String expectedProduce) {       //NEW
-        CommonUtils.getAppRoot().$("title-bar").$("h1").click();
+        openMainPage();
         String produce = MainPageUtils.getMainPageRoot().$(By.className("produces")).getText();
         assertThat(produce).as("Checking API produces:").isEqualTo(expectedProduce);
     }
 
     @Then("^check that API contact info is$")
     public void checkThatAPIContactInfoIs(DataTable table) {        //NEW
-        CommonUtils.getAppRoot().$("title-bar").$("h1").click();
+        openMainPage();
         for (List<String> dataRow : table.cells()) {
-            String name = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("name")).getText();
-            assertThat(name).as("Checking API contatct name:").isEqualTo(dataRow.get(0));
+            String name = MainPageUtils.getMainPageRoot().$(MainPageElements.CONTACT_SECTION).$(By.className("name")).getText();
+            assertThat(name).as("Checking API contact name:").isEqualTo(dataRow.get(0));
 
-            String email = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("email")).getText();
-            assertThat(email).as("Checking API contatct email:").isEqualTo(dataRow.get(1));
+            String email = MainPageUtils.getMainPageRoot().$(MainPageElements.CONTACT_SECTION).$(By.className("email")).getText();
+            assertThat(email).as("Checking API contact email:").isEqualTo(dataRow.get(1));
 
-            String url = MainPageUtils.getMainPageRoot().$("contact-section").$(By.className("url")).getText();
-            assertThat(url).as("Checking API contatct url:").isEqualTo(dataRow.get(2));
+            String url = MainPageUtils.getMainPageRoot().$(MainPageElements.CONTACT_SECTION).$(By.className("url")).getText();
+            assertThat(url).as("Checking API contact url:").isEqualTo(dataRow.get(2));
         }
     }
 
     @Then("^check that API license is \"([^\"]*)\"$")
     public void checkThatAPILicenseIs(String expectedLincense) {        //NEW
-        CommonUtils.getAppRoot().$("title-bar").$("h1").click();
-        ElementsCollection licenses = MainPageUtils.getMainPageRoot().$("license-section").$$("button").filter(text("Change License"));
+        openMainPage();
+        ElementsCollection licenses = MainPageUtils.getMainPageRoot().$(MainPageElements.LICENSE_SECTION).$$("button").filter(text("Change License"));
         if (licenses.size() == 1) {
-            String license = MainPageUtils.getMainPageRoot().$("license-section").$("h2").getText();
+            String license = MainPageUtils.getMainPageRoot().$(MainPageElements.LICENSE_SECTION).$("h2").getText();
             assertThat(license).as("Checking API linces:").isEqualTo(expectedLincense);
         } else {
             fail("License is not set!");
@@ -83,16 +98,16 @@ public class MainPageVerifications {
 
     @Then("^check that API have tag \"([^\"]*)\" with description \"([^\"]*)\"$")
     public void checkThatAPIHaveTagWithDescription(String expectedTag, String expectedDescription) {
-        CommonUtils.getAppRoot().$("title-bar").$("h1").click();
-        ElementsCollection tagRows = MainPageUtils.getMainPageRoot().$("tags-section").$$("tag-row");
+        openMainPage();
+        ElementsCollection tagRows = MainPageUtils.getMainPageRoot().$(MainPageElements.TAGS_SECTION).$$("tag-row");
 
         if (tagRows.size() > 0) {
-            ElementsCollection tag = MainPageUtils.getMainPageRoot().$("tags-section").$$(By.className("name")).filter((text(expectedTag)));
+            ElementsCollection tag = MainPageUtils.getMainPageRoot().$(MainPageElements.TAGS_SECTION).$$(By.className("name")).filter((text(expectedTag)));
 
             if (tag.size() == 0) {
                 fail("Tag %s is not created!", expectedTag);
             } else {
-                String desc = tag.first().parent().$(By.className("description")).getText();
+                String desc = tag.first().parent().$(MainPageElements.DESCRIPTION).getText();
                 assertThat(desc).as("Checking tag description:").isEqualTo(expectedDescription);
             }
         } else {
@@ -107,7 +122,7 @@ public class MainPageVerifications {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        ElementsCollection paths = MainPageUtils.getMainPageRoot().$$("section").filter(attribute("label", "Paths")).first()
+        ElementsCollection paths = MainPageUtils.getMainPageRoot().$$(MainPageElements.SECTION).filter(attribute("label", "Paths")).first()
                 .$$(By.className("api-path")).filter(exactText(expectedPathName));
 
         assertThat(paths.size()).as("Path %s is not created:", expectedPathName).isEqualTo(1);
@@ -115,7 +130,7 @@ public class MainPageVerifications {
 
     @Then("^check that data type \"([^\"]*)\" is created$")
     public void checkThatDataTypeIsCreated(String datatype) {       //NEW
-        ElementsCollection types = MainPageUtils.getMainPageRoot().$$("section").filter(attribute("label", "Data Types")).first()
+        ElementsCollection types = MainPageUtils.getMainPageRoot().$$(MainPageElements.SECTION).filter(attribute("label", "Data Types")).first()
                 .$$(By.className("api-definition")).filter(exactText(datatype));
         assertThat(types.size()).as("Data type %s is not created!", datatype).isEqualTo(1);
     }
@@ -125,11 +140,12 @@ public class MainPageVerifications {
      **************************************************************/
     @Then("^check security scheme$")
     public void checkSecurityScheme(DataTable table) {      //NEW
+        openMainPage();
         for (List<String> dataRow : table.cells()) {
-            ElementsCollection schemeElements = MainPageUtils.getMainPageRoot().$(MainPageUtils.SECURITY_SECTION).$$("security-scheme-row").filter(text(dataRow.get(0))).filter(text(dataRow.get(1)));
+            ElementsCollection schemeElements = MainPageUtils.getMainPageRoot().$(MainPageElements.SECURITY_SECTION).$$("security-scheme-row").filter(text(dataRow.get(0))).filter(text(dataRow.get(1)));
             assertThat(schemeElements.size()).as("Scheme with name %s do not exist", dataRow.get(0)).isEqualTo(1);
             if (!dataRow.get(2).isEmpty()) {
-                String description = schemeElements.first().$(By.className("description")).getText();
+                String description = schemeElements.first().$(MainPageElements.DESCRIPTION).getText();
                 assertThat(description).as("Description should be %s but is %s", dataRow.get(2), description).isEqualTo(dataRow.get(2));
             }
         }
@@ -137,7 +153,12 @@ public class MainPageVerifications {
 
     @Then("^check that API security requirement \"([^\"]*)\" exists$")
     public void checkThatAPISecurityRequirementExists(String requirement) {
-        ElementsCollection requirementList = MainPageUtils.getMainPageRoot().$(MainPageUtils.REQUIREMENTS_SECTION).$$(By.className("security-requirement")).filter(text(requirement));
+        openMainPage();
+        ElementsCollection requirementList = MainPageUtils.getMainPageRoot().$(MainPageElements.REQUIREMENTS_SECTION).$$(By.className("security-requirement")).filter(text(requirement));
         CollectorHelper.getCollector().assertThat(requirementList.size()).as("Requirement %s do not exist", requirement).isEqualTo(1);
+    }
+
+    private void openMainPage() {
+        CommonUtils.getAppRoot().$(MainPageElements.TITLE_BAR).$(MainPageElements.H1).click();
     }
 }

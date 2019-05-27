@@ -14,8 +14,10 @@ public class DataTypeSteps {
     public static SelenideElement PROPERTIES_SECTION = DataTypeUtils.getDataTypesRoot().$$("section")
             .filter(Condition.attribute("label", "PROPERTIES")).first();
 
-    public static By INFO_SECTION = By.cssSelector("definition-info-section");
-    public static By EXAMPLE_SECTION = By.cssSelector("definition-example-section");
+    private static class DataTypesElements {
+        private static By INFO_SECTION = By.cssSelector("definition-info-section");
+        private static By EXAMPLE_SECTION = By.cssSelector("definition-example-section");
+    }
 
     @When("^create data type property with name \"([^\"]*)\"$")
     public void createDataTypeProperty(String property) {
@@ -32,12 +34,12 @@ public class DataTypeSteps {
 
     @When("^set data type description \"([^\"]*)\"$")
     public void setDataTypeDescription(String description) {
-        CommonUtils.setValueInTextArea(description, DataTypeUtils.getDataTypesRoot().$(INFO_SECTION));
+        CommonUtils.setValueInTextArea(description, DataTypeUtils.getDataTypesRoot().$(DataTypesElements.INFO_SECTION));
     }
 
     @When("^set data type example \"([^\"]*)\"$")
     public void setDataTypeExample(String example) {
-        CommonUtils.setValueInTextArea(example, DataTypeUtils.getDataTypesRoot().$(EXAMPLE_SECTION));
+        CommonUtils.setValueInTextArea(example, DataTypeUtils.getDataTypesRoot().$(DataTypesElements.EXAMPLE_SECTION));
     }
 
     @When("^set property \"([^\"]*)\" as \"([^\"]*)\"$")

@@ -13,15 +13,23 @@ import cucumber.api.java.en.Then;
 
 public class DataTypeVerifications {
 
+    private static class DataTypesElements {
+        private static By INFO_SECTION = By.cssSelector("definition-info-section");
+        private static By EXAMPLE_SECTION = By.cssSelector("definition-example-section");
+
+        private static By PROPERTY_ROW = By.cssSelector("property-row");
+        private static By DESCRIPTION = By.className("description");
+    }
+
     @Then("^check that data type description is \"([^\"]*)\"$")
     public void checkThatDataTypeDescriptionIs(String expectedDescription) {
-        String description = DataTypeUtils.getDataTypesRoot().$(DataTypeSteps.INFO_SECTION).$(By.className("description")).getText();
+        String description = DataTypeUtils.getDataTypesRoot().$(DataTypesElements.INFO_SECTION).$(DataTypesElements.DESCRIPTION).getText();
         CollectorHelper.getCollector().assertThat(description).as("Description should be %s but is %s", expectedDescription, description).isEqualTo(expectedDescription);
     }
 
     @Then("^check that data type property \"([^\"]*)\" is created$")
     public void checkThatDataTypePropertyIsCreated(String expectedProperty) {
-        ElementsCollection properties = DataTypeSteps.PROPERTIES_SECTION.$$("property-row");
+        ElementsCollection properties = DataTypeSteps.PROPERTIES_SECTION.$$(DataTypesElements.PROPERTY_ROW);
         for (SelenideElement property : properties) {
             String name = property.$(By.className("name")).getText();
             if (name.equals(expectedProperty)) {
@@ -34,7 +42,7 @@ public class DataTypeVerifications {
     @Then("^check that description is \"([^\"]*)\" for property \"([^\"]*)\"$")
     public void checkThatDescriptionIsForProperty(String expectedDescription, String property) {
         DataTypeUtils.openPropertyDescription(property);
-        String description = DataTypeSteps.PROPERTIES_SECTION.$$("property-row").filter(Condition.text(property)).first().$(By.className("description")).getText();
+        String description = DataTypeSteps.PROPERTIES_SECTION.$$(DataTypesElements.PROPERTY_ROW).filter(Condition.text(property)).first().$(DataTypesElements.DESCRIPTION).getText();
         CollectorHelper.getCollector().assertThat(description).as("Description of property %s should be %s but is %s", property, expectedDescription, description).isEqualTo(expectedDescription);
     }
 
@@ -69,7 +77,7 @@ public class DataTypeVerifications {
 
     @Then("^check that example is \"([^\"]*)\"$")
     public void checkThatExampleIs(String expectedExample) {
-        String example = DataTypeUtils.getDataTypesRoot().$(DataTypeSteps.EXAMPLE_SECTION).$(By.className("example")).getText();
+        String example = DataTypeUtils.getDataTypesRoot().$(DataTypesElements.EXAMPLE_SECTION).$(By.className("example")).getText();
         CollectorHelper.getCollector().assertThat(example).as("Example should be %s but is %s", expectedExample, example).isEqualTo(expectedExample);
     }
 }
