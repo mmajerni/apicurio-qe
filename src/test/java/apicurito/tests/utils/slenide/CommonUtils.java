@@ -21,6 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CommonUtils {
 
+    private static class CommonElements {
+        private static By TEXT_AREA = By.cssSelector("ace-editor textarea");
+    }
+
     public static SelenideElement getAppRoot() {
         return $(By.cssSelector(TestConfiguration.getAppRoot())).shouldBe(visible);
     }
@@ -70,9 +74,9 @@ public class CommonUtils {
 
         section.$$("div").filter(attribute("title", "Click to edit.")).first().click();
 
-        section.$("ace-editor textarea").sendKeys(Keys.CONTROL + "a");
-        section.$("ace-editor textarea").sendKeys(Keys.DELETE);
-        section.$("ace-editor textarea").sendKeys(value);
+        section.$(CommonElements.TEXT_AREA).sendKeys(Keys.CONTROL + "a");
+        section.$(CommonElements.TEXT_AREA).sendKeys(Keys.DELETE);
+        section.$(CommonElements.TEXT_AREA).sendKeys(value);
 
         getButtonWithTitle("Save changes.", section).click();
     }
@@ -105,7 +109,7 @@ public class CommonUtils {
             newDataFormPage.$("#qp_name").setValue(dataRow.get(0));
 
             if (!dataRow.get(1).isEmpty()) {
-                newDataFormPage.$("ace-editor textarea").sendKeys(dataRow.get(1));
+                newDataFormPage.$(CommonElements.TEXT_AREA).sendKeys(dataRow.get(1));
             }
 
             if (!dataRow.get(2).isEmpty()) {

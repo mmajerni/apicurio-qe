@@ -15,12 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MainPageUtils {
 
-    public static final By INFO_SECTION = By.cssSelector("info-section");
-    public static final By CONTACT_SECTION = By.cssSelector("contact-section");
-    public static final By LICENSE_SECTION = By.cssSelector("license-section");
-    public static final By TAGS_SECTION = By.cssSelector("tags-section");
-    public static final By SECURITY_SECTION = By.cssSelector("security-schemes-section");
-    public static final By REQUIREMENTS_SECTION = By.cssSelector("security-requirements-section");
+    private static class MainPageElements {
+        private static By LICENSE_SECTION = By.cssSelector("license-section");
+        private static By TAGS_SECTION = By.cssSelector("tags-section");
+    }
 
     public static SelenideElement getMainPageRoot() {
         return $("editor").shouldBe(visible);
@@ -29,16 +27,16 @@ public class MainPageUtils {
     public static void setLicense(String license) {
         log.info("Setting license to {}", license);
 
-        SelenideElement parentElement = getMainPageRoot().$(LICENSE_SECTION).$$("a").filter(text(license)).first().parent().parent();
+        SelenideElement parentElement = getMainPageRoot().$(MainPageElements.LICENSE_SECTION).$$("a").filter(text(license)).first().parent().parent();
         parentElement.$$("button").filter(text("Use This License")).first().click();
     }
 
     public static void addTag(String tag, String description) {
         log.info("Adding tag {} with description {}", tag, description);
 
-        getMainPageRoot().$(TAGS_SECTION).$("#tag").setValue(tag);
-        getMainPageRoot().$(TAGS_SECTION).$("#description").setValue(description);
-        CommonUtils.getButtonWithText("Add", getMainPageRoot().$(TAGS_SECTION)).click();
+        getMainPageRoot().$(MainPageElements.TAGS_SECTION).$("#tag").setValue(tag);
+        getMainPageRoot().$(MainPageElements.TAGS_SECTION).$("#description").setValue(description);
+        CommonUtils.getButtonWithText("Add", getMainPageRoot().$(MainPageElements.TAGS_SECTION)).click();
     }
 
     public static SelenideElement getPathWithName(String pathName) {

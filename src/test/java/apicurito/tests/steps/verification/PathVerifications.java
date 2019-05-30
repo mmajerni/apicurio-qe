@@ -15,6 +15,11 @@ import cucumber.api.java.en.Then;
 
 public class PathVerifications {
 
+    private static class PathElements {
+        private static By PATH_PARAMETERS_SECTION = By.cssSelector("path-params-section");
+        private static By PATH_PARAMETERS_ROW = By.cssSelector("path-param-row");
+    }
+
     @Then("^check that operation \"([^\"]*)\" is created for path \"([^\"]*)\"$")       //NEW
     public void checkThatOperationIsCreatedForPath(String operation, String path) {
         SelenideElement pathElement = MainPageUtils.getPathWithName(path);      //TODO private method to check that path is created
@@ -39,13 +44,13 @@ public class PathVerifications {
             pathElement.click();
         }
 
-        SelenideElement parameterElement = PathUtils.getPathPageRoot().$("path-params-section").$$("path-param-row").filter(matchText(parameter)).first();
+        SelenideElement parameterElement = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW).filter(matchText(parameter)).first();
         CollectorHelper.getCollector().assertThat(parameterElement.$("div").getAttribute("class")).as("Path parameter %s is not created", parameter).doesNotContain("missing");
     }
 
     @Then("^check that path parameter \"([^\"]*)\" has description \"([^\"]*)\"$")
     public void checkThatPathParameterHasDescription(String parameter, String description) {
-        SelenideElement descriptionElement = PathUtils.getPathPageRoot().$("path-params-section").$$("path-param-row")
+        SelenideElement descriptionElement = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
                 .filter(matchText(parameter)).first().$(By.className("description"));
 
         CollectorHelper.getCollector().assertThat(descriptionElement.getText()).as("Description for path parameter %s is different", parameter).isEqualTo(description);
@@ -53,7 +58,7 @@ public class PathVerifications {
 
     @Then("^check that path parameter \"([^\"]*)\" has type \"([^\"]*)\" formatted as \"([^\"]*)\"$")
     public void checkThatPathParameterHasTypeFormattedAs(String parameter, String type, String as) {
-        SelenideElement summaryElement = PathUtils.getPathPageRoot().$("path-params-section").$$("path-param-row")
+        SelenideElement summaryElement = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
                 .filter(matchText(parameter)).first().$(By.className("summary"));
 
         CollectorHelper.getCollector().assertThat(summaryElement.getText()).as("Parameter has not type %s formatted as %s", type, as).isEqualTo(type.toLowerCase() + " as " + as.toLowerCase());

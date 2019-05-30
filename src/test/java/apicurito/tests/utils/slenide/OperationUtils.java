@@ -14,6 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class OperationUtils {
 
+    private static class OperationElements {
+        private static By PATH_PARAMETERS_ROW = By.cssSelector("path-param-row");
+        private static By RESPONSES_SECTION = By.cssSelector("responses-section");
+    }
+
     public static SelenideElement getOperationRoot() {
         return $("operations-section").shouldBe(visible);
     }
@@ -31,13 +36,13 @@ public class OperationUtils {
 
     public static void selectResponse(Integer code) {
         log.info("Selecting response {}", code);
-        getOperationRoot().$("responses-section").$$(By.className("statusCode")).filter(text(code.toString())).first().click();
+        getOperationRoot().$(OperationElements.RESPONSES_SECTION).$$(By.className("statusCode")).filter(text(code.toString())).first().click();
     }
 
     public static void overrideParameter(String parameter) {
         log.info("Overriding parameter {}", parameter);
 
-        SelenideElement param = getOperationRoot().$$("path-param-row").filter(text(parameter)).first();
+        SelenideElement param = getOperationRoot().$$(OperationElements.PATH_PARAMETERS_ROW).filter(text(parameter)).first();
         CommonUtils.getButtonWithText("Override", param).click();
     }
 
