@@ -136,19 +136,23 @@ public class MainPageSteps {
     }
 
     /**
-     * @param table parameters: Name | Description | boolean if should be created with REST resources | boolean if should be created with Link |
+     * @param table parameters:
+     * Name
+     * Description OPTIONAL (could be empty string)
+     * Example in json format OPTIONAL (could be empty string)
+     * boolean if should be created with REST resources
+     * boolean if should be created with Link
      */
     @When("^create a new data type by link$")
     public void createANewDataType(DataTable table) {
         for (List<String> dataRow : table.cells()) {
-
-            if (Boolean.valueOf(dataRow.get(3))) {
+            if (Boolean.valueOf(dataRow.get(4))) {
                 CommonUtils.getClickableLink(CommonUtils.Sections.DATA_TYPES, CommonUtils.getAppRoot()).click();
             } else {
                 CommonUtils.getNewPlusSignButton(CommonUtils.Sections.DATA_TYPES, CommonUtils.getAppRoot()).click();
             }
 
-            MainPageUtils.createDataType(dataRow.get(0), dataRow.get(1), Boolean.valueOf(dataRow.get(2)));
+            MainPageUtils.createDataType(dataRow.get(0), dataRow.get(1), dataRow.get(2), Boolean.valueOf(dataRow.get(3)));
         }
     }
 

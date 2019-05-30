@@ -45,7 +45,7 @@ Feature: Basic tests
   Scenario: create data type by link
     When create a new API
     And create a new data type by link
-      | NewDataLink | best data type ever | false | true |
+      | NewDataLink | best data type ever |  | false | true |
 
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
@@ -55,7 +55,7 @@ Feature: Basic tests
   Scenario: create a new data type by plus
     When create a new API
     And create a new data type by link
-      | NewDataPlus | best data type ever | false | false |
+      | NewDataPlus | best data type ever |  | false | false |
 
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
