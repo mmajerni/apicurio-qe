@@ -3,12 +3,14 @@ package apicurito.tests.steps.verification;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static com.codeborne.selenide.Condition.matchText;
+import static com.codeborne.selenide.Condition.text;
 
 import org.openqa.selenium.By;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
+import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
 import apicurito.tests.utils.slenide.PathUtils;
 import cucumber.api.java.en.Then;
@@ -35,7 +37,7 @@ public class PathVerifications {
     }
 
     @Then("^check that path parameter \"([^\"]*)\" is created for path \"([^\"]*)\"$")
-    public void checkThatPathParameterIsCreatedForPath(String parameter, String path) {
+    public void checkThatPathParameterIsCreatedForPath(String parameter, String path) {     //NEW
         SelenideElement pathElement = MainPageUtils.getPathWithName(path);
         if (pathElement == null) {
             CollectorHelper.getCollector().fail("Parameter %s is not created because path %s is not found.", parameter, path);
@@ -45,25 +47,38 @@ public class PathVerifications {
         }
 
         SelenideElement parameterElement = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW).filter(matchText(parameter)).first();
-        CollectorHelper.getCollector().assertThat(parameterElement.$("div").getAttribute("class")).as("Path parameter %s is not created", parameter).doesNotContain("missing");
+        assertThat(parameterElement.$("div").getAttribute("class")).as("Path parameter %s is not created", parameter).doesNotContain("missing");
     }
 
     @Then("^check that path parameter \"([^\"]*)\" has description \"([^\"]*)\"$")
-    public void checkThatPathParameterHasDescription(String parameter, String description) {
+    public void checkThatPathParameterHasDescription(String parameter, String description) {        //NEW
         SelenideElement descriptionElement = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
                 .filter(matchText(parameter)).first().$(By.className("description"));
 
-        CollectorHelper.getCollector().assertThat(descriptionElement.getText()).as("Description for path parameter %s is different", parameter).isEqualTo(description);
+        assertThat(descriptionElement.getText()).as("Description for path parameter %s is different", parameter).isEqualTo(description);
     }
 
-    @Then("^check that path parameter \"([^\"]*)\" has type \"([^\"]*)\" formatted as \"([^\"]*)\"$")
-    public void checkThatPathParameterHasTypeFormattedAs(String parameter, String type, String as) {
-        SelenideElement summaryElement = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
-                .filter(matchText(parameter)).first().$(By.className("summary"));
+    @Then("^check that path parameter \"([^\"]*)\" has type \"([^\"]*)\"$")
+    public void checkThatPathParameterHasType(String parameter, String expectedType) {       //NEW
+        PathUtils.openPathTypes(parameter);
+        String type = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
+                .filter(text(parameter)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId()).getText();
+        assertThat(type).as("Type is %s but should be %s", type, expectedType).isEqualTo(expectedType);
+    }
 
-        CollectorHelper.getCollector().assertThat(summaryElement.getText()).as("Parameter has not type %s formatted as %s", type, as).isEqualTo(type.toLowerCase() + " as " + as.toLowerCase());
-        //TODO need support for array
-        //TODO e.g. int32 will not work (different strings in summary)
-        //TODO if both type and as are the same ->fail
+    @Then("^check that path parameter \"([^\"]*)\" has type of \"([^\"]*)\"$")
+    public void checkThatPathParameterHasTypeOf(String parameter, String expectedOf) {       //NEW
+        PathUtils.openPathTypes(parameter);
+        String of = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
+                .filter(text(parameter)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId()).getText();
+        assertThat(of).as("Type of is %s but should be %s", of, expectedOf).isEqualTo(expectedOf);
+    }
+
+    @Then("^check that path parameter \"([^\"]*)\" has type as \"([^\"]*)\"$")
+    public void checkThatPathParameterHasTypeAs(String parameter, String expectedAs) {       //NEW
+        PathUtils.openPathTypes(parameter);
+        String as = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
+                .filter(text(parameter)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId()).getText();
+        assertThat(as).as("Type as is %s but should be %s", as, expectedAs).isEqualTo(expectedAs);
     }
 }
