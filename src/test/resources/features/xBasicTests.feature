@@ -1,5 +1,5 @@
 @apicuritoTests
-@basicTests
+@basicTestsX
 Feature: Basic tests
 
   Background:
