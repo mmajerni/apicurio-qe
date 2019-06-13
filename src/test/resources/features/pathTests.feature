@@ -268,3 +268,121 @@ Feature: Path tests
 
     #TODO Add test -> create path parameter in operation
     #TODO Add tests -> create path QP and HP
+
+  @allGetParameters
+  Scenario: fill almost all get parameters
+    # There are missing: request data form, override parameter and security requirement
+    When import API "src/test/resources/preparedAPIs/basic.json"
+    And select path "/operations"
+    And select operation "GET"
+
+    And set operation summary "MySummary"
+    And set operation id "MyOperationID"
+    And set operation description "MyDescription"
+    And set operation tags "tag1,tag2"
+    And override consumes with "text/xml" for operation "GET"
+    And override produces with "text/xml" for operation "GET"
+
+    And create query parameters
+      | QueryParameter | Description for Query Param | Required | Array | String | Date |
+
+    And create header parameters
+      | HeaderParameter | Description for Header Param | Required | Array | String | Date |
+
+    And create request body
+    And set request body description "Description for RB"
+    And set request body type "Array"
+    And set request body type of "String"
+    And set request body type as "Date"
+
+    And set response 100 with plus sign
+    And set response description "Description for response 100" for response 100
+    And set response type "Number" for response 100
+    And set response type as "Float" for response 100
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    And select path "/operations"
+    And select operation "GET"
+
+    Then check that operation summary is "MySummary"
+    And check that operation ID is "MyOperationID"
+    And check that operation description is "MyDescription"
+    And check that operation tags are "tag1,tag2"
+    And check that operation consumes "text/xml"
+    And check that operation produces "text/xml"
+
+    And check that exist query parameters
+      | QueryParameter | Description for Query Param | Required | Array | String | Date |
+
+    And check that exist header parameters
+      | HeaderParameter | Description for Header Param | Required | Array | String | Date |
+
+    And check that exist request body
+    And check that request body description is "Description for RB"
+    And check that request body type is "Array"
+    And check that request body type of is "String"
+    And check that request body type as is "Date"
+
+    And check that exist response 100
+    And check that description is "Description for response 100" for response 100
+    And check that type is "Number" for response 100
+    And check that type as is "Float" for response 100
+
+  @otherParameters
+  Scenario: fill other operation parameters
+    When import API "src/test/resources/preparedAPIs/paramsAndSecurity.json"
+    And select path "/first/{id}/{name}{email}"
+    And select operation "POST"
+
+    And create request form data
+      | FormData | Description for FormData | Required | Array | String | Date |
+
+    And override security requirements in operation with
+      | oauth |
+      | basic |
+
+    And override security requirements in operation with
+      | No Security |
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+    And select path "/first/{id}/{name}{email}"
+    And select operation "POST"
+
+    Then check that exist request form data
+      | FormData | Description for FormData | Required | Array | String | Date |
+
+    And check that operation security requirement "oauth, basic" exist
+    And check that operation security requirement "No Security" exist
+
+  @pathWithParameters
+  Scenario: create path with parameters, one override and one create in operation
+    When import API "src/test/resources/preparedAPIs/paramsAndSecurity.json"
+    And select path "/first/{id}/{name}{email}"
+
+    And create path parameter "email"
+    And set description "parameter email desc" for path parameter "email"
+    And set path parameter type "String" for path parameter "email"
+    And set path parameter type as "Byte" for path parameter "email"
+
+    And select operation "GET"
+    And override parameter "email"
+    And set description "override parameter email desc" for override path parameter "email" in operation
+    #TODO create parameter in operation
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    And select path "/first/{id}/{name}{email}"
+
+    Then check that path parameter "email" is created for path "/first/{id}/{name}{email}"
+    And check that path parameter "email" has description "parameter email desc"
+    And check that path parameter "email" has type "String"
+    And check that path parameter "email" has type as "Byte"
+
+    And select operation "GET"
+
+    And check that path parameter "email" is overridden
+    And check that overridden path parameter "email" has description "override parameter email desc"

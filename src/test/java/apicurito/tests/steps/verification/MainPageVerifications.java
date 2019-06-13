@@ -36,23 +36,23 @@ public class MainPageVerifications {
     }
 
     @Then("^check that API name is \"([^\"]*)\"$")
-    public void checkThatAPINameIs(String expectedName) {       //NEW
+    public void checkThatAPINameIs(String expectedName) {
         String apiName = CommonUtils.getAppRoot().$(MainPageElements.TITLE_BAR).$(MainPageElements.H1).getText();
         assertThat(apiName).as("Checking API name:").isEqualTo(expectedName);
     }
 
     @Then("^check that API version is \"([^\"]*)\"$")
-    public void checkThatAPIVersionIs(String expectedVersion) {     //NEW
+    public void checkThatAPIVersionIs(String expectedVersion) {
         openMainPage();
         String version = MainPageUtils.getMainPageRoot().$(MainPageElements.INFO_SECTION).$(By.className("version")).getText();
         assertThat(version).as("Checking API version:").isEqualTo(expectedVersion);
     }
 
     @Then("^check that API description is \"([^\"]*)\"$")
-    public void checkThatAPIDescriptionIs(String expectedDescription) {     //TODO
+    public void checkThatAPIDescriptionIs(String expectedDescription) {
         openMainPage();
         String description = MainPageUtils.getMainPageRoot().$(MainPageElements.INFO_SECTION).$(MainPageElements.DESCRIPTION).getText();
-        CollectorHelper.getCollector().assertThat(description).as("Checking API descritpion:").isEqualTo(expectedDescription);
+        assertThat(description).as("Checking API descritpion:").isEqualTo(expectedDescription);
     }
 
     @Then("^check that API consume \"([^\"]*)\"$")
@@ -70,7 +70,7 @@ public class MainPageVerifications {
     }
 
     @Then("^check that API contact info is$")
-    public void checkThatAPIContactInfoIs(DataTable table) {        //NEW
+    public void checkThatAPIContactInfoIs(DataTable table) {
         openMainPage();
         for (List<String> dataRow : table.cells()) {
             String name = MainPageUtils.getMainPageRoot().$(MainPageElements.CONTACT_SECTION).$(By.className("name")).getText();
@@ -85,7 +85,7 @@ public class MainPageVerifications {
     }
 
     @Then("^check that API license is \"([^\"]*)\"$")
-    public void checkThatAPILicenseIs(String expectedLincense) {        //NEW
+    public void checkThatAPILicenseIs(String expectedLincense) {
         openMainPage();
         ElementsCollection licenses = MainPageUtils.getMainPageRoot().$(MainPageElements.LICENSE_SECTION).$$("button").filter(text("Change License"));
         if (licenses.size() == 1) {
@@ -116,7 +116,7 @@ public class MainPageVerifications {
     }
 
     @Then("^check that path \"([^\"]*)\" is created$")
-    public void checkThatPathIsCreated(String expectedPathName) {       //NEW
+    public void checkThatPathIsCreated(String expectedPathName) {
         try {
             Thread.sleep(1000L);        //need to wait at least for a second because of Stale Element Reference Exception
         } catch (InterruptedException e) {
@@ -129,7 +129,7 @@ public class MainPageVerifications {
     }
 
     @Then("^check that data type \"([^\"]*)\" is created$")
-    public void checkThatDataTypeIsCreated(String datatype) {       //NEW
+    public void checkThatDataTypeIsCreated(String datatype) {
         ElementsCollection types = MainPageUtils.getMainPageRoot().$$(MainPageElements.SECTION).filter(attribute("label", "Data Types")).first()
                 .$$(By.className("api-definition")).filter(exactText(datatype));
         assertThat(types.size()).as("Data type %s is not created!", datatype).isEqualTo(1);
@@ -138,8 +138,13 @@ public class MainPageVerifications {
     /**************************************************************
      ********** SECURITY SUBSECTION verification steps ************
      **************************************************************/
+
+    /**
+     * Currently is supported just name and description without editing scheme.
+     * #TODO after closing: https://github.com/Apicurio/apicurio-studio/issues/656
+     */
     @Then("^check security scheme$")
-    public void checkSecurityScheme(DataTable table) {      //NEW
+    public void checkSecurityScheme(DataTable table) {
         openMainPage();
         for (List<String> dataRow : table.cells()) {
             ElementsCollection schemeElements = MainPageUtils.getMainPageRoot().$(MainPageElements.SECURITY_SECTION).$$("security-scheme-row").filter(text(dataRow.get(0))).filter(text(dataRow.get(1)));
@@ -155,7 +160,7 @@ public class MainPageVerifications {
     public void checkThatAPISecurityRequirementExists(String requirement) {
         openMainPage();
         ElementsCollection requirementList = MainPageUtils.getMainPageRoot().$(MainPageElements.REQUIREMENTS_SECTION).$$(By.className("security-requirement")).filter(text(requirement));
-        CollectorHelper.getCollector().assertThat(requirementList.size()).as("Requirement %s do not exist", requirement).isEqualTo(1);
+        assertThat(requirementList.size()).as("Requirement %s do not exist", requirement).isEqualTo(1);
     }
 
     private void openMainPage() {

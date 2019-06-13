@@ -1,6 +1,5 @@
 package apicurito.tests.utils.slenide;
 
-import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
@@ -19,6 +18,10 @@ public class OperationUtils {
         private static By RESPONSES_SECTION = By.cssSelector("responses-section");
     }
 
+    private static class OperationSelenideElements {
+        private static SelenideElement DROPDOWN_ELEMENT = getOperationRoot().$("#addResponseModal").$(By.className("dropdown"));
+    }
+
     public static SelenideElement getOperationRoot() {
         return $("operations-section").shouldBe(visible);
     }
@@ -26,10 +29,8 @@ public class OperationUtils {
     public static void setResponseStatusCode(Integer code) {
         log.info("Setting status code to {}", code);
 
-        getOperationRoot().$("#statusCodeMenu").click();
-
-        getOperationRoot().$$("ul").filter(attribute("class", "dropdown-menu")).first()
-                .$$("a").filter(text(code.toString())).first().click();
+        OperationSelenideElements.DROPDOWN_ELEMENT.$("#statusCodeDropDown").click();
+        OperationSelenideElements.DROPDOWN_ELEMENT.$(By.className("dropdown-menu")).$$("a").filter(text(code.toString())).first().click();
 
         CommonUtils.getButtonWithText("Add", getOperationRoot()).click();
     }

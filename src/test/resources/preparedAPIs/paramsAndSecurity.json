@@ -17,6 +17,7 @@
         },
         "/first/{id}/{name}{email}": {
             "get": {},
+            "post": {},
             "parameters": [
                 {
                     "name": "id",

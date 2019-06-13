@@ -1,5 +1,5 @@
 @apicuritoTests
-@basicTestsX
+@basicTests
 Feature: Basic tests
 
   Background:
@@ -123,3 +123,29 @@ Feature: Basic tests
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
     Then check that operation "TRACE" is created for path "/clearPath"
+
+  @createAllOperations
+  Scenario: create all operations
+    When import API "src/test/resources/preparedAPIs/basic.json"
+    And select path "/clearPath"
+
+    And create new "GET" operation
+    And create new "PUT" operation
+    And create new "POST" operation
+    And create new "DELETE" operation
+    And create new "OPTIONS" operation
+    And create new "HEAD" operation
+    And create new "PATCH" operation
+    And create new "TRACE" operation
+
+    And save API as "json" and close editor
+    And import API "tmp/download/openapi-spec.json"
+
+    Then check that operation "GET" is created for path "/clearPath"
+    And check that operation "PUT" is created for path "/clearPath"
+    And check that operation "POST" is created for path "/clearPath"
+    And check that operation "DELETE" is created for path "/clearPath"
+    And check that operation "OPTIONS" is created for path "/clearPath"
+    And check that operation "HEAD" is created for path "/clearPath"
+    And check that operation "PATCH" is created for path "/clearPath"
+    And check that operation "TRACE" is created for path "/clearPath"

@@ -1,6 +1,7 @@
 package apicurito.tests.steps.verification;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import static com.codeborne.selenide.Condition.matchText;
 import static com.codeborne.selenide.Condition.text;
@@ -22,11 +23,11 @@ public class PathVerifications {
         private static By PATH_PARAMETERS_ROW = By.cssSelector("path-param-row");
     }
 
-    @Then("^check that operation \"([^\"]*)\" is created for path \"([^\"]*)\"$")       //NEW
+    @Then("^check that operation \"([^\"]*)\" is created for path \"([^\"]*)\"$")
     public void checkThatOperationIsCreatedForPath(String operation, String path) {
         SelenideElement pathElement = MainPageUtils.getPathWithName(path);      //TODO private method to check that path is created
         if (pathElement == null) {
-            CollectorHelper.getCollector().fail("Operation %s is not created because path %s is not found.", operation, path);
+            fail("Operation %s is not created because path %s is not found.", operation, path);
             return;
         } else {
             pathElement.click();
@@ -37,10 +38,10 @@ public class PathVerifications {
     }
 
     @Then("^check that path parameter \"([^\"]*)\" is created for path \"([^\"]*)\"$")
-    public void checkThatPathParameterIsCreatedForPath(String parameter, String path) {     //NEW
+    public void checkThatPathParameterIsCreatedForPath(String parameter, String path) {
         SelenideElement pathElement = MainPageUtils.getPathWithName(path);
         if (pathElement == null) {
-            CollectorHelper.getCollector().fail("Parameter %s is not created because path %s is not found.", parameter, path);
+            fail("Parameter %s is not created because path %s is not found.", parameter, path);
             return;
         } else {
             pathElement.click();
@@ -51,7 +52,7 @@ public class PathVerifications {
     }
 
     @Then("^check that path parameter \"([^\"]*)\" has description \"([^\"]*)\"$")
-    public void checkThatPathParameterHasDescription(String parameter, String description) {        //NEW
+    public void checkThatPathParameterHasDescription(String parameter, String description) {
         SelenideElement descriptionElement = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
                 .filter(matchText(parameter)).first().$(By.className("description"));
 
@@ -59,7 +60,7 @@ public class PathVerifications {
     }
 
     @Then("^check that path parameter \"([^\"]*)\" has type \"([^\"]*)\"$")
-    public void checkThatPathParameterHasType(String parameter, String expectedType) {       //NEW
+    public void checkThatPathParameterHasType(String parameter, String expectedType) {
         PathUtils.openPathTypes(parameter);
         String type = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
                 .filter(text(parameter)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId()).getText();
@@ -67,7 +68,7 @@ public class PathVerifications {
     }
 
     @Then("^check that path parameter \"([^\"]*)\" has type of \"([^\"]*)\"$")
-    public void checkThatPathParameterHasTypeOf(String parameter, String expectedOf) {       //NEW
+    public void checkThatPathParameterHasTypeOf(String parameter, String expectedOf) {
         PathUtils.openPathTypes(parameter);
         String of = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
                 .filter(text(parameter)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId()).getText();
@@ -75,7 +76,7 @@ public class PathVerifications {
     }
 
     @Then("^check that path parameter \"([^\"]*)\" has type as \"([^\"]*)\"$")
-    public void checkThatPathParameterHasTypeAs(String parameter, String expectedAs) {       //NEW
+    public void checkThatPathParameterHasTypeAs(String parameter, String expectedAs) {
         PathUtils.openPathTypes(parameter);
         String as = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
                 .filter(text(parameter)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId()).getText();
