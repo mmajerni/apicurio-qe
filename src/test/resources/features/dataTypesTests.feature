@@ -1,48 +1,59 @@
 @apicuritoTests
 @dataTypesTests
-Feature: Test everything on data types page
+Feature: Data types tests
 
   Background:
     Given delete API "tmp/download/openapi-spec.json"
     And log into apicurito
-    And create a new API
-    And initialize collector
 
-  @twoDataTypes
-  Scenario: create 2 data types with/without rest
-    When create a new data type by link
-      | data1 | best data type ever | false | true  |
-      | data2 | desc                | true  | false |
-
-    And select data type "data1"
+  @setDataTypeDescription
+  Scenario: set data types description
+    When import API "src/test/resources/preparedAPIs/basic.json"
+    And select data type "clearDataType"
     And set data type description "best data type"
+    And save API as "json" and close editor
+    And import API "tmp/download/openapi-spec.json"
+    And select data type "clearDataType"
+    Then check that data type description is "best data type"
+
+  @setDataTypeProperty
+  Scenario: set data type property
+    When import API "src/test/resources/preparedAPIs/basic.json"
+    And select data type "clearDataType"
     And create data type property with name "MyProperty"
     And set description "My desc" for data type property "MyProperty"
-
     And set property type "Integer" for property "MyProperty"
     And set property type as "32-Bit Integer" for property "MyProperty"
-
     And set property "MyProperty" as "Required"
-
-    And select data type "data2"
-    And set data type example "MyExample"
 
     Then save API as "json" and close editor
     When import API "tmp/download/openapi-spec.json"
+    And select data type "clearDataType"
 
-    Then check that data type "data1" is created
-    And select data type "data1"
-    And check that data type description is "best data type"
-    And check that data type property "MyProperty" is created
-
+    Then check that data type property "MyProperty" is created
     And check that description is "My desc" for property "MyProperty"
     And check that type is "Integer" for property "MyProperty"
     And check that type as is "32-Bit Integer" for property "MyProperty"
     And check that property "MyProperty" is "Required"
 
-    And check that data type "data2" is created
-    And select data type "data2"
-    And check that example is "MyExample"
+  @setDataTypeExample
+  Scenario: set data type example
+    When import API "src/test/resources/preparedAPIs/basic.json"
+    And select data type "clearDataType"
+    And set data type example "MyExample"
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+    And select data type "clearDataType"
+    Then check that example is MyExample
+
+  @createDataTypeWithRestResource
+  Scenario: create data type with rest resource
+    When create a new API
+    And create a new data type by link
+      | data2 |  |  | true | false |
+
+    And save API as "json" and close editor
+    Then import API "tmp/download/openapi-spec.json"
 
     And check that path "/data2S" is created
     And check that operation "GET" is created for path "/data2S"
@@ -114,4 +125,31 @@ Feature: Test everything on data types page
     #Choose type mean that the type is not set
     And check that type is "Choose Type" for response 204
 
-    Then check all for errors
+  @createFullDataType
+  Scenario: create full data type
+    When create a new API
+    And create a new data type by link
+      | exampleTest | desc | {"name" : "John", "age" : 24, "isMan" : true} | false | true |
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+    And select data type "exampleTest"
+
+    Then check that data type description is "desc"
+
+    And check that example is {"name" : "John", "age" : 24, "isMan" : true}
+
+    # Test also checks that properties will be created for given json example
+    And check that data type property "age" is created
+    And check that type is "Integer" for property "age"
+    And check that type as is "32-Bit Integer" for property "age"
+    And check that property "age" is "Not Required"
+
+    And check that data type property "isMan" is created
+    And check that type is "Boolean" for property "isMan"
+    And check that property "isMan" is "Not Required"
+
+    And check that data type property "name" is created
+    And check that type is "String" for property "name"
+    And check that type as is "String" for property "name"
+    And check that property "name" is "Not Required"

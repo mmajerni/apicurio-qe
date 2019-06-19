@@ -114,22 +114,29 @@ public class OperationSteps {
 
     @When("^override consumes with \"([^\"]*)\" for operation \"([^\"]*)\"$")
     public void overrideConsumesWithForOperation(String consumes, String operation) {
+        SelenideElement consumesSubsection = OperationUtils.getOperationRoot().$(OperationElements.CONSUMES);
+
         PathUtils.getOperationButton(PathSteps.Operations.valueOf(operation), OperationUtils.getOperationRoot())
                 .click();
 
-        CommonUtils.getButtonWithText("Override", OperationUtils.getOperationRoot().$(OperationElements.CONSUMES))
+        CommonUtils.getButtonWithText("Override", consumesSubsection)
                 .click();
-        CommonUtils.setValueInLabel(consumes, OperationUtils.getOperationRoot().$(OperationElements.CONSUMES), true);
+
+        CommonUtils.getLabelWithType("text", consumesSubsection).setValue(consumes);
+        CommonUtils.getButtonWithTitle("Save changes.", consumesSubsection).click();
     }
 
     @When("^override produces with \"([^\"]*)\" for operation \"([^\"]*)\"$")
     public void overrideProducesWithForOperation(String produces, String operation) {
+        SelenideElement producesSubsection = OperationUtils.getOperationRoot().$(OperationElements.PRODUCES);
+
         PathUtils.getOperationButton(PathSteps.Operations.valueOf(operation), OperationUtils.getOperationRoot())
                 .click();
 
         CommonUtils.getButtonWithText("Override", OperationUtils.getOperationRoot().$(OperationElements.PRODUCES))
                 .click();
-        CommonUtils.setValueInLabel(produces, OperationUtils.getOperationRoot().$(OperationElements.PRODUCES), true);
+        CommonUtils.getLabelWithType("text", producesSubsection).setValue(produces);
+        CommonUtils.getButtonWithTitle("Save changes.", producesSubsection).click();
     }
 
     @When("^delete current operation$")

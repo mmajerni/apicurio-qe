@@ -46,9 +46,6 @@ public class CommonSteps {
     @When("^import API \"([^\"]*)\"$")
     public void importAPI(String pathtoFile) {
         ImportExportUtils.importAPI(new File(pathtoFile));
-
-        //give jenkins more time so the integration shows up in the list //TODO
-        //TestUtils.sleepIgnoreInterrupt(TestConfiguration.getJenkinsDelay());
     }
 
     @Then("^save API as \"([^\"]*)\" and close editor$")
@@ -58,7 +55,6 @@ public class CommonSteps {
                 .exists()
                 .isFile()
                 .has(new Condition<>(f -> f.length() > 0, "File size should be greater than 0"));
-        //TODO ExportedIntegrationJSONUtil.testExportedFile(exportedIntegrationFile);
 
         CommonUtils.getButtonWithText("Close", CommonUtils.getAppRoot())
                 .click();
