@@ -1,0 +1,69 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "New API",
+        "description": "A brand new API with no content.  Go nuts!",
+        "version": "1.0"
+    },
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/first/{id}": {
+            "get": {}
+        },
+        "/first/{id}/{name}{email}": {
+            "get": {},
+            "post": {},
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "description": "parameter id description",
+                    "required": true,
+                    "type": "integer"
+                }
+            ]
+        }
+    },
+    "securityDefinitions": {
+        "basic": {
+            "type": "basic",
+            "description": "basic description"
+        },
+        "api": {
+            "type": "apiKey",
+            "description": "api description",
+            "name": "test",
+            "in": "header"
+        },
+        "oauth": {
+            "type": "oauth2",
+            "description": "oauth description",
+            "flow": "implicit",
+            "authorizationUrl": "https://x.com",
+            "scopes": {
+                "scope-1": "scope 1 descirption",
+                "scope-2": "scope 2 description"
+            }
+        }
+    },
+    "security": [
+        {
+            "basic": [],
+            "oauth": [
+                "scope-1"
+            ]
+        },
+        {
+            "basic": [],
+            "api": [],
+            "oauth": [
+                "scope-2"
+            ]
+        }
+    ]
+}

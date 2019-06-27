@@ -20,6 +20,33 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MainPageSteps {
+
+    private static class SecurityElements {
+        private static By SECURITY_SCHEME_EDITOR = By.cssSelector("security-scheme-editor");
+        private static By SECURITY_REQUIREMENT_EDITOR = By.cssSelector("security-requirement-editor");
+        private static By DESCRIPTION = By.id("description");
+        private static By DROPDOWN = By.className("dropdown");
+        private static By API_KEY_AUTH = By.className("apiKey-auth");
+        private static By OAUTH2_AUTH = By.className("oauth2-auth");
+        private static By SCHEMES_LIST = By.className("list-group-item");
+        private static By CHECKBOX = By.cssSelector("input");
+        private static By SCOPE = By.className("scope");
+    }
+
+    private static class BasicElements {
+        private static By BUTTON = By.cssSelector("button");
+        private static By A = By.cssSelector("a");
+    }
+
+    private static class MainPageElements {
+        private static By INFO_SECTION = By.cssSelector("info-section");
+        private static By CONTACT_SECTION = By.cssSelector("contact-section");
+        private static By LICENSE_SECTION = By.cssSelector("license-section");
+        private static By TAGS_SECTION = By.cssSelector("tags-section");
+        private static By SECURITY_SECTION = By.cssSelector("security-schemes-section");
+        private static By REQUIREMENTS_SECTION = By.cssSelector("security-requirements-section");
+    }
+
     /**
      * Second column: if true then create with link else create with plus sign.
      */
@@ -61,33 +88,33 @@ public class MainPageSteps {
 
     @When("^set API version to \"([^\"]*)\"$")
     public void setAPIVersionTo(String version) {
-        CommonUtils.setValueInLabel(version, CommonUtils.getAppRoot().$("info-section").$(By.className("version")), false);
+        CommonUtils.setValueInLabel(version, CommonUtils.getAppRoot().$(MainPageElements.INFO_SECTION).$(By.className("version")), false);
     }
 
     @When("^change description to \"([^\"]*)\"$")
     public void changeDescriptionTo(String description) {
-        CommonUtils.setValueInTextArea(description, CommonUtils.getAppRoot().$("info-section").$(By.className("description")));
+        CommonUtils.setValueInTextArea(description, CommonUtils.getAppRoot().$(MainPageElements.INFO_SECTION).$(By.className("description")));
     }
 
     @When("^add contact info$")
     public void addContactInfo(DataTable table) {
-        CommonUtils.getClickableLink(CommonUtils.Sections.CONTACT, MainPageUtils.CONTACT_SECTION).click();
+        CommonUtils.getClickableLink(CommonUtils.Sections.CONTACT, MainPageElements.CONTACT_SECTION).click();
         for (List<String> dataRow : table.cells()) {
-            CommonUtils.setValueInLabel(dataRow.get(0), CommonUtils.getAppRoot().$("contact-section").$(By.className("name")), false);
-            CommonUtils.setValueInLabel(dataRow.get(1), CommonUtils.getAppRoot().$("contact-section").$(By.className("email")), false);
-            CommonUtils.setValueInLabel(dataRow.get(2), CommonUtils.getAppRoot().$("contact-section").$(By.className("url")), false);
+            CommonUtils.setValueInLabel(dataRow.get(0), CommonUtils.getAppRoot().$(MainPageElements.CONTACT_SECTION).$(By.className("name")), false);
+            CommonUtils.setValueInLabel(dataRow.get(1), CommonUtils.getAppRoot().$(MainPageElements.CONTACT_SECTION).$(By.className("email")), false);
+            CommonUtils.setValueInLabel(dataRow.get(2), CommonUtils.getAppRoot().$(MainPageElements.CONTACT_SECTION).$(By.className("url")), false);
         }
     }
 
     @When("^add license \"([^\"]*)\"$")
     public void addLicense(String license) {
-        CommonUtils.getClickableLink(CommonUtils.Sections.LICENSE, MainPageUtils.LICENSE_SECTION).click();
+        CommonUtils.getClickableLink(CommonUtils.Sections.LICENSE, MainPageElements.LICENSE_SECTION).click();
         MainPageUtils.setLicense(license);
     }
 
     @When("^add tag \"([^\"]*)\" with description \"([^\"]*)\"$")
     public void addTagWithDescription(String tag, String description) {
-        CommonUtils.getClickableLink(CommonUtils.Sections.TAG, MainPageUtils.TAGS_SECTION).click();
+        CommonUtils.getClickableLink(CommonUtils.Sections.TAG, MainPageElements.TAGS_SECTION).click();
         MainPageUtils.addTag(tag, description);
     }
 
@@ -109,19 +136,23 @@ public class MainPageSteps {
     }
 
     /**
-     * @param table parameters: Name | Description | boolean if should be created with REST resources | boolean if should be created with Link |
+     * @param table parameters:
+     * Name
+     * Description OPTIONAL (could be empty string)
+     * Example in json format OPTIONAL (could be empty string)
+     * boolean if should be created with REST resources
+     * boolean if should be created with Link
      */
-    @When("^create a new data type with link$")
+    @When("^create a new data type by link$")
     public void createANewDataType(DataTable table) {
         for (List<String> dataRow : table.cells()) {
-
-            if (Boolean.valueOf(dataRow.get(3))) {
+            if (Boolean.valueOf(dataRow.get(4))) {
                 CommonUtils.getClickableLink(CommonUtils.Sections.DATA_TYPES, CommonUtils.getAppRoot()).click();
             } else {
                 CommonUtils.getNewPlusSignButton(CommonUtils.Sections.DATA_TYPES, CommonUtils.getAppRoot()).click();
             }
 
-            MainPageUtils.createDataType(dataRow.get(0), dataRow.get(1), Boolean.valueOf(dataRow.get(2)));
+            MainPageUtils.createDataType(dataRow.get(0), dataRow.get(1), dataRow.get(2), Boolean.valueOf(dataRow.get(3)));
         }
     }
 
@@ -138,18 +169,18 @@ public class MainPageSteps {
     @When("^create basic security scheme with values$")
     public void createBasicSecuritySchemeWithValues(DataTable table) {
         for (List<String> dataRow : table.cells()) {
-            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.getMainPageRoot().$(MainPageUtils.SECURITY_SECTION))
+            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.getMainPageRoot().$(MainPageElements.SECURITY_SECTION))
                     .click();
-            SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$("security-scheme-editor");
+            SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$(SecurityElements.SECURITY_SCHEME_EDITOR);
 
             CommonUtils.getLabelWithName("schemeName", schemeEditor)
                     .setValue(dataRow.get(0));
 
             if (!dataRow.get(1).isEmpty()) {
-                schemeEditor.$("#description").setValue(dataRow.get(1));
+                schemeEditor.$(SecurityElements.DESCRIPTION).setValue(dataRow.get(1));
             }
 
-            CommonUtils.setDropDownValue("button", "BASIC", schemeEditor.$(By.className("dropdown")));
+            CommonUtils.setDropDownValue("button", "BASIC", schemeEditor.$(SecurityElements.DROPDOWN));
 
             CommonUtils.getButtonWithText("Save", schemeEditor)
                     .click();
@@ -159,24 +190,24 @@ public class MainPageSteps {
     @When("^create API Key security scheme with values$")
     public void createAPIKeySecuritySchemeWithValues(DataTable table) {
         for (List<String> dataRow : table.cells()) {
-            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.getMainPageRoot().$(MainPageUtils.SECURITY_SECTION))
+            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.getMainPageRoot().$(MainPageElements.SECURITY_SECTION))
                     .click();
-            SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$("security-scheme-editor");
+            SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$(SecurityElements.SECURITY_SCHEME_EDITOR);
 
             CommonUtils.getLabelWithName("schemeName", schemeEditor)
                     .setValue(dataRow.get(0));
 
             if (!dataRow.get(1).isEmpty()) {
-                schemeEditor.$("#description").setValue(dataRow.get(1));
+                schemeEditor.$(SecurityElements.DESCRIPTION).setValue(dataRow.get(1));
             }
-            CommonUtils.setDropDownValue("button", "API Key", schemeEditor.$(By.className("dropdown")));
+            CommonUtils.setDropDownValue("button", "API Key", schemeEditor.$(SecurityElements.DROPDOWN));
 
             if (!dataRow.get(2).isEmpty()) {
-                CommonUtils.setDropDownValue("#in20", dataRow.get(2), schemeEditor.$(By.className("apiKey-auth")));
+                CommonUtils.setDropDownValue("#in20", dataRow.get(2), schemeEditor.$(SecurityElements.API_KEY_AUTH));
             }
 
             if (!dataRow.get(3).isEmpty()) {
-                CommonUtils.getLabelWithType("text", schemeEditor.$(By.className("apiKey-auth")))
+                CommonUtils.getLabelWithType("text", schemeEditor.$(SecurityElements.API_KEY_AUTH))
                         .setValue(dataRow.get(3));
             }
             CommonUtils.getButtonWithText("Save", schemeEditor)
@@ -187,29 +218,29 @@ public class MainPageSteps {
     @When("^create OAuth security scheme with values$")
     public void createOAuthSecuritySchemeWithValues(DataTable table) {
         for (List<String> dataRow : table.cells()) {
-            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.getMainPageRoot().$(MainPageUtils.SECURITY_SECTION))
+            CommonUtils.getNewPlusSignButton(CommonUtils.Sections.SCHEME, MainPageUtils.getMainPageRoot().$(MainPageElements.SECURITY_SECTION))
                     .click();
-            SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$("security-scheme-editor");
+            SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$(SecurityElements.SECURITY_SCHEME_EDITOR);
 
             CommonUtils.getLabelWithName("schemeName", schemeEditor)
                     .setValue(dataRow.get(0));
 
             if (!dataRow.get(1).isEmpty()) {
-                schemeEditor.$("#description").setValue(dataRow.get(1));
+                schemeEditor.$(SecurityElements.DESCRIPTION).setValue(dataRow.get(1));
             }
-            CommonUtils.setDropDownValue("button", "OAuth 2", schemeEditor.$(By.className("dropdown")));
+            CommonUtils.setDropDownValue("button", "OAuth 2", schemeEditor.$(SecurityElements.DROPDOWN));
 
             if (!dataRow.get(2).isEmpty()) {
-                CommonUtils.setDropDownValue("#flow", dataRow.get(2), schemeEditor.$(By.className("oauth2-auth")));
+                CommonUtils.setDropDownValue("#flow", dataRow.get(2), schemeEditor.$(SecurityElements.OAUTH2_AUTH));
             }
 
             if (!dataRow.get(3).isEmpty()) {
-                CommonUtils.getLabelWithName("authorizationUrl", schemeEditor.$(By.className("oauth2-auth")))
+                CommonUtils.getLabelWithName("authorizationUrl", schemeEditor.$(SecurityElements.OAUTH2_AUTH))
                         .setValue(dataRow.get(3));
             }
 
             if (!dataRow.get(3).isEmpty()) {
-                CommonUtils.getLabelWithName("tokenUrl", schemeEditor.$(By.className("oauth2-auth")))
+                CommonUtils.getLabelWithName("tokenUrl", schemeEditor.$(SecurityElements.OAUTH2_AUTH))
                         .setValue(dataRow.get(4));
             }
             CommonUtils.getButtonWithText("Save", schemeEditor)
@@ -219,15 +250,15 @@ public class MainPageSteps {
 
     @When("^create security requirement with schemes$")
     public void createSecurityRequirementWithSchemes(DataTable table) {
-        CommonUtils.getNewPlusSignButton(CommonUtils.Sections.REQUIREMENT, MainPageUtils.getMainPageRoot().$(MainPageUtils.REQUIREMENTS_SECTION))
+        CommonUtils.getNewPlusSignButton(CommonUtils.Sections.REQUIREMENT, MainPageUtils.getMainPageRoot().$(MainPageElements.REQUIREMENTS_SECTION))
                 .click();
-        SelenideElement requirementEditor = MainPageUtils.getMainPageRoot().$("security-requirement-editor");
+        SelenideElement requirementEditor = MainPageUtils.getMainPageRoot().$(SecurityElements.SECURITY_REQUIREMENT_EDITOR);
 
         for (List<String> dataRow : table.cells()) {
-            ElementsCollection listOfSchemes = requirementEditor.$$(By.className("list-group-item"));
+            ElementsCollection listOfSchemes = requirementEditor.$$(SecurityElements.SCHEMES_LIST);
             for (SelenideElement scheme : listOfSchemes) {
                 if (scheme.$(By.className("name")).getText().equals(dataRow.get(0)) && !scheme.getAttribute("class").contains("active")) {
-                    scheme.$("input").click();
+                    scheme.$(SecurityElements.CHECKBOX).click();
                     break;
                 }
             }
@@ -238,15 +269,15 @@ public class MainPageSteps {
 
     @When("^add scopes to security requirement \"([^\"]*)\" and OAuth scheme \"([^\"]*)\"$")
     public void addScopesToSecurityRequirementAndOAuthScheme(String requirementName, String schemeName, DataTable table) {
-        SelenideElement requirement = MainPageUtils.getMainPageRoot().$(MainPageUtils.REQUIREMENTS_SECTION).$$(By.className("security-requirement")).filter(text(requirementName)).first();
-        requirement.$("button").click();
-        requirement.$("a").shouldHave(text("Edit")).click();
+        SelenideElement requirement = MainPageUtils.getMainPageRoot().$(MainPageElements.REQUIREMENTS_SECTION).$$(By.className("security-requirement")).filter(text(requirementName)).first();
+        requirement.$(BasicElements.BUTTON).click();
+        requirement.$(BasicElements.A).shouldHave(text("Edit")).click();
 
-        SelenideElement requirementEditor = MainPageUtils.getMainPageRoot().$("security-requirement-editor");
-        SelenideElement scheme = requirementEditor.$$(By.className("list-group-item")).filter(text(schemeName)).first();
+        SelenideElement requirementEditor = MainPageUtils.getMainPageRoot().$(SecurityElements.SECURITY_REQUIREMENT_EDITOR);
+        SelenideElement scheme = requirementEditor.$$(SecurityElements.SCHEMES_LIST).filter(text(schemeName)).first();
         scheme.$(By.className("list-view-pf-expand")).$("span").click();
         for (List<String> dataRow : table.cells()) {
-            scheme.$$(By.className("scope")).filter(text(dataRow.get(0))).first().$("input").click();
+            scheme.$$(SecurityElements.SCOPE).filter(text(dataRow.get(0))).first().$(SecurityElements.CHECKBOX).click();
         }
         CommonUtils.getButtonWithText("Save", requirementEditor)
                 .click();
@@ -254,14 +285,14 @@ public class MainPageSteps {
 
     @When("^add scopes to scheme \"([^\"]*)\"$")
     public void addScopesToScheme(String scheme, DataTable table) {
-        SelenideElement schemeElement = MainPageUtils.getMainPageRoot().$(MainPageUtils.SECURITY_SECTION).$$("security-scheme-row").filter(text(scheme)).first();
-        schemeElement.$("button").click();
-        schemeElement.$("a").shouldHave(text("Edit")).click();
+        SelenideElement schemeElement = MainPageUtils.getMainPageRoot().$(MainPageElements.SECURITY_SECTION).$$("security-scheme-row").filter(text(scheme)).first();
+        schemeElement.$(BasicElements.BUTTON).click();
+        schemeElement.$(BasicElements.A).shouldHave(text("Edit")).click();
 
-        SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$("security-scheme-editor");
+        SelenideElement schemeEditor = MainPageUtils.getMainPageRoot().$(SecurityElements.SECURITY_SCHEME_EDITOR);
         for (List<String> dataRow : table.cells()) {
             CommonUtils.getButtonWithText("Add Scope", schemeEditor).click();
-            ElementsCollection scopeElements = schemeEditor.$$(By.className("scope"));
+            ElementsCollection scopeElements = schemeEditor.$$(SecurityElements.SCOPE);
 
             CommonUtils.setValueInLabel(dataRow.get(0), scopeElements.get(scopeElements.size() - 1).$(By.className("scope-name")), false);
             CommonUtils.setValueInLabel(dataRow.get(1), scopeElements.get(scopeElements.size() - 1).$(By.className("scope-description")), false);

@@ -1,12 +1,14 @@
 package apicurito.tests.utils.slenide;
 
 import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.matchesText;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 
 import org.openqa.selenium.By;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
@@ -15,12 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MainPageUtils {
 
-    public static final By INFO_SECTION = By.cssSelector("info-section");
-    public static final By CONTACT_SECTION = By.cssSelector("contact-section");
-    public static final By LICENSE_SECTION = By.cssSelector("license-section");
-    public static final By TAGS_SECTION = By.cssSelector("tags-section");
-    public static final By SECURITY_SECTION = By.cssSelector("security-schemes-section");
-    public static final By REQUIREMENTS_SECTION = By.cssSelector("security-requirements-section");
+    private static class MainPageElements {
+        private static By LICENSE_SECTION = By.cssSelector("license-section");
+        private static By TAGS_SECTION = By.cssSelector("tags-section");
+        private static By ENTITY_EDITOR_FORM = By.id("entity-editor-form");
+        private static By TEXT_AREA = By.cssSelector("ace-editor textarea");
+    }
 
     public static SelenideElement getMainPageRoot() {
         return $("editor").shouldBe(visible);
@@ -29,16 +31,16 @@ public class MainPageUtils {
     public static void setLicense(String license) {
         log.info("Setting license to {}", license);
 
-        SelenideElement parentElement = getMainPageRoot().$(LICENSE_SECTION).$$("a").filter(text(license)).first().parent().parent();
+        SelenideElement parentElement = getMainPageRoot().$(MainPageElements.LICENSE_SECTION).$$("a").filter(text(license)).first().parent().parent();
         parentElement.$$("button").filter(text("Use This License")).first().click();
     }
 
     public static void addTag(String tag, String description) {
         log.info("Adding tag {} with description {}", tag, description);
 
-        getMainPageRoot().$(TAGS_SECTION).$("#tag").setValue(tag);
-        getMainPageRoot().$(TAGS_SECTION).$("#description").setValue(description);
-        CommonUtils.getButtonWithText("Add", getMainPageRoot().$(TAGS_SECTION)).click();
+        getMainPageRoot().$(MainPageElements.TAGS_SECTION).$("#tag").setValue(tag);
+        getMainPageRoot().$(MainPageElements.TAGS_SECTION).$("#description").setValue(description);
+        CommonUtils.getButtonWithText("Add", getMainPageRoot().$(MainPageElements.TAGS_SECTION)).click();
     }
 
     public static SelenideElement getPathWithName(String pathName) {
@@ -64,14 +66,35 @@ public class MainPageUtils {
                 .$$(By.className("api-definition")).filter(text(datatypeName)).first();
     }
 
-    public static void createDataType(String name, String description, Boolean isRest) {
+    /**
+     * @param name is name of Data Type
+     * @param description is OPTIONAL description for Data Type
+     * @param example is OPTIONAL example for Data Type
+     * @param isRest is boolean value which indicates using REST Resource, true -> use REST Resource , false -> No Resource
+     */
+    public static void createDataType(String name, String description, String example, Boolean isRest) {
         log.info("Creating data type with name {} and description {} and rest resources are {}", name, description, isRest);
 
-        CommonUtils.getLabelWithName("name", CommonUtils.getAppRoot()).setValue(name);
-        if (isRest) {
-            CommonUtils.getAppRoot().$$("div").filter(attribute("class", "create-option")).filter(text("REST Resource")).first().click();
+        SelenideElement entityForm = CommonUtils.getAppRoot().$(MainPageElements.ENTITY_EDITOR_FORM);
+
+        CommonUtils.getLabelWithName("name", entityForm).setValue(name);
+
+        if (!description.isEmpty()) {
+            entityForm.$(By.id("description")).$(MainPageElements.TEXT_AREA).sendKeys(description);
         }
-        CommonUtils.getButtonWithText("Save", CommonUtils.getAppRoot().$("#entity-editor-form")).click();
+
+        if (!example.isEmpty()) {
+            entityForm.$$("div")
+                    .filter(Condition.attribute("class", "form-group"))
+                    .filter(matchesText("JSON Example"))
+                    .first().$(MainPageElements.TEXT_AREA).sendKeys(example);
+        }
+
+        if (isRest) {
+            entityForm.$$(By.className("create-option")).filter(text("REST Resource")).first().click();
+        }
+
+        CommonUtils.getButtonWithText("Save", entityForm).click();
     }
 
     public static void putSearchSubstring(String substring) {

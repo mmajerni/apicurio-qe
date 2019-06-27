@@ -19,6 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class PathUtils {
 
+    private static class PathElements {
+        private static By PATH_PARAMETERS_ROW = By.cssSelector("path-param-row");
+    }
+
     public static SelenideElement getPathPageRoot() {
         return $("path-form").shouldBe(visible);
     }
@@ -43,11 +47,11 @@ public class PathUtils {
     }
 
     public static void createPathParameter(String parameter) {
-        CommonUtils.getButtonWithText("Create", getPathPageRoot().$$("path-param-row").filter(text(parameter)).first()).click();
+        CommonUtils.getButtonWithText("Create", getPathPageRoot().$$(PathElements.PATH_PARAMETERS_ROW).filter(text(parameter)).first()).click();
     }
 
     public static void openPathDescription(String parameter) {
-        ElementsCollection elements = getPathPageRoot().$$("path-param-row")
+        ElementsCollection elements = getPathPageRoot().$$(PathElements.PATH_PARAMETERS_ROW)
                 .filter(text(parameter)).first()
                 .$$("div").filter(attribute("class", "description"));
         if (elements.size() == 1) {
@@ -56,7 +60,7 @@ public class PathUtils {
     }
 
     public static void openPathTypes(String parameter) {
-        ElementsCollection elements = getPathPageRoot().$$("path-param-row")
+        ElementsCollection elements = getPathPageRoot().$$(PathElements.PATH_PARAMETERS_ROW)
                 .filter(text(parameter)).first()
                 .$$("div").filter(attribute("class", "summary"));
         if (elements.size() == 1) {
