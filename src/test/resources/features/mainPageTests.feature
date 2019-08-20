@@ -1,4 +1,5 @@
 @apicuritoTests
+@ui
 @mainPageTests
 Feature: Main page tests
 

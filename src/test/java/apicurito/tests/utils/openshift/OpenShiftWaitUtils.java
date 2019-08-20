@@ -1,7 +1,8 @@
 package apicurito.tests.utils.openshift;
 
-import static org.assertj.core.api.Assertions.fail;
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.PodCondition;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
@@ -11,9 +12,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.PodCondition;
-import lombok.extern.slf4j.Slf4j;
+import static org.assertj.core.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 public class OpenShiftWaitUtils {
@@ -154,7 +154,7 @@ public class OpenShiftWaitUtils {
     }
 
     public static <X> boolean waitFor(Supplier<X> supplier, Function<X, Boolean> trueCondition, Function<X, Boolean> failCondition, long interval,
-            long timeout) throws InterruptedException, TimeoutException {
+                                      long timeout) throws InterruptedException, TimeoutException {
         timeout = System.currentTimeMillis() + timeout;
 
         while (System.currentTimeMillis() < timeout) {

@@ -81,7 +81,8 @@ public class ApicuritoTemplate {
         deployOnOCP("Role", TestConfiguration.apicuritoOperatorRoleUrl());
         deployOnOCP("Role binding", TestConfiguration.apicuritoOperatorRoleBindingUrl());
         deployOnOCP("Operator", TestConfiguration.apicuritoOperatorUrl());
-        deployCr();
+
+        deployCr(TestConfiguration.apicuritoOperatorCrUrl());
     }
 
     private static void deployOnOCP(String itemName, String item) {
@@ -93,12 +94,12 @@ public class ApicuritoTemplate {
         );
     }
 
-    private static void deployCr() {
+    public static void deployCr(String cr) {
         log.info("Deploying CR from " + TestConfiguration.apicuritoOperatorCrUrl());
         final String output = OpenShiftUtils.binary().execute(
                 "apply",
                 "-n", TestConfiguration.openShiftNamespace(),
-                "-f", TestConfiguration.apicuritoOperatorCrUrl()
+                "-f", cr
         );
     }
 

@@ -1,12 +1,12 @@
 package apicurito.tests.utils.slenide;
 
-import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.text;
+import apicurito.tests.configuration.CustomWebDriverProvider;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 
-import apicurito.tests.configuration.CustomWebDriverProvider;
-import lombok.extern.slf4j.Slf4j;
+import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.text;
 
 @Slf4j
 public class ImportExportUtils {
