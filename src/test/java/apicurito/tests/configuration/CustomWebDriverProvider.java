@@ -1,8 +1,5 @@
 package apicurito.tests.configuration;
 
-
-import com.codeborne.selenide.WebDriverProvider;
-import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -10,13 +7,15 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import com.codeborne.selenide.WebDriverProvider;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CustomWebDriverProvider implements WebDriverProvider {
@@ -31,12 +30,11 @@ public class CustomWebDriverProvider implements WebDriverProvider {
         if (TestConfiguration.apicuritoBrowser().contentEquals("chrome")) {
 
             return prepareChromeWebDriver();
-
         } else {
 
             // firefox needs to have DOWNLOAD_DIR path already created
             File dirPath = new File(DOWNLOAD_DIR);
-            assertThat(dirPath.mkdirs()).isTrue();
+            dirPath.mkdirs();
 
             return prepareFirefoxDriver();
         }
@@ -55,12 +53,12 @@ public class CustomWebDriverProvider implements WebDriverProvider {
 
         //filter to find out which driver we need as we do not know the exact name of driver file
         FilenameFilter fnf = new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 Boolean isChrome = TestConfiguration.apicuritoBrowser().contentEquals("chrome");
 
                 return (!name.contains("version") &&
                         ((isChrome && name.contains("chrome")) || (!isChrome && name.contains("geckodriver"))));
-
             }
         };
         File[] match = folder.listFiles(fnf);
@@ -87,7 +85,7 @@ public class CustomWebDriverProvider implements WebDriverProvider {
 
         System.setProperty("webdriver.chrome.driver", findDriverPath());
 
-        Map<String, Object> preferences = new Hashtable<String, Object>();
+        Map<String, Object> preferences = new Hashtable<>();
         preferences.put("profile.default_content_settings.popups", 0);
         preferences.put("download.prompt_for_download", "false");
         preferences.put("download.default_directory", DOWNLOAD_DIR);
