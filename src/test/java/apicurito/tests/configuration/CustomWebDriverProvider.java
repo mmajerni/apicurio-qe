@@ -1,5 +1,7 @@
 package apicurito.tests.configuration;
 
+import com.codeborne.selenide.WebDriverProvider;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -7,21 +9,17 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import com.codeborne.selenide.WebDriverProvider;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.nio.file.Paths;
 import java.util.Hashtable;
 import java.util.Map;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 public class CustomWebDriverProvider implements WebDriverProvider {
     public static final String DOWNLOAD_DIR = Paths.get("tmp" + File.separator + "download").toAbsolutePath().toString();
 
-    private final String EXPORT_MIME_TYPE = "application/octet-stream;application/zip";
+    private final String EXPORT_MIME_TYPE = "application/force-download";
 
     @Override
     public WebDriver createDriver(DesiredCapabilities capabilities) {

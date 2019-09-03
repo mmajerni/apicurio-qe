@@ -78,6 +78,12 @@ public class CommonUtils {
         section.$(CommonElements.TEXT_AREA).sendKeys(Keys.DELETE);
         section.$(CommonElements.TEXT_AREA).sendKeys(value);
 
+        try {
+            Thread.sleep(1000L);    // firefox needs at least second to process EXAMPLE
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         getButtonWithTitle("Save changes.", section).click();
     }
 
@@ -106,7 +112,7 @@ public class CommonUtils {
         SelenideElement newDataFormPage = MainPageUtils.getMainPageRoot().$("#entity-editor-form");
 
         for (List<String> dataRow : table.cells()) {
-            newDataFormPage.$("#qp_name").setValue(dataRow.get(0));
+            newDataFormPage.$("#qp_name").sendKeys(dataRow.get(0));
 
             if (!dataRow.get(1).isEmpty()) {
                 newDataFormPage.$(CommonElements.TEXT_AREA).sendKeys(dataRow.get(1));

@@ -1,4 +1,5 @@
 @apicuritoTests
+@ui
 @basicTests
 Feature: Basic tests
 
@@ -115,6 +116,8 @@ Feature: Basic tests
     And import API "tmp/download/openapi-spec.json"
     Then check that operation "PATCH" is created for path "/clearPath"
 
+  #operation TRACE is not available in current version of Apicurito
+  @skip_scenario
   @createTraceOperation
   Scenario: create TRACE operation
     When import API "src/test/resources/preparedAPIs/basic.json"
@@ -136,7 +139,7 @@ Feature: Basic tests
     And create new "OPTIONS" operation
     And create new "HEAD" operation
     And create new "PATCH" operation
-    And create new "TRACE" operation
+#    And create new "TRACE" operation
 
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
@@ -148,4 +151,4 @@ Feature: Basic tests
     And check that operation "OPTIONS" is created for path "/clearPath"
     And check that operation "HEAD" is created for path "/clearPath"
     And check that operation "PATCH" is created for path "/clearPath"
-    And check that operation "TRACE" is created for path "/clearPath"
+    #And check that operation "TRACE" is created for path "/clearPath"

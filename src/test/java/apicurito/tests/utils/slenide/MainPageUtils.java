@@ -77,7 +77,7 @@ public class MainPageUtils {
 
         SelenideElement entityForm = CommonUtils.getAppRoot().$(MainPageElements.ENTITY_EDITOR_FORM);
 
-        CommonUtils.getLabelWithName("name", entityForm).setValue(name);
+        CommonUtils.getLabelWithName("name", entityForm).sendKeys(name);
 
         if (!description.isEmpty()) {
             entityForm.$(By.id("description")).$(MainPageElements.TEXT_AREA).sendKeys(description);
@@ -92,6 +92,12 @@ public class MainPageUtils {
 
         if (isRest) {
             entityForm.$$(By.className("create-option")).filter(text("REST Resource")).first().click();
+        }
+
+        try {
+            Thread.sleep(1000L);    // firefox needs at least second to process EXAMPLE
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         CommonUtils.getButtonWithText("Save", entityForm).click();

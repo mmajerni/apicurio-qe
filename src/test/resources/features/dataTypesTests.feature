@@ -1,4 +1,5 @@
 @apicuritoTests
+@ui
 @dataTypesTests
 Feature: Data types tests
 

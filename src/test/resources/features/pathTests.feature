@@ -1,5 +1,6 @@
 @apicuritoTests
-@pathsTestsX
+@ui
+@pathsTests
 Feature: Path tests
 
   Background:
