@@ -6,22 +6,36 @@ import apicurito.tests.configuration.templates.ApicuritoTemplate;
 import apicurito.tests.utils.openshift.OpenShiftUtils;
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.ImportExportUtils;
+import apicurito.tests.utils.slenide.OperationUtils;
+import apicurito.tests.utils.slenide.PathUtils;
 import com.codeborne.selenide.Selenide;
+import com.codeborne.selenide.SelenideElement;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import io.cucumber.datatable.DataTable;
 import io.fabric8.kubernetes.api.model.Pod;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Condition;
+import org.openqa.selenium.By;
 
 import java.io.File;
 import java.util.List;
 
-import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.enabled;
+import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.text;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
 public class CommonSteps {
+
+    private static class Elements {
+        private static By QUERY_PARAM_SECTION = By.cssSelector("query-params-section");
+        private static By HEADER_PARAM_SECTION = By.cssSelector("header-params-section");
+        private static By REQUEST_BODY_SECTION = By.cssSelector("requestbody-section");
+    }
 
     @Given("^log into apicurito$")
     public void login() {
@@ -115,5 +129,40 @@ public class CommonSteps {
             }
         }
         assertThat(imageName).as("Apicurito has not container from %s", image).isEqualTo(image);
+    }
+    /*
+        Create parameters or RDFs (Request data forms) on specified page
+        param could be header|query|RFD
+        page could be path|operations
+     */
+    @When("create {string} on {string} page with plus sign {string}")
+    public void createParameterOnPage(String param, String page, String isPlus, DataTable table) {
+        SelenideElement pageElement = page.equals("operations") ? OperationUtils.getOperationRoot() : PathUtils.getPathPageRoot();
+        String aName = null;
+        By section = null;
+
+        switch (param) {
+            case "query":
+                aName = CommonUtils.Sections.QUERY_PARAM.getA();
+                section = Elements.QUERY_PARAM_SECTION;
+                break;
+            case "header":
+                aName = CommonUtils.Sections.HEADER_PARAM.getA();
+                section = Elements.HEADER_PARAM_SECTION;
+                break;
+            case "RFD":
+                aName = CommonUtils.Sections.RFD_PARAM.getA();
+                section = Elements.REQUEST_BODY_SECTION;
+                break;
+        }
+        CommonUtils.openCollapsedSection(pageElement, section);
+
+        if (Boolean.valueOf(isPlus)){
+            pageElement.$(section).$$("icon-button").filter(attribute("type", "add"))
+                    .shouldHaveSize(1).first().shouldBe(visible).$("button").click();
+        }else {
+            pageElement.$(section).$$("a").filter(text(aName)).shouldHaveSize(1).first().shouldBe(visible).click();
+        }
+        CommonUtils.fillEntityEditorForm(table);
     }
 }

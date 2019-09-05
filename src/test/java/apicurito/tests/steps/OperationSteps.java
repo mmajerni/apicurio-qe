@@ -1,24 +1,22 @@
 package apicurito.tests.steps;
 
-import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.enabled;
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
-
-import org.openqa.selenium.By;
-
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
-
-import java.util.List;
-
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
 import apicurito.tests.utils.slenide.OperationUtils;
 import apicurito.tests.utils.slenide.PathUtils;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
 import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.By;
+
+import java.util.List;
+
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.enabled;
+import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.text;
 
 @Slf4j
 public class OperationSteps {
@@ -31,8 +29,6 @@ public class OperationSteps {
 
         private static By RESPONSE_SECTION = By.cssSelector("responses-section");
         private static By REQUEST_BODY_SECTION = By.cssSelector("requestbody-section");
-        private static By QUERY_PARAM_SECTION = By.cssSelector("query-params-section");
-        private static By HEADER_PARAM_SECTION = By.cssSelector("header-params-section");
         private static By PATH_PARAMETERS_SECTION = By.cssSelector("path-params-section");
         private static By REQUIREMENTS_SECTION = By.cssSelector("security-requirements-section");
     }
@@ -176,39 +172,6 @@ public class OperationSteps {
     public void setRequestBodyTypeAs(String as) {
         CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId(),
                 as, OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION));
-    }
-
-    @When("^create request form data$")
-    public void createRequestFormData(DataTable table) {
-        CommonUtils.openCollapsedSection(OperationElements.REQUEST_BODY_SECTION);
-
-        OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION).$$(OperationElements.A)
-                .filter(text("add request form data")).shouldHaveSize(1).first()   //TODO refactor with enum Sections
-                .shouldBe(visible).click();                                        //TODO support for more than one form
-
-        CommonUtils.fillEntityEditorForm(table);
-    }
-
-    @When("^create query parameters$")
-    public void addQueryParameters(DataTable table) {
-        CommonUtils.openCollapsedSection(OperationElements.QUERY_PARAM_SECTION);
-
-        OperationUtils.getOperationRoot().$(OperationElements.QUERY_PARAM_SECTION).$$(OperationElements.A)
-                .filter(text("add a query parameter")).shouldHaveSize(1).first()   //TODO refactor with enum Sections
-                .shouldBe(visible).click();
-
-        CommonUtils.fillEntityEditorForm(table);
-    }
-
-    @When("^create header parameters$")
-    public void createHeaderParameters(DataTable table) {
-        CommonUtils.openCollapsedSection(OperationElements.HEADER_PARAM_SECTION);
-
-        OperationUtils.getOperationRoot().$(OperationElements.HEADER_PARAM_SECTION).$$(OperationElements.A)
-                .filter(text("add a header parameter")).shouldHaveSize(1).first()   //TODO refactor with enum Sections
-                .shouldBe(visible).click();
-
-        CommonUtils.fillEntityEditorForm(table);
     }
 
     @When("^override security requirements in operation with$")

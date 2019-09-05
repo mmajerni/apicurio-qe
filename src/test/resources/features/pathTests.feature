@@ -98,7 +98,7 @@ Feature: Path tests
     When import API "src/test/resources/preparedAPIs/basic.json"
     And select path "/operations"
     And select operation "GET"
-    And create query parameters
+    And create "query" on "operations" page with plus sign "false"
       | QueryParameter | Description for Query Param | Required | Array | String | Date |
 
     Then save API as "json" and close editor
@@ -106,7 +106,7 @@ Feature: Path tests
 
     And select path "/operations"
     And select operation "GET"
-    Then check that exist query parameters
+    Then check that exist "query" on "operations" page
       | QueryParameter | Description for Query Param | Required | Array | String | Date |
 
   @createOperationHP
@@ -114,7 +114,7 @@ Feature: Path tests
     When import API "src/test/resources/preparedAPIs/basic.json"
     And select path "/operations"
     And select operation "GET"
-    And create header parameters
+    And create "header" on "operations" page with plus sign "true"
       | HeaderParameter | Description for Header Param | Required | Array | String | Date |
 
     Then save API as "json" and close editor
@@ -122,7 +122,7 @@ Feature: Path tests
 
     And select path "/operations"
     And select operation "GET"
-    Then check that exist header parameters
+    Then check that exist "header" on "operations" page
       | HeaderParameter | Description for Header Param | Required | Array | String | Date |
 
   @createOperationRequestBody
@@ -154,7 +154,7 @@ Feature: Path tests
     When import API "src/test/resources/preparedAPIs/basic.json"
     And select path "/operations"
     And select operation "GET"
-    And create request form data
+    And create "RFD" on "operations" page with plus sign "false"
       | FormData | Description for FormData | Required | Array | String | Date |
 
     Then save API as "json" and close editor
@@ -162,7 +162,7 @@ Feature: Path tests
 
     And select path "/operations"
     And select operation "GET"
-    Then check that exist request form data
+    Then check that exist "RFD" on "operations" page
       | FormData | Description for FormData | Required | Array | String | Date |
 
   @createOperationResponseLink
@@ -268,7 +268,34 @@ Feature: Path tests
     And check that overridden path parameter "id" has description "override parameter id desc"
 
     #TODO Add test -> create path parameter in operation
-    #TODO Add tests -> create path QP and HP
+
+  @createPathQP
+  Scenario: create query parameter on path page
+    When import API "src/test/resources/preparedAPIs/basic.json"
+    And select path "/clearPath"
+    And create "query" on "path" page with plus sign "true"
+      | QueryParameter | Description for Query Param | Required | Array | String | Date |
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    And select path "/clearPath"
+    Then check that exist "query" on "path" page
+      | QueryParameter | Description for Query Param | Required | Array | String | Date |
+
+  @createPathHP
+  Scenario: create header parameter on path page
+    When import API "src/test/resources/preparedAPIs/basic.json"
+    And select path "/clearPath"
+    And create "header" on "path" page with plus sign "false"
+      | HeaderParameter | Description for Header Param | Required | Array | String | Date |
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    And select path "/clearPath"
+    Then check that exist "header" on "path" page
+      | HeaderParameter | Description for Header Param | Required | Array | String | Date |
 
   @allGetParameters
   Scenario: fill almost all get parameters
@@ -284,10 +311,10 @@ Feature: Path tests
     And override consumes with "text/xml" for operation "GET"
     And override produces with "text/xml" for operation "GET"
 
-    And create query parameters
+    And create "query" on "operations" page with plus sign "false"
       | QueryParameter | Description for Query Param | Required | Array | String | Date |
 
-    And create header parameters
+    And create "header" on "operations" page with plus sign "false"
       | HeaderParameter | Description for Header Param | Required | Array | String | Date |
 
     And create request body
@@ -314,10 +341,10 @@ Feature: Path tests
     And check that operation consumes "text/xml"
     And check that operation produces "text/xml"
 
-    And check that exist query parameters
+    And check that exist "query" on "operations" page
       | QueryParameter | Description for Query Param | Required | Array | String | Date |
 
-    And check that exist header parameters
+    And check that exist "header" on "operations" page
       | HeaderParameter | Description for Header Param | Required | Array | String | Date |
 
     And check that exist request body
@@ -337,7 +364,7 @@ Feature: Path tests
     And select path "/first/{id}/{name}{email}"
     And select operation "POST"
 
-    And create request form data
+    And create "RFD" on "operations" page with plus sign "false"
       | FormData | Description for FormData | Required | Array | String | Date |
 
     And override security requirements in operation with
@@ -352,7 +379,7 @@ Feature: Path tests
     And select path "/first/{id}/{name}{email}"
     And select operation "POST"
 
-    Then check that exist request form data
+    Then check that exist "RFD" on "operations" page
       | FormData | Description for FormData | Required | Array | String | Date |
 
     And check that operation security requirement "oauth, basic" exist
