@@ -182,6 +182,26 @@ Feature: Main page tests
     And check that path "/Mypathsx" is created
     And check that path "/Mypaths24" is created
 
+  @plurals
+  Scenario: test for creating paths in plural forms
+    #TODO change to the right path names after closing:
+    #https://issues.jboss.org/browse/ENTESB-11594
+    When create a new API
+    And create a new data type by link
+      | beer   |  |  | true | false |
+      | BANANA |  |  | true | false |
+      | data2  |  |  | true | false |
+      | mouse  |  |  | true | false |
+      | man    |  |  | true | false |
+      | abc    |  |  | true | false |
+
+    Then check that path "/beers" is created
+    And check that path "/bANANAS" is created
+    And check that path "/data2S" is created
+    And check that path "/mice" is created
+    And check that path "/men" is created
+    And check that path "/abcs" is created
+
   Scenario: #kebab menu for paths and data types
 
   #TODO after closing:
