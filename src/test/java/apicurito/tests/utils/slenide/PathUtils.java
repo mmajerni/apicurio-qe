@@ -43,7 +43,7 @@ public class PathUtils {
     public static SelenideElement getOperationButton(PathSteps.Operations operation, SelenideElement differentRoot) {
         log.info("searching for operation button for operation {}", operation);
 
-        return differentRoot.$(By.className(operation.toString().toLowerCase() + "-tab")).shouldBe(enabled);
+        return differentRoot.$(By.className(operation.toString().toLowerCase() + "-tab")).waitUntil(visible, 5000).shouldBe(enabled);
     }
 
     public static void createPathParameter(String parameter) {
