@@ -1,23 +1,16 @@
 package apicurito.tests.steps.verification;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-
-import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.matchText;
-import static com.codeborne.selenide.Condition.text;
-
-import org.openqa.selenium.By;
-
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
-
-import java.util.List;
-
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.OperationUtils;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
 import cucumber.api.java.en.Then;
-import io.cucumber.datatable.DataTable;
+import org.openqa.selenium.By;
+
+import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.matchText;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class OperationVerifications {
 
@@ -27,12 +20,9 @@ public class OperationVerifications {
         private static By PATH_PARAMETERS_SECTION = By.cssSelector("path-params-section");
         private static By RESPONSES_SECTION = By.cssSelector("responses-section");
         private static By REQUEST_BODY_SECTION = By.cssSelector("requestbody-section");
-        private static By QUERY_PARAM_SECTION = By.cssSelector("query-params-section");
-        private static By HEADER_PARAM_SECTION = By.cssSelector("header-params-section");
         private static By REQUIREMENTS_SECTION = By.cssSelector("security-requirements-section");
 
         private static By PATH_PARAMETERS_ROW = By.cssSelector("path-param-row");
-        private static By PARAMETERS_TYPE = By.className("param-type");
     }
 
     @Then("^check that operation summary is \"([^\"]*)\"$")
@@ -160,78 +150,6 @@ public class OperationVerifications {
     public void checkThatRequestBodyTypeAsIs(String expectedAs) {
         String as = OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION).$(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId()).getText();
         assertThat(as).as("Type as is %s but should be %s", as, expectedAs).isEqualTo(expectedAs);
-    }
-
-    @Then("^check that exist request form data$")
-    public void checkThatExistRequestFormData(DataTable table) {
-        CommonUtils.openCollapsedSection(OperationElements.REQUEST_BODY_SECTION);
-
-        for (List<String> dataRow : table.cells()) {
-            checkRow(dataRow, OperationElements.REQUEST_BODY_SECTION, "formdata-param-row", "Form data parameter");
-        }
-    }
-
-    @Then("^check that exist query parameters$")
-    public void checkThatExistQueryParameter(DataTable table) {
-        CommonUtils.openCollapsedSection(OperationElements.QUERY_PARAM_SECTION);
-
-        for (List<String> dataRow : table.cells()) {
-            checkRow(dataRow, OperationElements.QUERY_PARAM_SECTION, "query-param-row", "Query parameter");
-        }
-    }
-
-    @Then("^check that exist header parameters$")
-    public void checkThatExistHeaderParameters(DataTable table) {
-        CommonUtils.openCollapsedSection(OperationElements.HEADER_PARAM_SECTION);
-
-        for (List<String> dataRow : table.cells()) {
-            checkRow(dataRow, OperationElements.HEADER_PARAM_SECTION, "header-param-row", "Header parameter");
-        }
-    }
-
-    private void checkRow(List<String> dataRow, By section, String rowType, String message) {
-        ElementsCollection queryRows = OperationUtils.getOperationRoot().$(section).$$(rowType);
-
-        if (queryRows.size() > 0) {
-            ElementsCollection names = OperationUtils.getOperationRoot().$(section).$$(By.className("name")).filter((text(dataRow.get(0))));
-
-            if (names.size() == 0) {
-                fail("%s with name %s is not created!", message, dataRow.get(0));
-            } else {
-                SelenideElement row = names.first().parent().parent();
-
-                if (!dataRow.get(1).isEmpty()) {
-                    String description = row.$(OperationElements.DESCRIPTION).getText();
-                    assertThat(description).as("%s description should be %s but is %s", message, dataRow.get(1), description).isEqualTo(dataRow.get(1));
-                }
-
-                row.$(By.className("summary")).click();
-
-                if (!dataRow.get(2).isEmpty()) {
-                    String isRequired = row.$(By.className("param-required")).$("drop-down").getText();
-                    assertThat(isRequired)
-                            .as("%s should be %s but is %s", message, dataRow.get(2), isRequired)
-                            .isEqualTo(dataRow.get(2));
-                }
-
-                if (!dataRow.get(3).isEmpty()) {
-                    String type = row.$(OperationElements.PARAMETERS_TYPE).$(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId()).getText();
-                    assertThat(type).as("%s type is %s but should be %s", message, type, dataRow.get(3)).isEqualTo(dataRow.get(3));
-                }
-
-                if (!dataRow.get(4).isEmpty()) {
-                    String of = row.$(OperationElements.PARAMETERS_TYPE).$(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId()).getText();
-                    assertThat(of).as("%s type of is %s but should be %s", message, of, dataRow.get(4)).isEqualTo(dataRow.get(4));
-                }
-
-                if (!dataRow.get(5).isEmpty()) {
-                    String as = row.$(OperationElements.PARAMETERS_TYPE).$(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId()).getText();
-                    assertThat(as).as("%s type as is %s but should be %s", message, as, dataRow.get(5)).isEqualTo(dataRow.get(5));
-                }
-            }
-        } else {
-            fail("There is no %s!", message);
-        }
     }
 
     @Then("^check that operation security requirement \"([^\"]*)\" exist$")

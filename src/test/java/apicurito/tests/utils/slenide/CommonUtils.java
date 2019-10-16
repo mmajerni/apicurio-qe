@@ -143,8 +143,8 @@ public class CommonUtils {
      *
      * @param section which should be opened
      */
-    public static void openCollapsedSection(By section) {
-        ElementsCollection collapsedSection = OperationUtils.getOperationRoot().$(section).$$("a").filter(attribute("class", "collapsed"));
+    public static void openCollapsedSection(SelenideElement page, By section) {
+        ElementsCollection collapsedSection = page.$(section).$$("a").filter(attribute("class", "collapsed"));
         if (collapsedSection.size() > 0) {
             collapsedSection.first().click();
         }
@@ -159,7 +159,10 @@ public class CommonUtils {
         TAG("section tags-section panel-group", "Add a tag"),
         SCHEME("section security-section panel-group", "Add a security scheme"),
         REQUIREMENT("section security-requirements-section panel-group", "Add security requirement"),
-        PROPERTIES("section security-requirements-section panel-group", "Add a property");
+        PROPERTIES("section security-requirements-section panel-group", "Add a property"),
+        QUERY_PARAM("section query-parameters-section panel-group", "Add a query parameter"),
+        HEADER_PARAM("section header-parameters-section panel-group", "Add a header parameter"),
+        RFD_PARAM("section requestBody-section panel-group", "add request form data");
 
         private String sectionElementName;
         private String a;
