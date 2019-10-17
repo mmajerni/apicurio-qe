@@ -120,8 +120,8 @@ public class ApicuritoTemplate {
             OpenShiftUtils.getInstance().clean();
 
             List<ReplicaSet> operatorReplicaSets = OpenShiftUtils.getInstance().apps().replicaSets().inNamespace(TestConfiguration.openShiftNamespace()).list().getItems();
-            if (!operatorReplicaSets.isEmpty()) {
-                OpenShiftUtils.binary().execute("delete", "rs", operatorReplicaSets.get(0).getMetadata().getName());
+            for (ReplicaSet rs : operatorReplicaSets){
+                OpenShiftUtils.binary().execute("delete", "rs", rs.getMetadata().getName());
             }
 
             OpenShiftUtils.getInstance().waiters().isProjectClean().waitFor();
