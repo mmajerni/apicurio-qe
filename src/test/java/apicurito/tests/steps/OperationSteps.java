@@ -13,18 +13,13 @@ import org.openqa.selenium.By;
 
 import java.util.List;
 
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Condition.enabled;
-import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.*;
 
 @Slf4j
 public class OperationSteps {
 
     private static class OperationElements {
         private static By DESCRIPTION = By.className("description");
-        private static By CONSUMES = By.className("consumes");
-        private static By PRODUCES = By.className("produces");
         private static By A = By.cssSelector("a");
 
         private static By RESPONSE_SECTION = By.cssSelector("responses-section");
@@ -67,8 +62,8 @@ public class OperationSteps {
         OperationUtils.setResponseStatusCode(response);
     }
 
-    @When("^set response description \"([^\"]*)\" for response (\\d+)$")
-    public void setDescriptionForResponse(String description, Integer response) {
+    @When("^set response description \"([^\"]*)\" for response \"([^\"]*)\"$")
+    public void setDescriptionForResponse(String description, String response) {
         OperationUtils.selectResponse(response);
         CommonUtils.setValueInTextArea(description, OperationUtils.getOperationRoot().$(OperationElements.RESPONSE_SECTION));
     }
@@ -90,62 +85,55 @@ public class OperationSteps {
         CommonUtils.setValueInTextArea(description, parameterElement);
     }
 
-    @When("^set response type \"([^\"]*)\" for response (\\d+)$")
-    public void setResponseType(String type, Integer response) {
-        OperationUtils.selectResponse(response);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId(), type, OperationUtils.getOperationRoot().$(OperationElements.RESPONSE_SECTION));
+    /**
+     * Table parameters:
+     * Type of dropdown                            --> type | of | as | required
+     * Value of dropdown                           --> Array | String | Integer | ...
+     * Page where dropdown is located              --> path | operations | datatypes
+     * Section where dropdown is located           --> query | header | response | request body
+     * Boolean if dropdown is in Responses section --> true it is , false otherwise
+     * Number of response                          --> 100 | 200 | 404 | ...
+     */
+    @When("set parameters types")
+    public void setParametersTypes(DataTable table) {       //TODO  add specific parameter when it will be needed
+
+        for (List<String> dataRow : table.cells()) {
+            String buttonId = CommonUtils.getButtonId(dataRow.get(0));
+            SelenideElement page = CommonUtils.getPageElement(dataRow.get(2));
+            By section = CommonUtils.getSectionBy(dataRow.get(3));
+
+            if (Boolean.valueOf(dataRow.get(4))) {
+                OperationUtils.selectResponse(dataRow.get(5));
+            } else {
+                CommonUtils.openCollapsedSection(page, section);
+            }
+            CommonUtils.setDropDownValue(buttonId, dataRow.get(1), page.$(section));
+        }
     }
 
-    @When("^set response type of \"([^\"]*)\" for response (\\d+)$")
-    public void setResponseTypeOf(String of, Integer response) {
-        OperationUtils.selectResponse(response);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId(), of, OperationUtils.getOperationRoot().$(OperationElements.RESPONSE_SECTION));
-    }
-
-    @When("^set response type as \"([^\"]*)\" for response (\\d+)$")
-    public void setResponseTypeAs(String as, Integer response) {
-        OperationUtils.selectResponse(response);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId(), as, OperationUtils.getOperationRoot().$(OperationElements.RESPONSE_SECTION));
-    }
-
-    @When("^override consumes with \"([^\"]*)\" for operation \"([^\"]*)\"$")
-    public void overrideConsumesWithForOperation(String consumes, String operation) {
-        SelenideElement consumesSubsection = OperationUtils.getOperationRoot().$(OperationElements.CONSUMES);
+    @When("^override consumes or produces \"([^\"]*)\" with \"([^\"]*)\" for operation \"([^\"]*)\"$")
+    public void overrideProducesWithForOperation(String consumesProduces, String values, String operation) {
+        SelenideElement subsection = OperationUtils.getOperationRoot().$(By.className(consumesProduces));
 
         PathUtils.getOperationButton(PathSteps.Operations.valueOf(operation), OperationUtils.getOperationRoot())
                 .click();
 
-        CommonUtils.getButtonWithText("Override", consumesSubsection)
+        CommonUtils.getButtonWithText("Override", subsection)
                 .click();
-
-        CommonUtils.getLabelWithType("text", consumesSubsection).setValue(consumes);
-        CommonUtils.getButtonWithTitle("Save changes.", consumesSubsection).click();
+        CommonUtils.getLabelWithType("text", subsection).setValue(values);
+        CommonUtils.getButtonWithTitle("Save changes.", subsection).click();
     }
 
-    @When("^override produces with \"([^\"]*)\" for operation \"([^\"]*)\"$")
-    public void overrideProducesWithForOperation(String produces, String operation) {
-        SelenideElement producesSubsection = OperationUtils.getOperationRoot().$(OperationElements.PRODUCES);
-
-        PathUtils.getOperationButton(PathSteps.Operations.valueOf(operation), OperationUtils.getOperationRoot())
+    @When("^delete \"([^\"]*)\" operation$")
+    public void deleteOperation(String operation) {
+        PathUtils.getOperationButton(PathSteps.Operations.valueOf(operation), OperationUtils.getOperationRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")))
                 .click();
-
-        CommonUtils.getButtonWithText("Override", OperationUtils.getOperationRoot().$(OperationElements.PRODUCES))
-                .click();
-        CommonUtils.getLabelWithType("text", producesSubsection).setValue(produces);
-        CommonUtils.getButtonWithTitle("Save changes.", producesSubsection).click();
-    }
-
-    @When("^delete current operation$")
-    public void deleteOperation() {
-        OperationUtils.deleteOperation();       //TODO specify operation
+        OperationUtils.deleteOperation();
     }
 
     @When("^create request body$")
     public void createRequestBody() {
-        ElementsCollection collapsedSection = OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION).$$(OperationElements.A).filter(attribute("class", "collapsed"));
-        if (collapsedSection.size() > 0) {
-            collapsedSection.first().click();
-        }
+        CommonUtils.openCollapsedSection(OperationUtils.getOperationRoot(), OperationElements.REQUEST_BODY_SECTION);
         OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION).$$(OperationElements.A)
                 .filter(text("Add a request body")).shouldHaveSize(1).first()   //TODO refactor with enum Sections
                 .shouldBe(visible).click();
@@ -154,24 +142,6 @@ public class OperationSteps {
     @When("^set request body description \"([^\"]*)\"$")
     public void setRequestBodyDescription(String description) {
         CommonUtils.setValueInTextArea(description, OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION));
-    }
-
-    @When("^set request body type \"([^\"]*)\"$")
-    public void setRequestBodyType(String type) {
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId(),
-                type, OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION));
-    }
-
-    @When("^set request body type of \"([^\"]*)\"$")
-    public void setRequestBodyTypeOf(String of) {
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId(),
-                of, OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION));
-    }
-
-    @When("^set request body type as \"([^\"]*)\"$")
-    public void setRequestBodyTypeAs(String as) {
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId(),
-                as, OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION));
     }
 
     @When("^override security requirements in operation with$")

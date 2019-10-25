@@ -55,20 +55,6 @@ public class MainPageVerifications {
         assertThat(description).as("Checking API descritpion:").isEqualTo(expectedDescription);
     }
 
-    @Then("^check that API consume \"([^\"]*)\"$")
-    public void checkThatAPIConsume(String expectedConsume) {               //TODO      //NEW
-        openMainPage();
-        String consume = MainPageUtils.getMainPageRoot().$(By.className("consumes")).getText();
-        assertThat(consume).as("Checking API consumes:").isEqualTo(expectedConsume);
-    }
-
-    @Then("^check that API produce \"([^\"]*)\"$")
-    public void checkThatAPIProduce(String expectedProduce) {       //NEW
-        openMainPage();
-        String produce = MainPageUtils.getMainPageRoot().$(By.className("produces")).getText();
-        assertThat(produce).as("Checking API produces:").isEqualTo(expectedProduce);
-    }
-
     @Then("^check that API contact info is$")
     public void checkThatAPIContactInfoIs(DataTable table) {
         openMainPage();

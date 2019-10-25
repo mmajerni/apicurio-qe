@@ -42,27 +42,10 @@ public class DataTypeSteps {
         CommonUtils.setValueInTextArea(example, DataTypeUtils.getDataTypesRoot().$(DataTypesElements.EXAMPLE_SECTION));
     }
 
-    @When("^set property \"([^\"]*)\" as \"([^\"]*)\"$")
-    public void setPropertyAsRequired(String property, String isRequired) {
+    @When("^set property \"([^\"]*)\" as \"([^\"]*)\" for property \"([^\"]*)\"$")
+    public void setPropertyAsForProperty(String subject, String subjectValue, String property) {
+        String buttonId = CommonUtils.getButtonId(subject);
         DataTypeUtils.openPropertyTypes(property);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_REQUIRED.getButtonId(), isRequired, PROPERTIES_SECTION);
-    }
-
-    @When("^set property type \"([^\"]*)\" for property \"([^\"]*)\"$")
-    public void setPropertyTypeForProperty(String type, String property) {
-        DataTypeUtils.openPropertyTypes(property);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId(), type, PROPERTIES_SECTION);
-    }
-
-    @When("^set property type of \"([^\"]*)\" for property \"([^\"]*)\"$")
-    public void setPropertyTypeOfForProperty(String of, String property) {
-        DataTypeUtils.openPropertyTypes(property);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId(), of, PROPERTIES_SECTION);
-    }
-
-    @When("^set property type as \"([^\"]*)\" for property \"([^\"]*)\"$")
-    public void setPropertyTypeAsForProperty(String as, String property) {
-        DataTypeUtils.openPropertyTypes(property);
-        CommonUtils.setDropDownValue(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId(), as, PROPERTIES_SECTION);
+        CommonUtils.setDropDownValue(buttonId, subjectValue, PROPERTIES_SECTION);
     }
 }

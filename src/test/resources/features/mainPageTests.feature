@@ -34,19 +34,19 @@ Feature: Main page tests
   @setAPIconsumes
   Scenario: set API consumes
     When create a new API
-    And set consumes to "text/xml"
+    And set consumes or produces "consumes" to "text/xml"
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
-    Then check that API consume "text/xmlapplication/json"
+    Then check that API "consumes" values "text/xmlapplication/json" on page "main page"
     #TODO add space and check every label separately
 
   @setAPIproduces
   Scenario: set API produces
     When create a new API
-    And set produces to "text/xml"
+    And set consumes or produces "produces" to "text/xml"
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
-    Then check that API produce "text/xmlapplication/json"
+    Then check that API "produces" values "text/xmlapplication/json" on page "main page"
     #TODO add space and check every label separately
 
   @setAPIcontact
@@ -127,8 +127,8 @@ Feature: Main page tests
     And change API name to "MyApi"
     And set API version to "2.20a"
     And change description to "New API desc"
-    And set consumes to "text/xml"
-    And set produces to "text/xml"
+    And set consumes or produces "consumes" to "text/xml"
+    And set consumes or produces "produces" to "text/xml"
     And add contact info
       | Ignite test | a@a.com | https://github.com/Apicurio/ |
 
@@ -141,9 +141,9 @@ Feature: Main page tests
     And check that API name is "MyApi"
     And check that API version is "2.20a"
     And check that API description is "New API desc"
-    And check that API consume "text/xmlapplication/json"
+    And check that API "consumes" values "text/xmlapplication/json" on page "main page"
     #TODO add space and check every label separately
-    And check that API produce "text/xmlapplication/json"
+    And check that API "produces" values "text/xmlapplication/json" on page "main page"
     And check that API contact info is
       | Ignite test | a@a.com | https://github.com/Apicurio/ |
 
