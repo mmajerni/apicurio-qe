@@ -23,6 +23,11 @@ public class CommonUtils {
 
     private static class CommonElements {
         private static By TEXT_AREA = By.cssSelector("ace-editor textarea");
+
+        private static By RESPONSE_SECTION = By.cssSelector("responses-section");
+        private static By REQUEST_BODY_SECTION = By.cssSelector("requestbody-section");
+        private static By QUERY_PARAM_SECTION = By.cssSelector("query-params-section");
+        private static By HEADER_PARAM_SECTION = By.cssSelector("header-params-section");
     }
 
     public static SelenideElement getAppRoot() {
@@ -201,5 +206,48 @@ public class CommonUtils {
         public String getButtonId() {
             return this.buttonId;
         }
+    }
+
+    public static By getSectionBy(String section) {
+        switch (section) {
+            case "query":
+                return CommonElements.QUERY_PARAM_SECTION;
+            case "header":
+                return CommonElements.HEADER_PARAM_SECTION;
+            case "response":
+                return CommonElements.RESPONSE_SECTION;
+            case "RFD":
+            case "request body":
+                return CommonElements.REQUEST_BODY_SECTION;
+        }
+        return null;
+    }
+
+    public static SelenideElement getPageElement(String pageName) {
+        switch (pageName) {
+            case "operations":
+                return OperationUtils.getOperationRoot();
+            case "path":
+                return PathUtils.getPathPageRoot();
+            case "datatypes":
+                return DataTypeUtils.getDataTypesRoot();
+            case "main page":
+                return MainPageUtils.getMainPageRoot();
+        }
+        return null;
+    }
+
+    public static String getButtonId(String buttonName) {
+        switch (buttonName) {
+            case "type":
+                return DropdownButtons.PROPERTY_TYPE.getButtonId();
+            case "of":
+                return DropdownButtons.PROPERTY_TYPE_OF.getButtonId();
+            case "as":
+                return DropdownButtons.PROPERTY_TYPE_AS.getButtonId();
+            case "required":
+                return DropdownButtons.PROPERTY_REQUIRED.getButtonId();
+        }
+        return null;
     }
 }

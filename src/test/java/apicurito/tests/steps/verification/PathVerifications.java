@@ -22,28 +22,14 @@ public class PathVerifications {
 
     @Then("^check that operation \"([^\"]*)\" is created for path \"([^\"]*)\"$")
     public void checkThatOperationIsCreatedForPath(String operation, String path) {
-        SelenideElement pathElement = MainPageUtils.getPathWithName(path);      //TODO private method to check that path is created
-        if (pathElement == null) {
-            fail("Operation %s is not created because path %s is not found.", operation, path);
-            return;
-        } else {
-            pathElement.click();
-        }
-
+        checkThatPathIsCreatedAndSelectIt(path);
         ElementsCollection ec = PathUtils.getPathPageRoot().$$(By.cssSelector("div." + operation.toLowerCase() + "-tab.enabled"));
         assertThat(ec.size() == 1).as("Operation %s is not created", operation).isTrue();
     }
 
     @Then("^check that path parameter \"([^\"]*)\" is created for path \"([^\"]*)\"$")
     public void checkThatPathParameterIsCreatedForPath(String parameter, String path) {
-        SelenideElement pathElement = MainPageUtils.getPathWithName(path);
-        if (pathElement == null) {
-            fail("Parameter %s is not created because path %s is not found.", parameter, path);
-            return;
-        } else {
-            pathElement.click();
-        }
-
+        checkThatPathIsCreatedAndSelectIt(path);
         SelenideElement parameterElement = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW).filter(matchText(parameter)).first();
         assertThat(parameterElement.$("div").getAttribute("class")).as("Path parameter %s is not created", parameter).doesNotContain("missing");
     }
@@ -56,27 +42,20 @@ public class PathVerifications {
         assertThat(descriptionElement.getText()).as("Description for path parameter %s is different", parameter).isEqualTo(description);
     }
 
-    @Then("^check that path parameter \"([^\"]*)\" has type \"([^\"]*)\"$")
-    public void checkThatPathParameterHasType(String parameter, String expectedType) {
-        PathUtils.openPathTypes(parameter);
-        String type = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
-                .filter(text(parameter)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId()).getText();
-        assertThat(type).as("Type is %s but should be %s", type, expectedType).isEqualTo(expectedType);
-    }
-
-    @Then("^check that path parameter \"([^\"]*)\" has type of \"([^\"]*)\"$")
-    public void checkThatPathParameterHasTypeOf(String parameter, String expectedOf) {
-        PathUtils.openPathTypes(parameter);
-        String of = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
-                .filter(text(parameter)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId()).getText();
-        assertThat(of).as("Type of is %s but should be %s", of, expectedOf).isEqualTo(expectedOf);
-    }
-
-    @Then("^check that path parameter \"([^\"]*)\" has type as \"([^\"]*)\"$")
-    public void checkThatPathParameterHasTypeAs(String parameter, String expectedAs) {
+    @Then("^check that path parameter \"([^\"]*)\" has \"([^\"]*)\" type with value \"([^\"]*)\"$")
+    public void checkThatPathParameterHasTypeAs(String parameter, String type,  String expectedAs) {
         PathUtils.openPathTypes(parameter);
         String as = PathUtils.getPathPageRoot().$(PathElements.PATH_PARAMETERS_SECTION).$$(PathElements.PATH_PARAMETERS_ROW)
-                .filter(text(parameter)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId()).getText();
-        assertThat(as).as("Type as is %s but should be %s", as, expectedAs).isEqualTo(expectedAs);
+                .filter(text(parameter)).first().$(CommonUtils.getButtonId(type)).getText();
+        assertThat(as).as("%s is %s but should be %s", type, as, expectedAs).isEqualTo(expectedAs);
+    }
+
+    private void checkThatPathIsCreatedAndSelectIt(String path){
+        SelenideElement pathElement = MainPageUtils.getPathWithName(path);
+        if (pathElement == null) {
+            fail("Operation is not created because path %s is not found.", path);
+        } else {
+            pathElement.click();
+        }
     }
 }

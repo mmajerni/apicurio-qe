@@ -9,6 +9,7 @@ import cucumber.api.java.en.Then;
 import io.cucumber.datatable.DataTable;
 import org.openqa.selenium.By;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static com.codeborne.selenide.Condition.text;
@@ -18,9 +19,6 @@ import static org.assertj.core.api.Assertions.fail;
 public class CommonVerifications {
 
     private static class Elements {
-        private static By QUERY_PARAM_SECTION = By.cssSelector("query-params-section");
-        private static By HEADER_PARAM_SECTION = By.cssSelector("header-params-section");
-        private static By REQUEST_BODY_SECTION = By.cssSelector("requestbody-section");
         private static By DESCRIPTION = By.className("description");
         private static By PARAMETERS_TYPE = By.className("param-type");
     }
@@ -34,20 +32,17 @@ public class CommonVerifications {
     public void checkThatExistOnPage(String param, String page, DataTable table) {
         SelenideElement pageElement = page.equals("operations") ? OperationUtils.getOperationRoot() : PathUtils.getPathPageRoot();
         String rowType = null;
-        By section = null;
+        By section = CommonUtils.getSectionBy(param);
 
         switch (param) {
             case "query":
                 rowType = "query-param-row";
-                section = Elements.QUERY_PARAM_SECTION;
                 break;
             case "header":
                 rowType = "header-param-row";
-                section = Elements.HEADER_PARAM_SECTION;
                 break;
             case "RFD":
                 rowType = "formdata-param-row";
-                section = Elements.REQUEST_BODY_SECTION;
                 break;
         }
 
@@ -56,6 +51,30 @@ public class CommonVerifications {
         for (List<String> dataRow : table.cells()) {
             checkRow(dataRow, pageElement, section, rowType, param + " parameter");
         }
+    }
+
+    @Then("check parameters types")
+    public void checkParametersTypes(DataTable table) {
+        for (List<String> dataRow : table.cells()) {
+            String buttonId = CommonUtils.getButtonId(dataRow.get(0));
+            SelenideElement page = CommonUtils.getPageElement(dataRow.get(2));
+            By section = CommonUtils.getSectionBy(dataRow.get(3));
+
+            if (Boolean.valueOf(dataRow.get(4))) {
+                OperationUtils.selectResponse(dataRow.get(5));
+            } else {
+                CommonUtils.openCollapsedSection(page, section);      //TODO open the right row
+            }
+
+            String dropDownValue = page.$(section).$(buttonId).getText();
+            assertThat(dropDownValue).as("%s is %s but should be %s", dataRow.get(0), dropDownValue, dataRow.get(1)).isEqualTo(dataRow.get(1));
+        }
+    }
+
+    @Then("^check that API \"([^\"]*)\" values \"([^\"]*)\" on page \"([^\"]*)\"$")
+    public void checkThatConsumesProducesHasValuesOnPage(String consumesProduces, String values, String page) {
+        SelenideElement subsection = CommonUtils.getPageElement(page).$(By.className(consumesProduces));
+        assertThat(subsection.getText()).as("%s should be %s but is %s",consumesProduces, values, subsection.getText()).isEqualTo(values);
     }
 
     private void checkRow(List<String> dataRow, SelenideElement pageElement, By section, String rowType, String message) {

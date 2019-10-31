@@ -23,9 +23,9 @@ Feature: Data types tests
     And select data type "clearDataType"
     And create data type property with name "MyProperty"
     And set description "My desc" for data type property "MyProperty"
-    And set property type "Integer" for property "MyProperty"
-    And set property type as "32-Bit Integer" for property "MyProperty"
-    And set property "MyProperty" as "Required"
+    And set property "type" as "Integer" for property "MyProperty"
+    And set property "as" as "32-Bit Integer" for property "MyProperty"
+    And set property "required" as "Required" for property "MyProperty"
 
     Then save API as "json" and close editor
     When import API "tmp/download/openapi-spec.json"
@@ -33,9 +33,10 @@ Feature: Data types tests
 
     Then check that data type property "MyProperty" is created
     And check that description is "My desc" for property "MyProperty"
-    And check that type is "Integer" for property "MyProperty"
-    And check that type as is "32-Bit Integer" for property "MyProperty"
-    And check that property "MyProperty" is "Required"
+
+    And check that "type" is "Integer" for property "MyProperty"
+    And check that "as" is "32-Bit Integer" for property "MyProperty"
+    And check that "required" is "Required" for property "MyProperty"
 
   @setDataTypeExample
   Scenario: set data type example
@@ -65,9 +66,11 @@ Feature: Data types tests
     And check that operation description is "Gets a list of all data2 entities."
 
     And check that exist response 200
-    And check that description is "Successful response - returns an array of data2 entities." for response 200
-    And check that type is "Array" for response 200
-    And check that type of is "data2" for response 200
+    And check that description is "Successful response - returns an array of data2 entities." for response "200"
+
+    And check parameters types
+      | type | Array | operations | response | true | 200 |
+      | of   | data2 | operations | response | true | 200 |
 
     And check that operation "POST" is created for path "/data2S"
     When select path "/data2S"
@@ -77,12 +80,14 @@ Feature: Data types tests
     And check that operation description is "Creates a new instance of a data2."
 
     And check that exist response 201
-    And check that description is "Successful response." for response 201
+    And check that description is "Successful response." for response "201"
     #Choose type mean that the type is not set
-    And check that type is "Choose Type" for response 201
+    And check parameters types
+      | type | Choose Type | operations | response | true | 201 |
 
     And check that request body description is "A new data2 to be created."
-    And check that request body type is "data2"
+    And check parameters types
+      | type | data2 | operations | request body | false | |
 
     And check that path "/data2S/{data2Id}" is created
     And check that operation "GET" is created for path "/data2S/{data2Id}"
@@ -96,8 +101,9 @@ Feature: Data types tests
     And check that operation description is "Gets the details of a single instance of a data2."
 
     And check that exist response 200
-    And check that description is "Successful response - returns a single data2." for response 200
-    And check that type is "data2" for response 200
+    And check that description is "Successful response - returns a single data2." for response "200"
+    And check parameters types
+      | type | data2 | operations | response | true | 200 |
 
     And check that operation "PUT" is created for path "/data2S/{data2Id}"
     When select path "/data2S/{data2Id}"
@@ -107,12 +113,14 @@ Feature: Data types tests
     And check that operation description is "Updates an existing data2."
 
     And check that exist response 202
-    And check that description is "Successful response." for response 202
+    And check that description is "Successful response." for response "202"
     #Choose type mean that the type is not set
-    And check that type is "Choose Type" for response 202
+    And check parameters types
+      | type | Choose Type | operations | response | true | 202 |
 
     And check that request body description is "Updated data2 information."
-    And check that request body type is "data2"
+    And check parameters types
+      | type | data2 | operations | request body | false | |
 
     And check that operation "DELETE" is created for path "/data2S/{data2Id}"
     When select path "/data2S/{data2Id}"
@@ -122,9 +130,10 @@ Feature: Data types tests
     And check that operation description is "Deletes an existing data2."
 
     And check that exist response 204
-    And check that description is "Successful response." for response 204
+    And check that description is "Successful response." for response "204"
     #Choose type mean that the type is not set
-    And check that type is "Choose Type" for response 204
+    And check parameters types
+      | type | Choose Type | operations | response | true | 204 |
 
   @createFullDataType
   Scenario: create full data type
@@ -142,15 +151,15 @@ Feature: Data types tests
 
     # Test also checks that properties will be created for given json example
     And check that data type property "age" is created
-    And check that type is "Integer" for property "age"
-    And check that type as is "32-Bit Integer" for property "age"
-    And check that property "age" is "Not Required"
+    And check that "type" is "Integer" for property "age"
+    And check that "as" is "32-Bit Integer" for property "age"
+    And check that "required" is "Not Required" for property "age"
 
     And check that data type property "isMan" is created
-    And check that type is "Boolean" for property "isMan"
-    And check that property "isMan" is "Not Required"
+    And check that "type" is "Boolean" for property "isMan"
+    And check that "required" is "Not Required" for property "isMan"
 
     And check that data type property "name" is created
-    And check that type is "String" for property "name"
-    And check that type as is "String" for property "name"
-    And check that property "name" is "Not Required"
+    And check that "type" is "String" for property "name"
+    And check that "as" is "String" for property "name"
+    And check that "required" is "Not Required" for property "name"

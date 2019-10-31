@@ -123,16 +123,10 @@ public class MainPageSteps {
         MainPageUtils.getPathWithName(path).click();
     }
 
-    @When("^set consumes to \"([^\"]*)\"$")      //TODO this is add consume but application/json is still there --> delete it
-    public void setConsumesTo(String consumes) {
-        log.info("Setting consumes to {}", consumes);
-        CommonUtils.setValueInLabel(consumes, MainPageUtils.getMainPageRoot().$(By.className("consumes")), true);
-    }
-
-    @When("^set produces to \"([^\"]*)\"$")      //TODO this is add consume but application/json is still there --> delete it
-    public void setProducesTo(String produces) {
-        log.info("Setting produces to {}", produces);
-        CommonUtils.setValueInLabel(produces, MainPageUtils.getMainPageRoot().$(By.className("produces")), true);
+    @When("^set consumes or produces \"([^\"]*)\" to \"([^\"]*)\"$")      //TODO this is add consume but application/json is still there --> delete it
+    public void setConsumesProducesTo(String consumesProduces, String values) {
+        log.info("Setting {} to {}",consumesProduces, values);
+        CommonUtils.setValueInLabel(values, MainPageUtils.getMainPageRoot().$(By.className(consumesProduces)), true);
     }
 
     /**

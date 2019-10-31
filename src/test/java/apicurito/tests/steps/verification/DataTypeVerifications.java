@@ -51,37 +51,14 @@ public class DataTypeVerifications {
         assertThat(description).as("Description of property %s should be %s but is %s", property, expectedDescription, description).isEqualTo(expectedDescription);
     }
 
-    @Then("^check that type is \"([^\"]*)\" for property \"([^\"]*)\"$")
-    public void checkThatTypeIsForProperty(String expectedType, String property) {
-        DataTypeUtils.openPropertyTypes(property);
-        String type = DataTypeSteps.PROPERTIES_SECTION.$$(DataTypesElements.PROPERTY_ROW)
-                .filter(text(property)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId()).getText();
-        assertThat(type).as("Type is %s but should be %s for data type property %s", type, expectedType, property).isEqualTo(expectedType);
-    }
+    @Then("^check that \"([^\"]*)\" is \"([^\"]*)\" for property \"([^\"]*)\"$")
+    public void checkThatTypeAsIsForProperty(String subject, String expectedSubjectValue, String property) {
+        String buttonId = CommonUtils.getButtonId(subject);
 
-    @Then("^check that type of is \"([^\"]*)\" for property \"([^\"]*)\"$")
-    public void checkThatTypeOfIsForProperty(String expectedOf, String property) {
         DataTypeUtils.openPropertyTypes(property);
-        String of = DataTypeSteps.PROPERTIES_SECTION.$$(DataTypesElements.PROPERTY_ROW)
-                .filter(text(property)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId()).getText();
-        assertThat(of).as("Type is %s but should be %s for data type property %s", of, expectedOf, property).isEqualTo(expectedOf);
-    }
-
-    @Then("^check that type as is \"([^\"]*)\" for property \"([^\"]*)\"$")
-    public void checkThatTypeAsIsForProperty(String expectedAs, String property) {
-        DataTypeUtils.openPropertyTypes(property);
-        String as = DataTypeSteps.PROPERTIES_SECTION.$$(DataTypesElements.PROPERTY_ROW)
-                .filter(text(property)).first().$(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId()).getText();
-        assertThat(as).as("Type is %s but should be %s for data type property %s", as, expectedAs, property).isEqualTo(expectedAs);
-    }
-
-    @Then("^check that property \"([^\"]*)\" is \"([^\"]*)\"$")
-    public void checkThatPropertyIsRequired(String property, String expectedIsRequired) {
-        DataTypeUtils.openPropertyTypes(property);
-        String isRequired = DataTypeSteps.PROPERTIES_SECTION.$$(DataTypesElements.PROPERTY_ROW)
-                .filter(text(property)).first().$(CommonUtils.DropdownButtons.PROPERTY_REQUIRED.getButtonId()).getText();
-        assertThat(isRequired).as("Property %s should be %s but is %s", property, expectedIsRequired, isRequired)
-                .isEqualTo(expectedIsRequired);
+        String subjectValue = DataTypeSteps.PROPERTIES_SECTION.$$(DataTypesElements.PROPERTY_ROW)
+                .filter(text(property)).first().$(buttonId).getText();
+        assertThat(subjectValue).as("%s is %s but should be %s for data type property %s",subject, subjectValue, expectedSubjectValue, property).isEqualTo(expectedSubjectValue);
     }
 
     @Then("^check that example is (.*)$")

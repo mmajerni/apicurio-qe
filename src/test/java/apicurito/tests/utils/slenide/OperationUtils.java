@@ -35,9 +35,9 @@ public class OperationUtils {
         CommonUtils.getButtonWithText("Add", getOperationRoot()).click();
     }
 
-    public static void selectResponse(Integer code) {
+    public static void selectResponse(String code) {
         log.info("Selecting response {}", code);
-        getOperationRoot().$(OperationElements.RESPONSES_SECTION).$$(By.className("statusCode")).filter(text(code.toString())).first().click();
+        getOperationRoot().$(OperationElements.RESPONSES_SECTION).$$(By.className("statusCode")).filter(text(code)).first().click();
     }
 
     public static void overrideParameter(String parameter) {

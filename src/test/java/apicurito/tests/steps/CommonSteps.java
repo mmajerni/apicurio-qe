@@ -31,12 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 public class CommonSteps {
 
-    private static class Elements {
-        private static By QUERY_PARAM_SECTION = By.cssSelector("query-params-section");
-        private static By HEADER_PARAM_SECTION = By.cssSelector("header-params-section");
-        private static By REQUEST_BODY_SECTION = By.cssSelector("requestbody-section");
-    }
-
     @Given("^log into apicurito$")
     public void login() {
         Selenide.open(TestConfiguration.apicuritoUrl());
@@ -139,20 +133,17 @@ public class CommonSteps {
     public void createParameterOnPage(String param, String page, String isPlus, DataTable table) {
         SelenideElement pageElement = page.equals("operations") ? OperationUtils.getOperationRoot() : PathUtils.getPathPageRoot();
         String aName = null;
-        By section = null;
+        By section = CommonUtils.getSectionBy(param);
 
         switch (param) {
             case "query":
                 aName = CommonUtils.Sections.QUERY_PARAM.getA();
-                section = Elements.QUERY_PARAM_SECTION;
                 break;
             case "header":
                 aName = CommonUtils.Sections.HEADER_PARAM.getA();
-                section = Elements.HEADER_PARAM_SECTION;
                 break;
             case "RFD":
                 aName = CommonUtils.Sections.RFD_PARAM.getA();
-                section = Elements.REQUEST_BODY_SECTION;
                 break;
         }
         CommonUtils.openCollapsedSection(pageElement, section);

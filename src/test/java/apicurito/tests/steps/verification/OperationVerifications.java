@@ -1,15 +1,12 @@
 package apicurito.tests.steps.verification;
 
-import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.OperationUtils;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import cucumber.api.java.en.Then;
 import org.openqa.selenium.By;
 
-import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.matchText;
+import static com.codeborne.selenide.Condition.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class OperationVerifications {
@@ -77,44 +74,11 @@ public class OperationVerifications {
         assertThat(rows.size()).as("Response %d is not exist", response).isEqualTo(1);
     }
 
-    @Then("^check that description is \"([^\"]*)\" for response (\\d+)$")
-    public void checkThatDescriptionIsForResponse(String expectedDescription, Integer response) {
+    @Then("^check that description is \"([^\"]*)\" for response \"([^\"]*)\"$")
+    public void checkThatDescriptionIsForResponse(String expectedDescription, String response) {
         OperationUtils.selectResponse(response);
         String description = OperationUtils.getOperationRoot().$(OperationElements.RESPONSES_SECTION).$(By.className("response-description")).$(By.className("grow")).getText();
         assertThat(description).as("Checking description:").isEqualTo(expectedDescription);
-    }
-
-    @Then("^check that type is \"([^\"]*)\" for response (\\d+)$")
-    public void checkThatTypeIsForResponse(String expectedType, Integer response) {
-        OperationUtils.selectResponse(response);
-        String type = OperationUtils.getOperationRoot().$(OperationElements.RESPONSES_SECTION).$(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId()).getText();
-        assertThat(type).as("Type is %s but should be %s", type, expectedType).isEqualTo(expectedType);
-    }
-
-    @Then("^check that type of is \"([^\"]*)\" for response (\\d+)$")
-    public void checkThatTypeOfIsForResponse(String expectedOf, Integer response) {
-        OperationUtils.selectResponse(response);
-        String of = OperationUtils.getOperationRoot().$(OperationElements.RESPONSES_SECTION).$(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId()).getText();
-        assertThat(of).as("Type of is %s but should be %s", of, expectedOf).isEqualTo(expectedOf);
-    }
-
-    @Then("^check that type as is \"([^\"]*)\" for response (\\d+)$")
-    public void checkThatTypeAsIsForResponse(String expectedAs, Integer response) {
-        OperationUtils.selectResponse(response);
-        String as = OperationUtils.getOperationRoot().$(OperationElements.RESPONSES_SECTION).$(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId()).getText();
-        assertThat(as).as("Type as is %s but should be %s", as, expectedAs).isEqualTo(expectedAs);
-    }
-
-    @Then("^check that operation consumes \"([^\"]*)\"$")
-    public void checkThatOperationConsumes(String consumes) {
-        SelenideElement consumesSubsection = OperationUtils.getOperationRoot().$(By.className("consumes")); //TODO in OperationStep is the same thing find better solution
-        assertThat(consumesSubsection.getText()).as("Overriden consumes should be %s but is %s", consumes, consumesSubsection.getText()).isEqualTo(consumes);
-    }
-
-    @Then("^check that operation produces \"([^\"]*)\"$")
-    public void checkThatOperationProduces(String produces) {
-        SelenideElement producesSubsection = OperationUtils.getOperationRoot().$(By.className("produces")); //TODO in OperationStep is the same thing find better solution
-        assertThat(producesSubsection.getText()).as("Overriden consumes should be %s but is %s", produces, producesSubsection.getText()).isEqualTo(produces);
     }
 
     @Then("^check that exist request body$")
@@ -132,24 +96,6 @@ public class OperationVerifications {
     public void checkThatRequestBodyDescriptionIs(String expectedDescription) {
         String description = OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION).$("inline-markdown-editor").getText();
         assertThat(description).as("Request body description should be %s but is %s", expectedDescription, description).isEqualTo(expectedDescription);
-    }
-
-    @Then("^check that request body type is \"([^\"]*)\"$")
-    public void checkThatRequestBodyTypeIs(String expectedType) {
-        String type = OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION).$(CommonUtils.DropdownButtons.PROPERTY_TYPE.getButtonId()).getText();
-        assertThat(type).as("Type is %s but should be %s", type, expectedType).isEqualTo(expectedType);
-    }
-
-    @Then("^check that request body type of is \"([^\"]*)\"$")
-    public void checkThatRequestBodyTypeOfIs(String expectedOf) {
-        String of = OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION).$(CommonUtils.DropdownButtons.PROPERTY_TYPE_OF.getButtonId()).getText();
-        assertThat(of).as("Type of is %s but should be %s", of, expectedOf).isEqualTo(expectedOf);
-    }
-
-    @Then("^check that request body type as is \"([^\"]*)\"$")
-    public void checkThatRequestBodyTypeAsIs(String expectedAs) {
-        String as = OperationUtils.getOperationRoot().$(OperationElements.REQUEST_BODY_SECTION).$(CommonUtils.DropdownButtons.PROPERTY_TYPE_AS.getButtonId()).getText();
-        assertThat(as).as("Type as is %s but should be %s", as, expectedAs).isEqualTo(expectedAs);
     }
 
     @Then("^check that operation security requirement \"([^\"]*)\" exist$")
