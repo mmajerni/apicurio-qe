@@ -101,8 +101,12 @@ public class MainPageVerifications {
         }
     }
 
-    @Then("^check that path \"([^\"]*)\" is created$")
-    public void checkThatPathIsCreated(String expectedPathName) {
+    /**
+     * @param expectedPathName expected name of path
+     * @param isCreated        [ is | is not ] is for cheack that path exists, is not otherwise
+     */
+    @Then("^check that path \"([^\"]*)\" \"([^\"]*)\" created$")
+    public void checkThatPathIsCreated(String expectedPathName, String isCreated) {
         try {
             Thread.sleep(1000L);        //need to wait at least for a second because of Stale Element Reference Exception
         } catch (InterruptedException e) {
@@ -111,14 +115,26 @@ public class MainPageVerifications {
         ElementsCollection paths = MainPageUtils.getMainPageRoot().$$(MainPageElements.SECTION).filter(attribute("label", "Paths")).first()
                 .$$(By.className("api-path")).filter(exactText(expectedPathName));
 
-        assertThat(paths.size()).as("Path %s is not created:", expectedPathName).isEqualTo(1);
+        if ("is".equals(isCreated)) {
+            assertThat(paths.size()).as("Path %s is not created (should be)", expectedPathName).isEqualTo(1);
+        } else {
+            assertThat(paths.size()).as("Path %s is created (should not be)", expectedPathName).isEqualTo(0);
+        }
     }
 
-    @Then("^check that data type \"([^\"]*)\" is created$")
-    public void checkThatDataTypeIsCreated(String datatype) {
+    /**
+     * @param datatype  expected name of data type
+     * @param isCreated [ is | is not ] is for cheack that path exists, is not otherwise
+     */
+    @Then("^check that data type \"([^\"]*)\" \"([^\"]*)\" created$")
+    public void checkThatDataTypeIsCreated(String datatype, String isCreated) {
         ElementsCollection types = MainPageUtils.getMainPageRoot().$$(MainPageElements.SECTION).filter(attribute("label", "Data Types")).first()
                 .$$(By.className("api-definition")).filter(exactText(datatype));
-        assertThat(types.size()).as("Data type %s is not created!", datatype).isEqualTo(1);
+        if ("is".equals(isCreated)) {
+            assertThat(types.size()).as("Data type %s is not created! (should be)", datatype).isEqualTo(1);
+        } else {
+            assertThat(types.size()).as("Data type %s is created! (should not be)", datatype).isEqualTo(0);
+        }
     }
 
     /**************************************************************
@@ -142,11 +158,29 @@ public class MainPageVerifications {
         }
     }
 
-    @Then("^check that API security requirement \"([^\"]*)\" exists$")
-    public void checkThatAPISecurityRequirementExists(String requirement) {
+    /**
+     * TEMPORARY method implement this into method above after closing https://github.com/Apicurio/apicurio-studio/issues/656
+     */
+    @Then("check that scheme {string} {string} {string} created")
+    public void checkThatSchemeCreated(String schemeName, String schemeType, String isCreated) {
+        ElementsCollection schemeElements = MainPageUtils.getMainPageRoot().$(MainPageElements.SECURITY_SECTION).$$("security-scheme-row").filter(text(schemeName)).filter(text(schemeType));
+        if ("is".equals(isCreated)) {
+            assertThat(schemeElements.size()).as("Scheme with name %s do not exists, and should", schemeName).isEqualTo(1);
+        } else {
+            assertThat(schemeElements.size()).as("Scheme with name %s exists, and should not", schemeName).isEqualTo(0);
+        }
+
+    }
+
+    @Then("^check that API security requirement \"([^\"]*)\" \"([^\"]*)\" created$")
+    public void checkThatAPISecurityRequirementExists(String requirement, String isCreated) {
         openMainPage();
         ElementsCollection requirementList = MainPageUtils.getMainPageRoot().$(MainPageElements.REQUIREMENTS_SECTION).$$(By.className("security-requirement")).filter(text(requirement));
-        assertThat(requirementList.size()).as("Requirement %s do not exist", requirement).isEqualTo(1);
+        if ("is".equals(isCreated)) {
+            assertThat(requirementList.size()).as("Requirement %s do not exists, and should", requirement).isEqualTo(1);
+        } else {
+            assertThat(requirementList.size()).as("Requirement %s exists, and should not", requirement).isEqualTo(0);
+        }
     }
 
     private void openMainPage() {

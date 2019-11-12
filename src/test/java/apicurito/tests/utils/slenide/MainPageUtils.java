@@ -67,10 +67,10 @@ public class MainPageUtils {
     }
 
     /**
-     * @param name is name of Data Type
+     * @param name        is name of Data Type
      * @param description is OPTIONAL description for Data Type
-     * @param example is OPTIONAL example for Data Type
-     * @param isRest is boolean value which indicates using REST Resource, true -> use REST Resource , false -> No Resource
+     * @param example     is OPTIONAL example for Data Type
+     * @param isRest      is boolean value which indicates using REST Resource, true -> use REST Resource , false -> No Resource
      */
     public static void createDataType(String name, String description, String example, Boolean isRest) {
         log.info("Creating data type with name {} and description {} and rest resources are {}", name, description, isRest);
@@ -106,12 +106,5 @@ public class MainPageUtils {
     public static void putSearchSubstring(String substring) {
         log.info("Searching for {}", substring);
         CommonUtils.getAppRoot().$("#masterSearch").setValue(substring);
-    }
-
-    public static SelenideElement getDropdownMenuItem(String name) {
-        return CommonUtils.getAppRoot()
-                .$$(By.cssSelector(".dropdown-menu li span"))
-                .filter(text(name))
-                .shouldHaveSize(1).first();
     }
 }

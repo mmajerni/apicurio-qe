@@ -142,7 +142,7 @@ public class CommonSteps {
             case "header":
                 aName = CommonUtils.Sections.HEADER_PARAM.getA();
                 break;
-            case "RFD":
+            case "RDF":
                 aName = CommonUtils.Sections.RFD_PARAM.getA();
                 break;
         }

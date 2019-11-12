@@ -156,7 +156,7 @@ Feature: Path tests
     When import API "src/test/resources/preparedAPIs/basic.json"
     And select path "/operations"
     And select operation "GET"
-    And create "RFD" on "operations" page with plus sign "false"
+    And create "RDF" on "operations" page with plus sign "false"
       | FormData | Description for FormData | Required | Array | String | Date |
 
     Then save API as "json" and close editor
@@ -164,7 +164,7 @@ Feature: Path tests
 
     And select path "/operations"
     And select operation "GET"
-    Then check that exist "RFD" on "operations" page
+    Then check that exist "RDF" on "operations" page
       | FormData | Description for FormData | Required | Array | String | Date |
 
   @createOperationResponseLink
@@ -187,7 +187,7 @@ Feature: Path tests
     And select path "/operations"
     And select operation "GET"
 
-    Then check that exist response 200
+    Then check that "exists" response 200
     And check that description is "Description for response 200" for response "200"
     And check parameters types
       | type | Array  | operations | response | true | 200 |
@@ -212,7 +212,7 @@ Feature: Path tests
     And select path "/operations"
     And select operation "GET"
 
-    Then check that exist response 100
+    Then check that "exists" response 100
     And check that description is "Description for response 100" for response "100"
     And check parameters types
       | type | Number | operations | response | true | 100 |
@@ -236,8 +236,8 @@ Feature: Path tests
 
     And select path "/first/{id}"
     And select operation "GET"
-    Then check that operation security requirement "oauth, api" exist
-    And check that operation security requirement "No Security" exist
+    Then check that operation security requirement "oauth, api" "is" created
+    And check that operation security requirement "No Security" "is" created
 
   @createPathParameter
   Scenario: create one path parameter
@@ -362,7 +362,7 @@ Feature: Path tests
       | of   | String | operations | request body | false |  |
       | as   | Date   | operations | request body | false |  |
 
-    And check that exist response 100
+    And check that "exists" response 100
     And check that description is "Description for response 100" for response "100"
     And check parameters types
       | type | Number | operations | response | true | 100 |
@@ -374,7 +374,7 @@ Feature: Path tests
     And select path "/first/{id}/{name}{email}"
     And select operation "POST"
 
-    And create "RFD" on "operations" page with plus sign "false"
+    And create "RDF" on "operations" page with plus sign "false"
       | FormData | Description for FormData | Required | Array | String | Date |
 
     And override security requirements in operation with
@@ -389,11 +389,11 @@ Feature: Path tests
     And select path "/first/{id}/{name}{email}"
     And select operation "POST"
 
-    Then check that exist "RFD" on "operations" page
+    Then check that exist "RDF" on "operations" page
       | FormData | Description for FormData | Required | Array | String | Date |
 
-    And check that operation security requirement "oauth, basic" exist
-    And check that operation security requirement "No Security" exist
+    And check that operation security requirement "oauth, basic" "is" created
+    And check that operation security requirement "No Security" "is" created
 
   @pathWithParameters
   Scenario: create path with parameters, one override and one create in operation

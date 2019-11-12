@@ -1,9 +1,7 @@
 package apicurito.tests.utils.slenide;
 
 import static com.codeborne.selenide.CollectionCondition.sizeGreaterThanOrEqual;
-import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.*;
 import static com.codeborne.selenide.Selenide.$;
 
 import org.openqa.selenium.By;
@@ -28,6 +26,19 @@ public class CommonUtils {
         private static By REQUEST_BODY_SECTION = By.cssSelector("requestbody-section");
         private static By QUERY_PARAM_SECTION = By.cssSelector("query-params-section");
         private static By HEADER_PARAM_SECTION = By.cssSelector("header-params-section");
+        private static By SECURITY_REQ_SECTION = By.cssSelector("security-requirements-section");
+        private static By SECURITY_SCHEMA_SECTION = By.cssSelector("security-schemes-section");
+        private static By PATH_PARAM_SECTION = By.cssSelector("path-params-section");
+
+        private static By QUERY_PARAM_ROW = By.cssSelector("query-param-row");
+        private static By HEADER_PARAM_ROW = By.cssSelector("header-param-row");
+        private static By FORM_DATA_ROW = By.cssSelector("formdata-param-row");
+        private static By SECURITY_REQ_ROW = By.className("security-requirement");
+        private static By SECURITY_SCHEMA_ROW = By.cssSelector("security-scheme-row");
+        private static By PATH_PARAM_ROW = By.cssSelector("path-param-row");
+        private static By PROPERTY_ROW = By.cssSelector("property-row");
+
+
     }
 
     public static SelenideElement getAppRoot() {
@@ -216,9 +227,15 @@ public class CommonUtils {
                 return CommonElements.HEADER_PARAM_SECTION;
             case "response":
                 return CommonElements.RESPONSE_SECTION;
-            case "RFD":
+            case "RDF":
             case "request body":
                 return CommonElements.REQUEST_BODY_SECTION;
+            case "security requirement":
+                return CommonElements.SECURITY_REQ_SECTION;
+            case "security schema":
+                return CommonElements.SECURITY_SCHEMA_SECTION;
+            case "path":
+                return CommonElements.PATH_PARAM_SECTION;
         }
         return null;
     }
@@ -248,6 +265,53 @@ public class CommonUtils {
             case "required":
                 return DropdownButtons.PROPERTY_REQUIRED.getButtonId();
         }
+        return null;
+    }
+
+    public static SelenideElement getDropdownMenuItem(String name) {
+        return CommonUtils.getAppRoot()
+                .$$(By.cssSelector(".dropdown-menu li a span"))
+                .filter(text(name))
+                .shouldHaveSize(1).first();
+    }
+
+    public static SelenideElement getKebabButtonOnElement(SelenideElement element) {
+        return element.$(By.className("dropdown-toggle"));
+    }
+
+    public static SelenideElement getElementRow(SelenideElement section, String sectionName, String elementName) {
+        By sectionRowType = null;
+        switch (sectionName) {
+            case "query":
+                sectionRowType = CommonElements.QUERY_PARAM_ROW;
+                break;
+            case "header":
+                sectionRowType = CommonElements.HEADER_PARAM_ROW;
+                break;
+            case "RDF":
+                sectionRowType = CommonElements.FORM_DATA_ROW;
+                break;
+            case "security requirement":
+                sectionRowType = CommonElements.SECURITY_REQ_ROW;
+                break;
+            case "security schema":
+                sectionRowType = CommonElements.SECURITY_SCHEMA_ROW;
+                break;
+            case "path":
+                sectionRowType = CommonElements.PATH_PARAM_ROW;
+                break;
+            case "property":
+                sectionRowType = CommonElements.PROPERTY_ROW;
+                break;
+
+        }
+        ElementsCollection rows = section.$$(sectionRowType);
+        for (SelenideElement row : rows) {
+            if (row.$(By.className("name")).getText().equals(elementName)) {
+                return row;
+            }
+        }
+        //element not found
         return null;
     }
 }
