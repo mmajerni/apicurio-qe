@@ -3,11 +3,13 @@ package apicurito.tests.steps;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.cssClass;
 import static com.codeborne.selenide.Condition.enabled;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
 
-import apicurito.tests.utils.slenide.*;
 import org.assertj.core.api.Condition;
 import org.openqa.selenium.By;
 
@@ -16,22 +18,24 @@ import com.codeborne.selenide.SelenideElement;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import apicurito.tests.configuration.Component;
 import apicurito.tests.configuration.TestConfiguration;
 import apicurito.tests.configuration.templates.ApicuritoTemplate;
 import apicurito.tests.utils.openshift.OpenShiftUtils;
+import apicurito.tests.utils.slenide.CommonUtils;
+import apicurito.tests.utils.slenide.ImportExportUtils;
+import apicurito.tests.utils.slenide.MainPageUtils;
+import apicurito.tests.utils.slenide.OperationUtils;
+import apicurito.tests.utils.slenide.PathUtils;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import cz.xtf.core.openshift.OpenShift;
 import io.cucumber.datatable.DataTable;
 import io.fabric8.kubernetes.api.model.Pod;
 import lombok.extern.slf4j.Slf4j;
-
-import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selenide.$;
-import static com.codeborne.selenide.Selenide.$$;
-
 
 @Slf4j
 public class CommonSteps {
@@ -45,11 +49,11 @@ public class CommonSteps {
     public void createANewApi(String version) {
         if ("3".equals(version)) {
             CommonUtils.getButtonWithText("New API", CommonUtils.getAppRoot()).shouldBe(visible, enabled).shouldNotHave(attribute("disabled"))
-                    .click();
+                .click();
         } else {
 
             CommonUtils.getButtonWithText("Toggle Dropdown", CommonUtils.getAppRoot()).shouldBe(visible, enabled).shouldNotHave(attribute("disabled"))
-                    .click();
+                .click();
 
             CommonUtils.getAppRoot().$$("a").filter(text("New (OpenAPI 2)")).first().click();
         }
@@ -73,14 +77,14 @@ public class CommonSteps {
     public void saveAPIAsAndCloseEditor(String format) {
         File exportedIntegrationFile = ImportExportUtils.exportAPIUtil(format);
         assertThat(exportedIntegrationFile)
-                .exists()
-                .isFile()
-                .has(new Condition<>(f -> f.length() > 0, "File size should be greater than 0"));
+            .exists()
+            .isFile()
+            .has(new Condition<>(f -> f.length() > 0, "File size should be greater than 0"));
 
         CommonUtils.getButtonWithText("Close", CommonUtils.getAppRoot())
-                .click();
+            .click();
         CommonUtils.getButtonWithText("Don't Save", CommonUtils.getAppRoot())
-                .click();
+            .click();
     }
 
     @Then("^delete API \"([^\"]*)\"$")
@@ -102,7 +106,9 @@ public class CommonSteps {
 
     @When("deploy another custom resource")
     public void deployAnotherCustomResource() {
-        String cr = "https://gist.githubusercontent.com/mmajerni/e47e14f2a1c2bf934219cb3d4508e81c/raw/ff59f25b5a37918f19c69d70931154c081b683fa/operatorUpdateTest.yaml";
+        String cr =
+            "https://gist.githubusercontent.com/mmajerni/e47e14f2a1c2bf934219cb3d4508e81c/raw/ff59f25b5a37918f19c69d70931154c081b683fa" +
+                "/operatorUpdateTest.yaml";
         ApicuritoTemplate.deployCr(cr);
 
         //Wait for Rollout until there is no unavailable pod
@@ -114,7 +120,8 @@ public class CommonSteps {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            tmp = OpenShiftUtils.getInstance().apps().deployments().inNamespace(TestConfiguration.openShiftNamespace()).list().getItems().get(1).getStatus().getUnavailableReplicas();
+            tmp = OpenShiftUtils.getInstance().apps().deployments().inNamespace(TestConfiguration.openShiftNamespace()).list().getItems().get(1)
+                .getStatus().getUnavailableReplicas();
         }
 
         //Wait another 15 seconds because of termination running pods
@@ -167,7 +174,7 @@ public class CommonSteps {
 
         if (Boolean.valueOf(isPlus)) {
             pageElement.$(section).$$("icon-button").filter(attribute("type", "add"))
-                    .shouldHaveSize(1).first().shouldBe(visible).$("button").click();
+                .shouldHaveSize(1).first().shouldBe(visible).$("button").click();
         } else {
             pageElement.$(section).$$("a").filter(text(aName)).shouldHaveSize(1).first().shouldBe(visible).click();
         }
@@ -202,7 +209,7 @@ public class CommonSteps {
             //open editor by plus button(true) or by link (false)
             if (Boolean.valueOf(dataRow.get(2))) {
                 pageElement.$(section).$$("icon-button").filter(attribute("type", "add"))
-                        .shouldHaveSize(1).first().shouldBe(visible).$("button").click();
+                    .shouldHaveSize(1).first().shouldBe(visible).$("button").click();
             } else {
                 pageElement.$(section).$$("a").filter(text("Add a server")).shouldHaveSize(1).first().shouldBe(visible).click();
             }
@@ -237,9 +244,38 @@ public class CommonSteps {
             CommonUtils.getLabelWithType("text", variablesArea.$$(By.className("panel-body")).filter(visible).first()).sendKeys(dataRow.get(1));
 
             variablesArea.$$("textarea").filter(visible).first().sendKeys(dataRow.get(2));
-
-
         }
         CommonUtils.getButtonWithText("Save", MainPageUtils.getMainPageRoot().$("#entity-editor-form")).click();
+    }
+    
+    @When("deploy apicurito into operatorhub and subscribe")
+    public void deployApicuritoIntoOperatorhubAndSubscribe() {
+        final String disableOH = "src/test/resources/operatorhubFiles/disableOH.yaml";
+        final String operatorsource = "src/test/resources/operatorhubFiles/operatorsource.yaml";
+        final String operatorGroup = "src/test/resources/operatorhubFiles/operatorGroup.yaml";
+        final String subscription = "src/test/resources/operatorhubFiles/subscription.yaml";
+
+        ApicuritoTemplate.applyOnOCP("Disable operators", "openshift-marketplace", disableOH);
+        ApicuritoTemplate.applyOnOCP("Operator source", "openshift-marketplace", operatorsource);
+
+        OpenShift myOpenshift = OpenShiftUtils.getAnotherOpenShiftUtils("openshift-marketplace");
+
+        myOpenshift.waiters()
+            .areExactlyNPodsReady(1, "marketplace.operatorSource", "fuse-apicurito")
+            .interval(TimeUnit.SECONDS, 2)
+            .timeout(TimeUnit.MINUTES, 1)
+            .waitFor();
+
+        ApicuritoTemplate.applyOnOCP("Operator group", "operatorhub", operatorGroup);
+        ApicuritoTemplate.applyOnOCP("Subscription", "operatorhub", subscription);
+    }
+
+    @Then("check that apicurito operator is deployed and in running state")
+    public void checkThatApicuritoOperatorIsDeployedAndInRunningState() {
+        OpenShiftUtils.xtf().waiters()
+            .areExactlyNPodsReady(1, "name", "apicurito-operator")
+            .interval(TimeUnit.SECONDS, 2)
+            .timeout(TimeUnit.MINUTES, 3)
+            .waitFor();
     }
 }
