@@ -95,7 +95,7 @@ public class ApicuritoTemplate {
     }
 
     public static void deployCr(String cr) {
-        log.info("Deploying CR from " + TestConfiguration.apicuritoOperatorCrUrl());
+        log.info("Deploying CR from " + cr);
         final String output = OpenShiftUtils.binary().execute(
                 "apply",
                 "-n", TestConfiguration.openShiftNamespace(),

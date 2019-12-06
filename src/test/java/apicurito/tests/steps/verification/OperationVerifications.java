@@ -68,10 +68,18 @@ public class OperationVerifications {
         assertThat(descriptionElement.getText()).as("Description for path parameter %s is different", parameter).isEqualTo(description);
     }
 
-    @Then("^check that exist response (\\d+)$")
-    public void checkThatExistResponse(Integer response) {
+    /*
+        param isCreated - "exists" for check that response exists
+                        - "not exists" for check that response do not exists
+     */
+    @Then("^check that \"([^\"]*)\" response (\\d+)$")
+    public void checkThatExistResponse(String isCreated, Integer response) {
         ElementsCollection rows = OperationUtils.getOperationRoot().$$(By.className("statusCode")).filter(text(response.toString()));
-        assertThat(rows.size()).as("Response %d is not exist", response).isEqualTo(1);
+        if ("exists".equals(isCreated)) {
+            assertThat(rows.size()).as("Response %d is not exists, and should exists", response).isEqualTo(1);
+        } else {
+            assertThat(rows.size()).as("Response %d exists, and should not", response).isEqualTo(0);
+        }
     }
 
     @Then("^check that description is \"([^\"]*)\" for response \"([^\"]*)\"$")
@@ -98,9 +106,13 @@ public class OperationVerifications {
         assertThat(description).as("Request body description should be %s but is %s", expectedDescription, description).isEqualTo(expectedDescription);
     }
 
-    @Then("^check that operation security requirement \"([^\"]*)\" exist$")
-    public void checkThatOperationSecurityRequirementExist(String requirement) {        //TODO same method as in MainPageVerifications --> join
-        ElementsCollection requirementList = OperationUtils.getOperationRoot().$(OperationElements.REQUIREMENTS_SECTION).$$(By.className("security-requirement")).filter(text(requirement));
-        assertThat(requirementList.size()).as("Operation requirement %s do not exist", requirement).isEqualTo(1);
+    @Then("^check that operation security requirement \"([^\"]*)\" \"([^\"]*)\" created$")
+    public void checkThatOperationSecurityRequirementExist(String requirement, String isCreated) {        //TODO same method as in MainPageVerifications --> join
+        ElementsCollection requirementList = OperationUtils.getOperationRoot().$(OperationElements.REQUIREMENTS_SECTION).$$(By.className("security-requirement")).filter(exactText(requirement));
+        if ("is".equals(isCreated)) {
+            assertThat(requirementList.size()).as("Requirement %s do not exists, and should", requirement).isEqualTo(1);
+        } else {
+            assertThat(requirementList.size()).as("Requirement %s exists, and should not", requirement).isEqualTo(0);
+        }
     }
 }

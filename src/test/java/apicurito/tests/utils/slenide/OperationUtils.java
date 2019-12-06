@@ -49,6 +49,6 @@ public class OperationUtils {
 
     public static void deleteOperation() {
         getOperationRoot().$(By.className("actions")).shouldBe(visible).click();
-        MainPageUtils.getDropdownMenuItem("Delete Operation").shouldBe(visible).click();
+        CommonUtils.getDropdownMenuItem("Delete Operation").shouldBe(visible).click();
     }
 }

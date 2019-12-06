@@ -119,7 +119,7 @@ Feature: Main page tests
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
 
-    Then check that API security requirement "api, basic" exists
+    Then check that API security requirement "api, basic" "is" created
 
   @mainPage
   Scenario: Test the api main page (set everything except security)
@@ -167,20 +167,20 @@ Feature: Main page tests
       | DataType24 | desc |  | false | false |
 
     And search path or data type with substring "x"
-    Then check that path "/Mypathsx" is created
-    And check that data type "DataTypex" is created
+    Then check that path "/Mypathsx" "is" created
+    And check that data type "DataTypex" "is" created
 
     When search path or data type with substring "2"
-    Then check that path "/Mypaths2" is created
-    And check that path "/Mypaths24" is created
-    And check that data type "DataType2" is created
-    And check that data type "DataType24" is created
+    Then check that path "/Mypaths2" "is" created
+    And check that path "/Mypaths24" "is" created
+    And check that data type "DataType2" "is" created
+    And check that data type "DataType24" "is" created
 
     When search path or data type with substring "ATH"
-    Then check that path "/Mypaths1" is created
-    And check that path "/Mypaths2" is created
-    And check that path "/Mypathsx" is created
-    And check that path "/Mypaths24" is created
+    Then check that path "/Mypaths1" "is" created
+    And check that path "/Mypaths2" "is" created
+    And check that path "/Mypathsx" "is" created
+    And check that path "/Mypaths24" "is" created
 
   @plurals
   Scenario: test for creating paths in plural forms
@@ -195,14 +195,14 @@ Feature: Main page tests
       | man    |  |  | true | false |
       | abc    |  |  | true | false |
 
-    Then check that path "/beers" is created
-    And check that path "/bANANAS" is created
-    And check that path "/data2S" is created
-    And check that path "/mice" is created
-    And check that path "/men" is created
-    And check that path "/abcs" is created
+    Then check that path "/beers" "is" created
+    And check that path "/bANANAS" "is" created
+    And check that path "/data2S" "is" created
+    And check that path "/mice" "is" created
+    And check that path "/men" "is" created
+    And check that path "/abcs" "is" created
 
-  Scenario: #kebab menu for paths and data types
+
 
   #TODO after closing:
   # https://github.com/Apicurio/apicurio-studio/issues/656

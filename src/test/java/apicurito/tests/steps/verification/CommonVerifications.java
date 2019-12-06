@@ -9,7 +9,6 @@ import cucumber.api.java.en.Then;
 import io.cucumber.datatable.DataTable;
 import org.openqa.selenium.By;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static com.codeborne.selenide.Condition.text;
@@ -41,7 +40,7 @@ public class CommonVerifications {
             case "header":
                 rowType = "header-param-row";
                 break;
-            case "RFD":
+            case "RDF":
                 rowType = "formdata-param-row";
                 break;
         }
@@ -74,7 +73,29 @@ public class CommonVerifications {
     @Then("^check that API \"([^\"]*)\" values \"([^\"]*)\" on page \"([^\"]*)\"$")
     public void checkThatConsumesProducesHasValuesOnPage(String consumesProduces, String values, String page) {
         SelenideElement subsection = CommonUtils.getPageElement(page).$(By.className(consumesProduces));
-        assertThat(subsection.getText()).as("%s should be %s but is %s",consumesProduces, values, subsection.getText()).isEqualTo(values);
+        assertThat(subsection.getText()).as("%s should be %s but is %s", consumesProduces, values, subsection.getText()).isEqualTo(values);
+    }
+
+    @Then("check that {string} created {string} on {string} page with name {string}")
+    public void checkThatCreatedOnPageWithName(String isCreated, String param, String page, String elementName) {
+        By sectionBy = CommonUtils.getSectionBy(param);
+        SelenideElement elementRow = CommonUtils.getElementRow(CommonUtils.getPageElement(page).$(sectionBy), param, elementName);
+        if ("is".equals(isCreated)) {
+            assertThat(elementRow).as("Object %s with name %s on %s page is not created and should be", param, elementName, page).isNotNull();
+        } else {
+            assertThat(elementRow).as("Object %s with name %s on %s page is created and should not be", param, elementName, page).isNull();
+        }
+    }
+
+    @Then("check that {string} overridden {string} on {string} page with name {string}")
+    public void checkThatOverrideOnPageWithName(String isOverridden, String param, String page, String elementName) {
+        By sectionBy = CommonUtils.getSectionBy(param);
+        SelenideElement elementRow = CommonUtils.getElementRow(CommonUtils.getPageElement(page).$(sectionBy), param, elementName);
+        if ("is".equals(isOverridden)) {
+            assertThat(elementRow.$$("button").filter(text("Override"))).as("Object %s with name %s on %s page is not created and should be", param, elementName, page).isNull();
+        } else {
+            assertThat(elementRow.$$("button").filter(text("Override"))).as("Object %s with name %s on %s page is created and should not be", param, elementName, page).isNotNull();
+        }
     }
 
     private void checkRow(List<String> dataRow, SelenideElement pageElement, By section, String rowType, String message) {

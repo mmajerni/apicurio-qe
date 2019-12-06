@@ -1,0 +1,166 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "New API",
+        "description": "A brand new API with no content.  Go nuts!",
+        "version": "1.0"
+    },
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/path1": {
+            "post": {
+                "parameters": [
+                    {
+                        "name": "qp1",
+                        "in": "query"
+                    },
+                    {
+                        "name": "qp2",
+                        "in": "query"
+                    },
+                    {
+                        "name": "qp3",
+                        "in": "query"
+                    },
+                    {
+                        "name": "hp1",
+                        "in": "header"
+                    },
+                    {
+                        "name": "hp2",
+                        "in": "header"
+                    },
+                    {
+                        "name": "hp3",
+                        "in": "header"
+                    },
+                    {
+                        "name": "fd1",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "fd2",
+                        "in": "formData"
+                    },
+                    {
+                        "name": "fd3",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {},
+                    "201": {},
+                    "400": {}
+                },
+                "security": [
+                    {
+                        "s1": []
+                    },
+                    {
+                        "s2": []
+                    },
+                    {
+                        "s1": [],
+                        "s2": [],
+                        "s3": []
+                    }
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "qp1",
+                    "in": "query"
+                },
+                {
+                    "name": "qp2",
+                    "in": "query"
+                },
+                {
+                    "name": "qp3",
+                    "in": "query"
+                },
+                {
+                    "name": "hp1",
+                    "in": "header"
+                },
+                {
+                    "name": "hp2",
+                    "in": "header"
+                },
+                {
+                    "name": "hp3",
+                    "in": "header"
+                }
+            ]
+        },
+        "/path2/{id}{id2}": {
+            "delete": {
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "name": "id2",
+                        "in": "path",
+                        "required": true
+                    }
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true
+                },
+                {
+                    "name": "id2",
+                    "in": "path",
+                    "required": true
+                }
+            ]
+        }
+    },
+    "definitions": {
+        "data1": {
+            "type": "object",
+            "properties": {
+                "prop1": {},
+                "prop2": {},
+                "prop3": {}
+            }
+        },
+        "data2": {
+            "type": "object"
+        }
+    },
+    "securityDefinitions": {
+        "s1": {
+            "type": "basic"
+        },
+        "s2": {
+            "type": "apiKey"
+        },
+        "s3": {
+            "type": "oauth2",
+            "scopes": {}
+        }
+    },
+    "security": [
+        {},
+        {
+            "s1": []
+        },
+        {
+            "s1": [],
+            "s2": [],
+            "s3": []
+        }
+    ]
+}

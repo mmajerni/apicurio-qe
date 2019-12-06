@@ -5,6 +5,7 @@ import static com.codeborne.selenide.Condition.enabled;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 
+import apicurito.tests.utils.slenide.OperationUtils;
 import org.openqa.selenium.By;
 
 import com.codeborne.selenide.ElementsCollection;
@@ -71,7 +72,7 @@ public class MainPageSteps {
     @When("^delete path \"([^\"]*)\"$")
     public void deletePath(String path) {
         MainPageUtils.getPathWithName(path).contextClick();
-        MainPageUtils.getDropdownMenuItem("Delete").shouldBe(visible).click();
+        CommonUtils.getDropdownMenuItem("Delete").shouldBe(visible).click();
     }
 
     @When("^change API name to \"([^\"]*)\"$")
@@ -123,19 +124,20 @@ public class MainPageSteps {
         MainPageUtils.getPathWithName(path).click();
     }
 
-    @When("^set consumes or produces \"([^\"]*)\" to \"([^\"]*)\"$")      //TODO this is add consume but application/json is still there --> delete it
+    @When("^set consumes or produces \"([^\"]*)\" to \"([^\"]*)\"$")
+    //TODO this is add consume but application/json is still there --> delete it
     public void setConsumesProducesTo(String consumesProduces, String values) {
-        log.info("Setting {} to {}",consumesProduces, values);
+        log.info("Setting {} to {}", consumesProduces, values);
         CommonUtils.setValueInLabel(values, MainPageUtils.getMainPageRoot().$(By.className(consumesProduces)), true);
     }
 
     /**
      * @param table parameters:
-     * Name
-     * Description OPTIONAL (could be empty string)
-     * Example in json format OPTIONAL (could be empty string)
-     * boolean if should be created with REST resources
-     * boolean if should be created with Link
+     *              Name
+     *              Description OPTIONAL (could be empty string)
+     *              Example in json format OPTIONAL (could be empty string)
+     *              boolean if should be created with REST resources
+     *              boolean if should be created with Link
      */
     @When("^create a new data type by link$")
     public void createANewDataType(DataTable table) {
@@ -293,5 +295,78 @@ public class MainPageSteps {
         }
         CommonUtils.getButtonWithText("Save", schemeEditor)
                 .click();
+    }
+
+    /**
+     * @param table contains parameters:
+     *              section : path | data types
+     *              element name e.g. /myPath
+     *              action : New Sub-Path | Rename | Clone | Delete
+     *              new name for element e.g. /mySuperPath
+     */
+    @When("context click on and manage element")
+    public void contextClickOn(DataTable table) {
+        for (List<String> dataRow : table.cells()) {
+            if (dataRow.get(0).equals("path")) {
+                MainPageUtils.getPathWithName(dataRow.get(1)).contextClick();
+            } else {
+                MainPageUtils.getDataTypeWithName(dataRow.get(1)).contextClick();
+            }
+            CommonUtils.getDropdownMenuItem(dataRow.get(2)).shouldBe(visible).click();
+
+            if (!dataRow.get(2).equals("Delete")) {
+                SelenideElement se = CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-body")).$("input");
+                se.clear();
+                se.sendKeys(dataRow.get(3));
+                //CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-body")).$("input").sendKeys(dataRow.get(3));
+                CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-footer")).$(By.className("btn-primary")).click();
+            }
+        }
+    }
+
+    /**
+     * @param table contains parameters:
+     *              page where kebab is located:  path | datatypes | main page | operations
+     *              section where kebab is located: query | header | response | RFD
+     *              name of element : e.g. headerParameter123
+     *              kebab operation: Rename | Delete | ...
+     *              new name for element e.g. /mySuperPath
+     */
+    @When("click on kebab menu and manage element")
+    public void clickOnKebabMenuAndManageElement(DataTable table) {
+        for (List<String> dataRow : table.cells()) {
+            if (dataRow.get(1).isEmpty()) {
+                //Usage for kebab for paths and data types
+                CommonUtils.getKebabButtonOnElement(CommonUtils.getPageElement(dataRow.get(0))).click();
+            } else {
+                By sectionBy = CommonUtils.getSectionBy(dataRow.get(1));
+                SelenideElement sectionElement = CommonUtils.getPageElement(dataRow.get(0)).$(sectionBy);
+                SelenideElement elementRow;
+
+                if ("response".equals(dataRow.get(1))) {
+                    //Usage for responses
+                    OperationUtils.selectResponse(dataRow.get(2));
+                    elementRow = CommonUtils.getPageElement(dataRow.get(0)).$(sectionBy);
+                } else {
+                    elementRow = CommonUtils.getElementRow(sectionElement, dataRow.get(1), dataRow.get(2));
+                }
+                CommonUtils.getKebabButtonOnElement(elementRow).click();
+            }
+
+            CommonUtils.getDropdownMenuItem(dataRow.get(3)).click();
+            if (!(dataRow.get(3).contains("Delete") || dataRow.get(3).contains("Sections"))) {
+                if ("response".equals(dataRow.get(1))) {
+                    //Change response status code
+                    OperationUtils.getOperationRoot().$("#statusCodeDropDown").$("#statusCodeDropDown").click();
+                    OperationUtils.getOperationRoot().$("#statusCodeDropDown").$(By.className("dropdown-menu")).$$(BasicElements.A).filter(text(dataRow.get(4))).first().click();
+                } else {
+                    //Change value in input field
+                    SelenideElement se = CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-body")).$("input");
+                    se.clear();
+                    se.sendKeys(dataRow.get(4));
+                }
+                CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-footer")).$(By.className("btn-primary")).click();
+            }
+        }
     }
 }

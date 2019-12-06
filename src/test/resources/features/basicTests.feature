@@ -30,7 +30,7 @@ Feature: Basic tests
 
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
-    Then check that path "/MyPathByLink" is created
+    Then check that path "/MyPathByLink" "is" created
 
   @createPathByPlus
   Scenario: create path by plus
@@ -40,7 +40,7 @@ Feature: Basic tests
 
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
-    Then check that path "/MyPathByPlus" is created
+    Then check that path "/MyPathByPlus" "is" created
 
   @createDataTypeByLink
   Scenario: create data type by link
@@ -50,7 +50,7 @@ Feature: Basic tests
 
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
-    Then check that data type "NewDataLink" is created
+    Then check that data type "NewDataLink" "is" created
 
   @createDataTypeByPlus
   Scenario: create a new data type by plus
@@ -60,7 +60,7 @@ Feature: Basic tests
 
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
-    Then check that data type "NewDataPlus" is created
+    Then check that data type "NewDataPlus" "is" created
 
   @createPutOperation
   Scenario: create PUT operation

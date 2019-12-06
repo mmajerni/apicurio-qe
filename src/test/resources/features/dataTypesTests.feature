@@ -57,7 +57,7 @@ Feature: Data types tests
     And save API as "json" and close editor
     Then import API "tmp/download/openapi-spec.json"
 
-    And check that path "/data2S" is created
+    And check that path "/data2S" "is" created
     And check that operation "GET" is created for path "/data2S"
     When select path "/data2S"
     And select operation "GET"
@@ -65,7 +65,7 @@ Feature: Data types tests
     And check that operation ID is "getdata2S"
     And check that operation description is "Gets a list of all data2 entities."
 
-    And check that exist response 200
+    And check that "exists" response 200
     And check that description is "Successful response - returns an array of data2 entities." for response "200"
 
     And check parameters types
@@ -79,7 +79,7 @@ Feature: Data types tests
     And check that operation ID is "createdata2"
     And check that operation description is "Creates a new instance of a data2."
 
-    And check that exist response 201
+    And check that "exists" response 201
     And check that description is "Successful response." for response "201"
     #Choose type mean that the type is not set
     And check parameters types
@@ -89,7 +89,7 @@ Feature: Data types tests
     And check parameters types
       | type | data2 | operations | request body | false | |
 
-    And check that path "/data2S/{data2Id}" is created
+    And check that path "/data2S/{data2Id}" "is" created
     And check that operation "GET" is created for path "/data2S/{data2Id}"
     When select path "/data2S/{data2Id}"
 
@@ -100,7 +100,7 @@ Feature: Data types tests
     And check that operation ID is "getdata2"
     And check that operation description is "Gets the details of a single instance of a data2."
 
-    And check that exist response 200
+    And check that "exists" response 200
     And check that description is "Successful response - returns a single data2." for response "200"
     And check parameters types
       | type | data2 | operations | response | true | 200 |
@@ -112,7 +112,7 @@ Feature: Data types tests
     And check that operation ID is "updatedata2"
     And check that operation description is "Updates an existing data2."
 
-    And check that exist response 202
+    And check that "exists" response 202
     And check that description is "Successful response." for response "202"
     #Choose type mean that the type is not set
     And check parameters types
@@ -129,7 +129,7 @@ Feature: Data types tests
     And check that operation ID is "deletedata2"
     And check that operation description is "Deletes an existing data2."
 
-    And check that exist response 204
+    And check that "exists" response 204
     And check that description is "Successful response." for response "204"
     #Choose type mean that the type is not set
     And check parameters types
