@@ -1,14 +1,14 @@
 package apicurito.tests.utils.slenide;
 
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.SelenideElement;
+import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.By;
+
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
-
-import org.openqa.selenium.By;
-
-import com.codeborne.selenide.SelenideElement;
-
-import lombok.extern.slf4j.Slf4j;
+import static com.codeborne.selenide.Selenide.$$;
 
 @Slf4j
 public class OperationUtils {
@@ -50,5 +50,16 @@ public class OperationUtils {
     public static void deleteOperation() {
         getOperationRoot().$(By.className("actions")).shouldBe(visible).click();
         CommonUtils.getDropdownMenuItem("Delete Operation").shouldBe(visible).click();
+    }
+
+    public static void ensureMediaTypeExistsForResponse(String mediaType, String response) {
+        OperationUtils.selectResponse(response);
+        if ($$("media-type-row").filter(Condition.text(mediaType)).size() == 0) {
+            String buttonId = CommonUtils.DropdownButtons.MEDIA_TYPE.getButtonId();
+            SelenideElement section = $("#addMediaTypeModal");
+            $(By.linkText("Add a media type")).click();
+            CommonUtils.setDropDownValue(buttonId, mediaType, section);
+            CommonUtils.getButtonWithText("Add", section).click();
+        }
     }
 }
