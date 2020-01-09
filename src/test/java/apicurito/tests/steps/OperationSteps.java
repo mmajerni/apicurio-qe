@@ -6,6 +6,7 @@ import apicurito.tests.utils.slenide.OperationUtils;
 import apicurito.tests.utils.slenide.PathUtils;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
 import lombok.extern.slf4j.Slf4j;
@@ -48,18 +49,24 @@ public class OperationSteps {
         CommonUtils.setValueInLabel(tags, OperationUtils.getOperationRoot().$(By.className("tags")), true);
     }
 
-    @When("^set response (\\d+) with clickable link$")
-    public void setResponseWithLink(Integer response) {
-        CommonUtils.getClickableLink(CommonUtils.Sections.RESPONSE, CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")))
-                .click();
-        OperationUtils.setResponseStatusCode(response);
-    }
-
-    @When("^set response (\\d+) with plus sign$")
-    public void setResponseWithPlusSign(Integer response) {
-        CommonUtils.getNewPlusSignButton(CommonUtils.Sections.RESPONSE, CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")))
-                .click();
-        OperationUtils.setResponseStatusCode(response);
+    /**
+     * Data table params: response code --> 200, 404, ...
+     *                    response definition
+     *                    boolean true  --> create with plus sign
+     *                            false --> create with link
+     */
+    @When("set response with plus sign")
+    public void setResponseWithPlusSign(DataTable table) {
+        for (List<String> dataRow : table.cells()) {
+            if (Boolean.valueOf(dataRow.get(2))){
+                CommonUtils.getNewPlusSignButton(CommonUtils.Sections.RESPONSE, OperationUtils.getOperationRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")))
+                        .click();
+            }else{
+                CommonUtils.getClickableLink(CommonUtils.Sections.RESPONSE, OperationUtils.getOperationRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")))
+                        .click();
+            }
+            OperationUtils.setResponseDetails(dataRow.get(0), dataRow.get(1));
+        }
     }
 
     @When("^set response description \"([^\"]*)\" for response \"([^\"]*)\"$")

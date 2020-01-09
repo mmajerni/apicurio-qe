@@ -64,6 +64,6 @@ public class DataTypeVerifications {
     @Then("^check that example is (.*)$")
     public void checkThatExampleIsRegEx(String expectedExample) {
         String example = DataTypeUtils.getDataTypesRoot().$(DataTypesElements.EXAMPLE_SECTION).$(By.className("example")).getText();
-        assertThat(example).as("Example should be %s but is %s", expectedExample, example).isEqualTo(expectedExample);
+        assertThat(example.replaceAll("\\s","")).as("Example should be %s but is %s", expectedExample, example).isEqualTo(expectedExample.replaceAll("\\s",""));
     }
 }

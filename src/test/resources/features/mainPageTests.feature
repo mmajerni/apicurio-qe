@@ -9,7 +9,7 @@ Feature: Main page tests
 
   @changeAPIname
   Scenario: change API name
-    When create a new API
+    When create a new API version "2"
     And change API name to "MyApi"
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
@@ -17,7 +17,7 @@ Feature: Main page tests
 
   @setAPIversion
   Scenario: set API version
-    When create a new API
+    When create a new API version "2"
     And set API version to "2.20a"
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
@@ -25,7 +25,7 @@ Feature: Main page tests
 
   @setAPIdescription
   Scenario: set API description
-    When create a new API
+    When create a new API version "2"
     And change description to "New API desc"
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
@@ -33,7 +33,7 @@ Feature: Main page tests
 
   @setAPIconsumes
   Scenario: set API consumes
-    When create a new API
+    When create a new API version "2"
     And set consumes or produces "consumes" to "text/xml"
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
@@ -42,7 +42,7 @@ Feature: Main page tests
 
   @setAPIproduces
   Scenario: set API produces
-    When create a new API
+    When create a new API version "2"
     And set consumes or produces "produces" to "text/xml"
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
@@ -51,7 +51,7 @@ Feature: Main page tests
 
   @setAPIcontact
   Scenario: set API contact
-    When create a new API
+    When create a new API version "2"
     And add contact info
       | Ignite test | a@a.com | https://github.com/Apicurio/ |
 
@@ -62,7 +62,7 @@ Feature: Main page tests
 
   @setAPIlicense
   Scenario: set API license
-    When create a new API
+    When create a new API version "2"
     And add license "MIT License"
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
@@ -70,7 +70,7 @@ Feature: Main page tests
 
   @setAPItag
   Scenario: set API tag
-    When create a new API
+    When create a new API version "2"
     And add tag "MyTag" with description "My desc"
     And save API as "json" and close editor
     And import API "tmp/download/openapi-spec.json"
@@ -123,7 +123,7 @@ Feature: Main page tests
 
   @mainPage
   Scenario: Test the api main page (set everything except security)
-    When create a new API
+    When create a new API version "2"
     And change API name to "MyApi"
     And set API version to "2.20a"
     And change description to "New API desc"
@@ -152,7 +152,7 @@ Feature: Main page tests
 
   @search
   Scenario: test search on paths and datatypes
-    When create a new API
+    When create a new API version "2"
     And create a new path with link
       | Mypaths1  | false |
       | Mypaths2  | false |
@@ -184,9 +184,7 @@ Feature: Main page tests
 
   @plurals
   Scenario: test for creating paths in plural forms
-    #TODO change to the right path names after closing:
-    #https://issues.jboss.org/browse/ENTESB-11594
-    When create a new API
+    When create a new API version "2"
     And create a new data type by link
       | beer   |  |  | true | false |
       | BANANA |  |  | true | false |
@@ -196,13 +194,67 @@ Feature: Main page tests
       | abc    |  |  | true | false |
 
     Then check that path "/beers" "is" created
-    And check that path "/bANANAS" "is" created
-    And check that path "/data2S" "is" created
+    And check that path "/bananas" "is" created
+    And check that path "/data2" "is" created
     And check that path "/mice" "is" created
     And check that path "/men" "is" created
     And check that path "/abcs" "is" created
 
+  @createServerMainPage
+  Scenario: Create a server on main page
+    When import API "src/test/resources/preparedAPIs/basicV3.yaml"
+    And create a server on "main page" page
+      | http://{domain}.example.com:{port}/api | server desc | false |
 
+    And configure server variables for "http://{domain}.example.com:{port}/api" on "main page" page
+      | domain | domain1 | domain desc |
+      | port   | port1   | port desc   |
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    Then check that server was created on "main page" page
+      | http://{domain}.example.com:{port}/api | server desc |
+
+    #Variables cannot be checked in UI (check the source json)
+
+  @createServerPathPage
+  Scenario: Create a server on path page
+    When import API "src/test/resources/preparedAPIs/basicV3.yaml"
+    And select path "/clearPath"
+    And create a server on "path" page
+      | http://{domain}.example.com:{port}/api | server desc | true |
+
+    And configure server variables for "http://{domain}.example.com:{port}/api" on "path" page
+      | domain | domain1 | domain desc |
+      | port   | port1   | port desc   |
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    And select path "/clearPath"
+    Then check that server was created on "path" page
+      | http://{domain}.example.com:{port}/api | server desc |
+
+  @createServerOperationsPage
+  Scenario: Create a server on operations page
+    When import API "src/test/resources/preparedAPIs/basicV3.yaml"
+    And select path "/operations"
+    And select operation "GET"
+    And create a server on "operations" page
+      | http://{domain}.example.com:{port}/api | server desc | true |
+
+    When configure server variables for "http://{domain}.example.com:{port}/api" on "operations" page
+      | domain | domain1 | domain desc |
+      | port   | port1   | port desc   |
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    And select path "/operations"
+    And select operation "GET"
+    Then check that server was created on "operations" page
+      | http://{domain}.example.com:{port}/api | server desc |
 
   #TODO after closing:
   # https://github.com/Apicurio/apicurio-studio/issues/656

@@ -137,6 +137,21 @@ public class MainPageVerifications {
         }
     }
 
+    /**
+     * @param response expected name of data type
+     * @param isCreated [ is | is not ] is for cheack that path exists, is not otherwise
+     */
+    @Then("^check that response \"([^\"]*)\" \"([^\"]*)\" created$")
+    public void checkThatResponseIsCreated(String response, String isCreated) {
+        ElementsCollection responses = MainPageUtils.getMainPageRoot().$$(MainPageElements.SECTION).filter(attribute("label", "Responses")).first()
+                .$$(By.className("api-response")).filter(exactText(response));
+        if ("is".equals(isCreated)) {
+            assertThat(responses.size()).as("Response %s is not created! (should be)", response).isEqualTo(1);
+        } else {
+            assertThat(responses.size()).as("Response %s is created! (should not be)", response).isEqualTo(0);
+        }
+    }
+
     /**************************************************************
      ********** SECURITY SUBSECTION verification steps ************
      **************************************************************/

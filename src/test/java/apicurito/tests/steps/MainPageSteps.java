@@ -5,7 +5,6 @@ import static com.codeborne.selenide.Condition.enabled;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 
-import apicurito.tests.utils.slenide.OperationUtils;
 import org.openqa.selenium.By;
 
 import com.codeborne.selenide.ElementsCollection;
@@ -15,6 +14,7 @@ import java.util.List;
 
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
+import apicurito.tests.utils.slenide.OperationUtils;
 import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
 import lombok.extern.slf4j.Slf4j;
@@ -368,5 +368,37 @@ public class MainPageSteps {
                 CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-footer")).$(By.className("btn-primary")).click();
             }
         }
+    }
+
+    /**
+     * @param table parameters:
+     *              Name
+     *              Description OPTIONAL (could be empty string)
+     *              boolean if should be created with Link
+     */
+    @When("^create a new response by link$")
+    public void createANewResponse(DataTable table) {
+        SelenideElement editor = MainPageUtils.getMainPageRoot().$("response-editor");
+
+        for (List<String> dataRow : table.cells()) {
+            if (Boolean.valueOf(dataRow.get(2))) {
+                CommonUtils.getClickableLink(CommonUtils.Sections.RESPONSES_PANEL, CommonUtils.getAppRoot()).click();
+            } else {
+                CommonUtils.getNewPlusSignButton(CommonUtils.Sections.RESPONSES_PANEL, CommonUtils.getAppRoot()).click();
+            }
+
+            MainPageUtils.getMainPageRoot().$("#rsp_name").sendKeys(dataRow.get(0));
+
+            if (!dataRow.get(1).isEmpty()) {
+                editor.$("ace-editor textarea").sendKeys(dataRow.get(1));
+            }
+            CommonUtils.getButtonWithText("Save", editor).click();
+        }
+    }
+
+    @When("convert OpenAPI two to OpenAPI three")
+    public void convertOpenAPItwoToOpenAPIthree() {
+        CommonUtils.getButtonWithText("Convert to OpenAPI 3", CommonUtils.getAppRoot()).click();
+        CommonUtils.getButtonWithText("Convert", CommonUtils.getAppRoot().$("#convert-modal")).click();
     }
 }
