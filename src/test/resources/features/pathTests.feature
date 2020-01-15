@@ -218,6 +218,29 @@ Feature: Path tests
       | type | Number | operations | response | true | 100 |
       | as   | Float  | operations | response | true | 100 |
 
+  @createOperationResponsePlus-openapi
+  Scenario: create response by plus
+    When import API "src/test/resources/preparedAPIs/openapi-spec.json"
+    And select path "/operations"
+    And select operation "GET"
+
+    And set response 100 with plus sign
+    And set response description "Description for response 100" for response "100"
+    And set type of "application/json" media type to "Number" on property "type" for response "100"
+    And set type of "application/json" media type to "Float" on property "as" for response "100"
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    And select path "/operations"
+    And select operation "GET"
+
+    Then check that "exists" response 100
+    And check that description is "Description for response 100" for response "100"
+    Then check type of "application/json" media type is "Number" on property "type" for response "100"
+    And check type of "application/json" media type is "Float" on property "as" for response "100"
+
+
   @overrideSecurityRequirements
   Scenario: override security requirements
     When import API "src/test/resources/preparedAPIs/paramsAndSecurity.json"

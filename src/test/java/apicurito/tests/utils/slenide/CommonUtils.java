@@ -1,20 +1,18 @@
 package apicurito.tests.utils.slenide;
 
-import static com.codeborne.selenide.CollectionCondition.sizeGreaterThanOrEqual;
-import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selenide.$;
-
+import apicurito.tests.configuration.TestConfiguration;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+import io.cucumber.datatable.DataTable;
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
-
 import java.util.List;
 
-import apicurito.tests.configuration.TestConfiguration;
-import io.cucumber.datatable.DataTable;
-import lombok.extern.slf4j.Slf4j;
+import static com.codeborne.selenide.CollectionCondition.sizeGreaterThanOrEqual;
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.$;
 
 @Slf4j
 public class CommonUtils {
@@ -23,6 +21,7 @@ public class CommonUtils {
         private static By TEXT_AREA = By.cssSelector("ace-editor textarea");
 
         private static By RESPONSE_SECTION = By.cssSelector("responses-section");
+        private static By MEDIA_TYPE_SECTION = By.cssSelector("#addMediaTypeModal");
         private static By REQUEST_BODY_SECTION = By.cssSelector("requestbody-section");
         private static By QUERY_PARAM_SECTION = By.cssSelector("query-params-section");
         private static By HEADER_PARAM_SECTION = By.cssSelector("header-params-section");
@@ -37,7 +36,6 @@ public class CommonUtils {
         private static By SECURITY_SCHEMA_ROW = By.cssSelector("security-scheme-row");
         private static By PATH_PARAM_ROW = By.cssSelector("path-param-row");
         private static By PROPERTY_ROW = By.cssSelector("property-row");
-
 
     }
 
@@ -206,7 +204,9 @@ public class CommonUtils {
         PARAM_REQUIRED("#api-param-required"),
         PARAM_TYPE("#api-param-type"),
         PARAM_TYPE_OF("#api-param-type-of"),
-        PARAM_TYPE_AS("#api-param-type-as");
+        PARAM_TYPE_AS("#api-param-type-as"),
+
+        MEDIA_TYPE("#api-mediaType");
 
         private String buttonId;
 
@@ -264,6 +264,8 @@ public class CommonUtils {
                 return DropdownButtons.PROPERTY_TYPE_AS.getButtonId();
             case "required":
                 return DropdownButtons.PROPERTY_REQUIRED.getButtonId();
+            case "media type":
+                return DropdownButtons.MEDIA_TYPE.getButtonId();
         }
         return null;
     }

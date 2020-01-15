@@ -1,0 +1,27 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "testAPI",
+        "version": "1.0",
+        "description": "A brand new API with no content.  Go nuts!"
+    },
+    "paths": {
+        "/clearPath": {},
+        "/operations": {
+            "get": {},
+            "put": {},
+            "post": {},
+            "delete": {},
+            "options": {},
+            "head": {},
+            "patch": {}
+        }
+    },
+    "components": {
+        "schemas": {
+            "clearDataType": {
+                "type": "object"
+            }
+        }
+    }
+}

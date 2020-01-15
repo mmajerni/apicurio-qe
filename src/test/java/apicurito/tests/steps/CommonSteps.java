@@ -22,10 +22,9 @@ import org.openqa.selenium.By;
 import java.io.File;
 import java.util.List;
 
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Condition.enabled;
-import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
@@ -124,6 +123,7 @@ public class CommonSteps {
         }
         assertThat(imageName).as("Apicurito has not container from %s", image).isEqualTo(image);
     }
+
     /*
         Create parameters or RDFs (Request data forms) on specified page
         param could be header|query|RFD
@@ -148,12 +148,29 @@ public class CommonSteps {
         }
         CommonUtils.openCollapsedSection(pageElement, section);
 
-        if (Boolean.valueOf(isPlus)){
+        if (Boolean.valueOf(isPlus)) {
             pageElement.$(section).$$("icon-button").filter(attribute("type", "add"))
                     .shouldHaveSize(1).first().shouldBe(visible).$("button").click();
-        }else {
+        } else {
             pageElement.$(section).$$("a").filter(text(aName)).shouldHaveSize(1).first().shouldBe(visible).click();
         }
         CommonUtils.fillEntityEditorForm(table);
+    }
+
+    @When("^(set|check) type of \"([^\"]*)\" media type (?:to|is) \"([^\"]*)\" on property \"([^\"]*)\" for response \"([^\"]*)\"$")
+    public void setTypeOfMediaType(String check, String mediaType, String type, String property, String response) {
+        OperationUtils.ensureMediaTypeExistsForResponse(mediaType, response);
+        SelenideElement mediaRow = $$("media-type-row").find(text(mediaType));
+        SelenideElement typeElement = mediaRow.$(".type");
+        if (!typeElement.has(cssClass("selected"))) {
+            typeElement.click();
+        }
+        String buttonId = CommonUtils.getButtonId(property);
+        if ("set".equalsIgnoreCase(check)) {
+            CommonUtils.setDropDownValue(buttonId, type, $("schema-type-editor"));
+        } else {
+            String value = mediaRow.$(buttonId).getText();
+            assertThat(value).as("%s is %s but should be %s", property, value, type).isEqualTo(type);
+        }
     }
 }
