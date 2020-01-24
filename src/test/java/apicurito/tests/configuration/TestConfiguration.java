@@ -169,15 +169,16 @@ public class TestConfiguration {
         props.setProperty(APICURITO_TEMPLATE_USE_OPERATOR, "true");
 
         // Copy syndesis properties to their xtf counterparts - used by binary oc client
-        System.setProperty("xtf.openshift.url", properties.getProperty(OPENSHIFT_URL));
-        System.setProperty("xtf.openshift.master.username", properties.getProperty(APICURITO_UI_USERNAME));
-        System.setProperty("xtf.openshift.master.password", properties.getProperty(APICURITO_UI_PASSWORD));
+        if (System.getProperty("xtf.openshift.url") == null) {
+            System.setProperty("xtf.openshift.url", properties.getProperty(OPENSHIFT_URL));
+            System.setProperty("xtf.openshift.master.username", properties.getProperty(APICURITO_UI_USERNAME));
+            System.setProperty("xtf.openshift.master.password", properties.getProperty(APICURITO_UI_PASSWORD));
 
-        System.setProperty("xtf.openshift.namespace", properties.getProperty(OPENSHIFT_NAMESPACE));
+            System.setProperty("xtf.openshift.namespace", properties.getProperty(OPENSHIFT_NAMESPACE));
 
-        // Set oc version - this version of the client will be used as the binary client
-        System.setProperty("xtf.openshift.version", "3.10.70");
-
+            // Set oc version - this version of the client will be used as the binary client
+            System.setProperty("xtf.openshift.version", "3.10.70");
+        }
         return props;
     }
 
