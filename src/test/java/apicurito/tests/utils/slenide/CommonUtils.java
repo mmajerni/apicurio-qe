@@ -59,7 +59,7 @@ public class CommonUtils {
 
     public static SelenideElement getLabelWithName(String labelName, SelenideElement differentRoot) {
         log.info("searching for label {}", labelName);
-        return differentRoot.shouldBe(visible).find(By.xpath("//input[contains(@name,\'" + labelName + "\')]"));
+        return differentRoot.shouldBe(visible).find(By.cssSelector(String.format("input[name*=\"%s\"]", labelName)));
     }
 
     public static SelenideElement getLabelWithType(String labelType, SelenideElement differentRoot) {

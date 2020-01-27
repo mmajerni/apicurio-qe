@@ -48,7 +48,7 @@ public class MainPageUtils {
 
         ElementsCollection allPaths = CommonUtils.getAppRoot().$$("div")
                 .filter(attribute("class", "section-body")).first()
-                .findAll(By.xpath("//div[contains(@class, 'api-path ' )]")); //TODO xpath
+                .findAll(By.cssSelector("div[class*=\"api-path\" ]"));
         for (SelenideElement path : allPaths) {
             String actualPathName = path.$$("div").filter(attribute("path-item")).first().getText();
             if (actualPathName.equals(pathName)) {
