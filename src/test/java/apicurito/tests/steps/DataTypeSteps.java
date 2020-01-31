@@ -22,7 +22,7 @@ public class DataTypeSteps {
     @When("^create data type property with name \"([^\"]*)\"$")
     public void createDataTypeProperty(String property) {
         CommonUtils.getClickableLink(CommonUtils.Sections.PROPERTIES, PROPERTIES_SECTION).click();
-        CommonUtils.getLabelWithName("name", DataTypeUtils.getDataTypesRoot()).sendKeys(property);
+        CommonUtils.getLabelWithName("name", CommonUtils.getAppRoot().$("property-editor")).sendKeys(property);
         CommonUtils.getButtonWithText("Save", CommonUtils.getAppRoot().$("property-editor")).click();
     }
 
