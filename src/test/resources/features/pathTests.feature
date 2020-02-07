@@ -173,7 +173,8 @@ Feature: Path tests
     And select path "/operations"
     And select operation "GET"
 
-    And set response 200 with clickable link
+    And set response with plus sign
+      | 200 |  | false |
 
     And set response description "Description for response 200" for response "200"
     And set parameters types
@@ -200,7 +201,8 @@ Feature: Path tests
     And select path "/operations"
     And select operation "GET"
 
-    And set response 100 with plus sign
+    And set response with plus sign
+      | 100 |  | true |
     And set response description "Description for response 100" for response "100"
     And set parameters types
       | type | Number | operations | response | true | 100 |
@@ -219,12 +221,13 @@ Feature: Path tests
       | as   | Float  | operations | response | true | 100 |
 
   @createOperationResponsePlus-openapi
-  Scenario: create response by plus
+  Scenario: create response by plus OpenAPIv3
     When import API "src/test/resources/preparedAPIs/openapi-spec.json"
     And select path "/operations"
     And select operation "GET"
 
-    And set response 100 with plus sign
+    And set response with plus sign
+      | 100 |  | true |
     And set response description "Description for response 100" for response "100"
     And set type of "application/json" media type to "Number" on property "type" for response "100"
     And set type of "application/json" media type to "Float" on property "as" for response "100"
@@ -353,7 +356,8 @@ Feature: Path tests
       | of   | String | operations | request body | false |  |
       | as   | Date   | operations | request body | false |  |
 
-    And set response 100 with plus sign
+    And set response with plus sign
+      | 100 |  | true |
     And set response description "Description for response 100" for response "100"
     And set parameters types
       | type | Number | operations | response | true | 100 |
@@ -448,3 +452,44 @@ Feature: Path tests
 
     And check that path parameter "email" is overridden
     And check that overridden path parameter "email" has description "override parameter email desc"
+
+  @createPathCP
+  Scenario: create cookie parameter on path page
+    When import API "src/test/resources/preparedAPIs/basicV3.yaml"
+    And select path "/clearPath"
+    And create "cookie" on "path" page with plus sign "false"
+      | CookieParameter | Description for Cookie Param | Required | Array | String | DateTime |
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    And select path "/clearPath"
+    Then check that exist "cookie" on "path" page
+      | CookieParameter | Description for Cookie Param | Required | Array | String | DateTime |
+
+  @createOperationCP
+  Scenario: create cookie parameter on operations page
+    When import API "src/test/resources/preparedAPIs/basicV3.yaml"
+    And select path "/operations"
+    And create "cookie" on "operations" page with plus sign "false"
+      | CookieParameter | Description for Cookie Param | Required | Array | String | DateTime |
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    And select path "/operations"
+    Then check that exist "cookie" on "operations" page
+      | CookieParameter | Description for Cookie Param | Required | Array | String | DateTime |
+
+  @createResponseWithResponseDef
+  Scenario: create a reponse with response definition
+    When import API "src/test/resources/preparedAPIs/basicV3.yaml"
+    And create a new response by link
+      | response1 | response desc | false |
+
+    And select path "/operations"
+    And set response with plus sign
+      | 404 | response1 | true |
+
+    Then check that "exists" response 404
+    Then check that response "404" is created from response definition "response1"

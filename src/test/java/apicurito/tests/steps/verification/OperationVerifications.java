@@ -82,6 +82,14 @@ public class OperationVerifications {
         }
     }
 
+    @Then("check that response {string} is created from response definition {string}")
+    public void checkThatResponseIsCreatedFromResponseDefinition(String response, String definition) {
+        OperationUtils.getOperationRoot().$$(By.className("statusCode")).filter(text(response)).first().click();
+        SelenideElement responseBody = OperationUtils.getOperationRoot().$(OperationElements.RESPONSES_SECTION).$(By.className("response-ref"));
+        assertThat(responseBody.exists()).as("Response %s was not created from response definition", response).isTrue();
+        assertThat(responseBody.$("em").getText()).as("Response %s was not created from response definition", response, definition).isEqualTo(definition);
+    }
+
     @Then("^check that description is \"([^\"]*)\" for response \"([^\"]*)\"$")
     public void checkThatDescriptionIsForResponse(String expectedDescription, String response) {
         OperationUtils.selectResponse(response);

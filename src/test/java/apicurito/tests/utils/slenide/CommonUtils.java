@@ -1,18 +1,22 @@
 package apicurito.tests.utils.slenide;
 
 import apicurito.tests.configuration.TestConfiguration;
+
+import static com.codeborne.selenide.CollectionCondition.sizeGreaterThanOrEqual;
+import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import io.cucumber.datatable.DataTable;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 
 import java.util.List;
-
-import static com.codeborne.selenide.CollectionCondition.sizeGreaterThanOrEqual;
-import static com.codeborne.selenide.Condition.*;
-import static com.codeborne.selenide.Selenide.$;
 
 @Slf4j
 public class CommonUtils {
@@ -28,6 +32,8 @@ public class CommonUtils {
         private static By SECURITY_REQ_SECTION = By.cssSelector("security-requirements-section");
         private static By SECURITY_SCHEMA_SECTION = By.cssSelector("security-schemes-section");
         private static By PATH_PARAM_SECTION = By.cssSelector("path-params-section");
+        private static By COOKIE_PARAM_SECTION = By.cssSelector("cookie-params-section");
+        private static By SERVER_SECTION = By.cssSelector("servers-section");
 
         private static By QUERY_PARAM_ROW = By.cssSelector("query-param-row");
         private static By HEADER_PARAM_ROW = By.cssSelector("header-param-row");
@@ -168,6 +174,8 @@ public class CommonUtils {
         PATH("section path-section panel-group", "Add a path"),
         DATA_TYPES("section definition-section panel-group", "Add a data type"),
         RESPONSE("section responses-section panel-group", "Add a response"),
+        //Panel on the left side below paths and data types sections
+        RESPONSES_PANEL("section response-section panel-group", "Add a response"),
         CONTACT("section contact-section panel-group", "Add contact info"),
         LICENSE("section license-section panel-group", "Set license"),
         TAG("section tags-section panel-group", "Add a tag"),
@@ -176,7 +184,8 @@ public class CommonUtils {
         PROPERTIES("section security-requirements-section panel-group", "Add a property"),
         QUERY_PARAM("section query-parameters-section panel-group", "Add a query parameter"),
         HEADER_PARAM("section header-parameters-section panel-group", "Add a header parameter"),
-        RFD_PARAM("section requestBody-section panel-group", "add request form data");
+        RFD_PARAM("section requestBody-section panel-group", "add request form data"),
+        COOKIE_PARAM("section cookie-parameters-section panel-group", "Add a cookie parameter");
 
         private String sectionElementName;
         private String a;
@@ -236,6 +245,10 @@ public class CommonUtils {
                 return CommonElements.SECURITY_SCHEMA_SECTION;
             case "path":
                 return CommonElements.PATH_PARAM_SECTION;
+            case "cookie":
+                return CommonElements.COOKIE_PARAM_SECTION;
+            case "server":
+                return CommonElements.SERVER_SECTION;
         }
         return null;
     }

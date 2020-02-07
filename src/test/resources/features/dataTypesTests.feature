@@ -50,19 +50,19 @@ Feature: Data types tests
 
   @createDataTypeWithRestResource
   Scenario: create data type with rest resource
-    When create a new API
+    When create a new API version "2"
     And create a new data type by link
       | data2 |  |  | true | false |
 
     And save API as "json" and close editor
     Then import API "tmp/download/openapi-spec.json"
 
-    And check that path "/data2S" "is" created
-    And check that operation "GET" is created for path "/data2S"
-    When select path "/data2S"
+    And check that path "/data2" "is" created
+    And check that operation "GET" is created for path "/data2"
+    When select path "/data2"
     And select operation "GET"
-    Then check that operation summary is "List All data2S"
-    And check that operation ID is "getdata2S"
+    Then check that operation summary is "List All data2"
+    And check that operation ID is "getdata2"
     And check that operation description is "Gets a list of all data2 entities."
 
     And check that "exists" response 200
@@ -72,8 +72,8 @@ Feature: Data types tests
       | type | Array | operations | response | true | 200 |
       | of   | data2 | operations | response | true | 200 |
 
-    And check that operation "POST" is created for path "/data2S"
-    When select path "/data2S"
+    And check that operation "POST" is created for path "/data2"
+    When select path "/data2"
     And select operation "POST"
     Then check that operation summary is "Create a data2"
     And check that operation ID is "createdata2"
@@ -89,11 +89,11 @@ Feature: Data types tests
     And check parameters types
       | type | data2 | operations | request body | false | |
 
-    And check that path "/data2S/{data2Id}" "is" created
-    And check that operation "GET" is created for path "/data2S/{data2Id}"
-    When select path "/data2S/{data2Id}"
+    And check that path "/data2/{data2Id}" "is" created
+    And check that operation "GET" is created for path "/data2/{data2Id}"
+    When select path "/data2/{data2Id}"
 
-    And check that path parameter "data2Id" is created for path "/data2S/{data2Id}"
+    And check that path parameter "data2Id" is created for path "/data2/{data2Id}"
 
     And select operation "GET"
     Then check that operation summary is "Get a data2"
@@ -105,8 +105,8 @@ Feature: Data types tests
     And check parameters types
       | type | data2 | operations | response | true | 200 |
 
-    And check that operation "PUT" is created for path "/data2S/{data2Id}"
-    When select path "/data2S/{data2Id}"
+    And check that operation "PUT" is created for path "/data2/{data2Id}"
+    When select path "/data2/{data2Id}"
     And select operation "PUT"
     Then check that operation summary is "Update a data2"
     And check that operation ID is "updatedata2"
@@ -122,8 +122,8 @@ Feature: Data types tests
     And check parameters types
       | type | data2 | operations | request body | false | |
 
-    And check that operation "DELETE" is created for path "/data2S/{data2Id}"
-    When select path "/data2S/{data2Id}"
+    And check that operation "DELETE" is created for path "/data2/{data2Id}"
+    When select path "/data2/{data2Id}"
     And select operation "DELETE"
     Then check that operation summary is "Delete a data2"
     And check that operation ID is "deletedata2"
@@ -137,7 +137,7 @@ Feature: Data types tests
 
   @createFullDataType
   Scenario: create full data type
-    When create a new API
+    When create a new API version "2"
     And create a new data type by link
       | exampleTest | desc | {"name" : "John", "age" : 24, "isMan" : true} | false | true |
 

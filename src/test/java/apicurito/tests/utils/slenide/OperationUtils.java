@@ -7,6 +7,8 @@ import org.openqa.selenium.By;
 
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Condition.attribute;
+
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
 
@@ -18,20 +20,25 @@ public class OperationUtils {
         private static By RESPONSES_SECTION = By.cssSelector("responses-section");
     }
 
-    private static class OperationSelenideElements {
-        private static SelenideElement DROPDOWN_ELEMENT = getOperationRoot().$("#addResponseModal").$(By.className("dropdown"));
-    }
-
     public static SelenideElement getOperationRoot() {
         return $("operations-section").shouldBe(visible);
     }
 
-    public static void setResponseStatusCode(Integer code) {
+    public static void setResponseDetails(String code, String responseDef) {
         log.info("Setting status code to {}", code);
 
-        OperationSelenideElements.DROPDOWN_ELEMENT.$("#statusCodeDropDown").click();
-        OperationSelenideElements.DROPDOWN_ELEMENT.$(By.className("dropdown-menu")).$$("a").filter(text(code.toString())).first().click();
+        SelenideElement statusElement = getOperationRoot().$("#addResponseModal")
+                .$$("drop-down").filter(attribute("id", "statusCodeDropDown")).first();
+        SelenideElement definitionElement = getOperationRoot().$("#addResponseModal")
+                .$$("drop-down").filter(attribute("id", "refDropDown")).first();
 
+        statusElement.$("#statusCodeDropDown").click();
+        statusElement.$(By.className("dropdown-menu")).$$("a").filter(text(code)).first().click();
+
+        if (!responseDef.isEmpty()) {
+            definitionElement.$("#refDropDown").click();
+            definitionElement.$(By.className("dropdown-menu")).$$("a").filter(text(responseDef)).first().click();
+        }
         CommonUtils.getButtonWithText("Add", getOperationRoot()).click();
     }
 

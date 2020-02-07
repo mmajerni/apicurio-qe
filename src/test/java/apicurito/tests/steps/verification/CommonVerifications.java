@@ -1,17 +1,22 @@
 package apicurito.tests.steps.verification;
 
 import apicurito.tests.utils.slenide.CommonUtils;
+import apicurito.tests.utils.slenide.MainPageUtils;
 import apicurito.tests.utils.slenide.OperationUtils;
 import apicurito.tests.utils.slenide.PathUtils;
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
+import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import io.cucumber.datatable.DataTable;
 import org.openqa.selenium.By;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
-import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.*;
+import static com.codeborne.selenide.Condition.visible;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -20,6 +25,8 @@ public class CommonVerifications {
     private static class Elements {
         private static By DESCRIPTION = By.className("description");
         private static By PARAMETERS_TYPE = By.className("param-type");
+
+        private static By SERVER_ROW = By.cssSelector("server-row");
     }
 
     /*
@@ -42,6 +49,9 @@ public class CommonVerifications {
                 break;
             case "RDF":
                 rowType = "formdata-param-row";
+                break;
+            case "cookie":
+                rowType = "cookie-param-row";
                 break;
         }
 
@@ -140,6 +150,33 @@ public class CommonVerifications {
             }
         } else {
             fail("There is no %s!", message);
+        }
+    }
+
+    @Then("check that server was created on {string} page")
+    public void checkThatServerWasCreatedOnPage(String page, DataTable table) {
+        By section = CommonUtils.getSectionBy("server");
+        SelenideElement pageElement = CommonUtils.getPageElement(page);
+        CommonUtils.openCollapsedSection(pageElement, section);
+
+        for (List<String> dataRow : table.cells()) {
+            ElementsCollection servers = pageElement.$(section).$$(Elements.SERVER_ROW);
+            assertThat(servers.size()).as("No servers were found!").isGreaterThan(0);
+
+            boolean found = false;
+            for (SelenideElement serverRow : servers) {
+                if (serverRow.$(By.className("url")).getText().equals(dataRow.get(0))) {
+                    if (!dataRow.get(1).isEmpty()) {
+                        String description = serverRow.$(By.className("description")).getText();
+                        assertThat(description).as("Server description is %s but it should be %s", description, dataRow.get(1)).isEqualTo(dataRow.get(1));
+                    }
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                fail("Server with url %s was not found", dataRow.get(0));
+            }
         }
     }
 }
