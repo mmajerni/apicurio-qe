@@ -39,9 +39,9 @@ public class ApicuritoTemplate {
         TestConfiguration.printDivider("Setting up input streams");
         log.info("Deploying input stream " + TestConfiguration.templateInputStreamUrl());
         final String output = OpenShiftUtils.binary().execute(
-                "apply",
-                "-n", TestConfiguration.openShiftNamespace(),
-                "-f", TestConfiguration.templateInputStreamUrl()
+            "apply",
+            "-n", TestConfiguration.openShiftNamespace(),
+            "-f", TestConfiguration.templateInputStreamUrl()
         );
     }
 
@@ -76,37 +76,51 @@ public class ApicuritoTemplate {
     private static void deployUsingGoOperator() {
         log.info("Deploying using GO operator");
 
-        deployOnOCP("CRD", TestConfiguration.apicuritoOperatorCrdUrl());
-        deployOnOCP("Service", TestConfiguration.apicuritoOperatorServiceUrl());
-        deployOnOCP("Role", TestConfiguration.apicuritoOperatorRoleUrl());
-        deployOnOCP("Role binding", TestConfiguration.apicuritoOperatorRoleBindingUrl());
-        deployOnOCP("Operator", TestConfiguration.apicuritoOperatorUrl());
+        createInOCP("CRD", TestConfiguration.apicuritoOperatorCrdUrl());
+        createInOCP("Service", TestConfiguration.apicuritoOperatorServiceUrl());
+        createInOCP("Role", TestConfiguration.apicuritoOperatorRoleUrl());
+        createInOCP("Role binding", TestConfiguration.apicuritoOperatorRoleBindingUrl());
+        createInOCP("Operator", TestConfiguration.apicuritoOperatorUrl());
 
-        deployCr(TestConfiguration.apicuritoOperatorCrUrl());
+        applyInOCP("Custom Resource", TestConfiguration.apicuritoOperatorCrUrl());
+
+        if (TestConfiguration.apicuritoOperatorUiImage() != null) {
+            setTestEnvToOperator("APICURITO_IMAGE", TestConfiguration.apicuritoOperatorUiImage());
+        }
     }
 
-    private static void deployOnOCP(String itemName, String item) {
-        log.info("Deploying {} from: {}", itemName, item);
+    private static void setTestEnvToOperator(String nameOfEnv, String valueOfEnv) {
+        log.info("Setting test ENV: " + nameOfEnv + "=" + valueOfEnv);
         final String output = OpenShiftUtils.binary().execute(
-                "create",
-                "-n", TestConfiguration.openShiftNamespace(),
-                "-f", item
+            "set",
+            "env",
+            "deployment",
+            "apicurito-operator",
+            nameOfEnv + "=" + valueOfEnv
         );
     }
 
-    public static void applyOnOCP(String itemName, String namespace, String item) {
+    private static void createInOCP(String itemName, String item) {
+        log.info("Creating " + itemName + " from: " + item);
+
+        final String output = OpenShiftUtils.binary().execute(
+            "create",
+            "-n", TestConfiguration.openShiftNamespace(),
+            "-f", item
+        );
+    }
+
+    public static void applyInOCP(String itemName, String item) {
         log.info("Applying {} from: {}", itemName, item);
         final String output = OpenShiftUtils.binary().execute(
-                "apply", "-n", namespace, "-f", item
+            "apply", "-n", TestConfiguration.openShiftNamespace(), "-f", item
         );
     }
 
-    public static void deployCr(String cr) {
-        log.info("Deploying CR from " + cr);
+    public static void applyInOCP(String itemName, String namespace, String item) {
+        log.info("Applying {} from: {}", itemName, item);
         final String output = OpenShiftUtils.binary().execute(
-                "apply",
-                "-n", TestConfiguration.openShiftNamespace(),
-                "-f", cr
+            "apply", "-n", namespace, "-f", item
         );
     }
 
@@ -126,7 +140,9 @@ public class ApicuritoTemplate {
         try {
             OpenShiftUtils.getInstance().clean();
 
-            List<ReplicaSet> operatorReplicaSets = OpenShiftUtils.getInstance().apps().replicaSets().inNamespace(TestConfiguration.openShiftNamespace()).list().getItems();
+            List<ReplicaSet> operatorReplicaSets =
+                OpenShiftUtils.getInstance().apps().replicaSets().inNamespace(TestConfiguration.openShiftNamespace()).list().getItems();
+
             for (ReplicaSet rs : operatorReplicaSets) {
                 OpenShiftUtils.binary().execute("delete", "rs", rs.getMetadata().getName());
             }
@@ -149,11 +165,11 @@ public class ApicuritoTemplate {
         ExecutorService executorService = Executors.newFixedThreadPool(components.size());
         components.forEach(c -> {
             Runnable runnable = () ->
-                    OpenShiftUtils.xtf().waiters()
-                            .areExactlyNPodsReady(numberOfPods, key, c.getName())
-                            .interval(TimeUnit.SECONDS, 10)
-                            .timeout(TimeUnit.MINUTES, 6)
-                            .waitFor();
+                OpenShiftUtils.xtf().waiters()
+                    .areExactlyNPodsReady(numberOfPods, key, c.getName())
+                    .interval(TimeUnit.SECONDS, 10)
+                    .timeout(TimeUnit.MINUTES, 6)
+                    .waitFor();
             executorService.submit(runnable);
         });
 
@@ -172,6 +188,6 @@ public class ApicuritoTemplate {
         final String output = OpenShiftUtils.binary().execute("delete", "project", "operatorhub");
         final String output2 = OpenShiftUtils.binary().execute("delete", "operatorsource", "fuse-apicurito", "-n", "openshift-marketplace");
         String available = "src/test/resources/operatorhubFiles/availableOH.yaml";
-        ApicuritoTemplate.applyOnOCP("Available operators","openshift-marketplace", available);
+        ApicuritoTemplate.applyInOCP("Available operators", "openshift-marketplace", available);
     }
 }

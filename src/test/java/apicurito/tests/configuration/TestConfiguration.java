@@ -35,7 +35,7 @@ public class TestConfiguration {
     public static final String APICURITO_OPERATOR_ROLE_URL = "apicurito.config.operator.role";
     public static final String APICURITO_OPERATOR_ROLE_BINDING_URL = "apicurito.config.operator.rolebinding";
     public static final String APICURITO_OPERATOR_CR_URL = "apicurito.config.operator.cr";
-    public static final String APICURITO_OPERATOR_TEMPLATE_URL = "apicurito.config.operator.template.url";
+    public static final String APICURITO_OPERATOR_UI_IMAGE = "apicurito.config.ui.image";
 
     public static final String APICURITO_UI_USERNAME = "apicurito.config.ui.username";
     public static final String APICURITO_UI_PASSWORD = "apicurito.config.ui.password";
@@ -78,11 +78,13 @@ public class TestConfiguration {
     }
 
     public static String templateUrl() {
-        return get().readValue(APICURITO_TEMPLATE_URL, "https://raw.githubusercontent.com/jboss-fuse/application-templates/master/fuse-apicurito.yml");
+        return get()
+            .readValue(APICURITO_TEMPLATE_URL, "https://raw.githubusercontent.com/jboss-fuse/application-templates/master/fuse-apicurito.yml");
     }
 
     public static String templateInputStreamUrl() {
-        return get().readValue(APICURITO_IS_TEMPLATE_URL, "https://raw.githubusercontent.com/jboss-fuse/application-templates/master/fis-image-streams.json");
+        return get()
+            .readValue(APICURITO_IS_TEMPLATE_URL, "https://raw.githubusercontent.com/jboss-fuse/application-templates/master/fis-image-streams.json");
     }
 
     public static String openShiftRouteSuffix() {
@@ -117,6 +119,10 @@ public class TestConfiguration {
         return get().readValue(APICURITO_OPERATOR_ROLE_BINDING_URL);
     }
 
+    public static String apicuritoOperatorUiImage() {
+        return get().readValue(APICURITO_OPERATOR_UI_IMAGE);
+    }
+
     public static int getConfigTimeout() {
         return Integer.parseInt(get().readValue(TESTSUITE_TIMEOUT, "300"));
     }
@@ -148,22 +154,28 @@ public class TestConfiguration {
         props.setProperty(OPENSHIFT_TOKEN, "");
 
         if (props.getProperty(APICURITO_OPERATOR_CRD_URL) == null) {
-            props.setProperty(APICURITO_OPERATOR_CRD_URL, String.format("https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/crds/apicur_v1alpha1_apicurito_crd.yaml"));
+            props.setProperty(APICURITO_OPERATOR_CRD_URL, String.format(
+                "https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/crds/apicur_v1alpha1_apicurito_crd.yaml"));
         }
         if (props.getProperty(APICURITO_OPERATOR_URL) == null) {
-            props.setProperty(APICURITO_OPERATOR_URL, String.format("https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/operator.yaml"));
+            props.setProperty(APICURITO_OPERATOR_URL,
+                String.format("https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/operator.yaml"));
         }
         if (props.getProperty(APICURITO_OPERATOR_CR_URL) == null) {
-            props.setProperty(APICURITO_OPERATOR_CR_URL, String.format("https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/crds/apicur_v1alpha1_apicurito_cr.yaml"));
+            props.setProperty(APICURITO_OPERATOR_CR_URL, String.format(
+                "https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/crds/apicur_v1alpha1_apicurito_cr.yaml"));
         }
         if (props.getProperty(APICURITO_OPERATOR_SERVICE_URL) == null) {
-            props.setProperty(APICURITO_OPERATOR_SERVICE_URL, String.format("https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/service_account.yaml"));
+            props.setProperty(APICURITO_OPERATOR_SERVICE_URL,
+                String.format("https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/service_account.yaml"));
         }
         if (props.getProperty(APICURITO_OPERATOR_ROLE_URL) == null) {
-            props.setProperty(APICURITO_OPERATOR_ROLE_URL, String.format("https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/role.yaml"));
+            props.setProperty(APICURITO_OPERATOR_ROLE_URL,
+                String.format("https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/role.yaml"));
         }
         if (props.getProperty(APICURITO_OPERATOR_ROLE_BINDING_URL) == null) {
-            props.setProperty(APICURITO_OPERATOR_ROLE_BINDING_URL, String.format("https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/role_binding.yaml"));
+            props.setProperty(APICURITO_OPERATOR_ROLE_BINDING_URL,
+                String.format("https://raw.githubusercontent.com/Apicurio/apicurio-operators/master/apicurito/deploy/role_binding.yaml"));
         }
 
         props.setProperty(APICURITO_TEMPLATE_USE_OPERATOR, "true");
@@ -194,7 +206,7 @@ public class TestConfiguration {
         final Properties props = new Properties();
 
         final Path propsPath = Paths.get(path)
-                .toAbsolutePath();
+            .toAbsolutePath();
         if (Files.isReadable(propsPath)) {
             try (InputStream is = Files.newInputStream(propsPath)) {
                 props.load(is);
@@ -213,8 +225,8 @@ public class TestConfiguration {
 
     private void copyValues(final Properties source, final boolean overwrite) {
         source.stringPropertyNames().stream()
-                .filter(key -> overwrite || !this.properties.containsKey(key))
-                .forEach(key -> this.properties.setProperty(key, source.getProperty(key)));
+            .filter(key -> overwrite || !this.properties.containsKey(key))
+            .forEach(key -> this.properties.setProperty(key, source.getProperty(key)));
     }
 
     public static void printDivider(String label) {
