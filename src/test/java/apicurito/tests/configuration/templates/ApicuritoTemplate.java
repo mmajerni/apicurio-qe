@@ -86,11 +86,18 @@ public class ApicuritoTemplate {
     }
 
     private static void deployOnOCP(String itemName, String item) {
-        log.info("Deploying " + itemName + " from: " + item);
+        log.info("Deploying {} from: {}", itemName, item);
         final String output = OpenShiftUtils.binary().execute(
                 "create",
                 "-n", TestConfiguration.openShiftNamespace(),
                 "-f", item
+        );
+    }
+
+    public static void applyOnOCP(String itemName, String namespace, String item) {
+        log.info("Applying {} from: {}", itemName, item);
+        final String output = OpenShiftUtils.binary().execute(
+                "apply", "-n", namespace, "-f", item
         );
     }
 
@@ -120,7 +127,7 @@ public class ApicuritoTemplate {
             OpenShiftUtils.getInstance().clean();
 
             List<ReplicaSet> operatorReplicaSets = OpenShiftUtils.getInstance().apps().replicaSets().inNamespace(TestConfiguration.openShiftNamespace()).list().getItems();
-            for (ReplicaSet rs : operatorReplicaSets){
+            for (ReplicaSet rs : operatorReplicaSets) {
                 OpenShiftUtils.binary().execute("delete", "rs", rs.getMetadata().getName());
             }
 
@@ -159,5 +166,12 @@ public class ApicuritoTemplate {
         } catch (InterruptedException e) {
             fail("Apicurito wasn't initilized in time");
         }
+    }
+
+    public static void cleanOcpAfterOperatorhubTest() {
+        final String output = OpenShiftUtils.binary().execute("delete", "project", "operatorhub");
+        final String output2 = OpenShiftUtils.binary().execute("delete", "operatorsource", "fuse-apicurito", "-n", "openshift-marketplace");
+        String available = "src/test/resources/operatorhubFiles/availableOH.yaml";
+        ApicuritoTemplate.applyOnOCP("Available operators","openshift-marketplace", available);
     }
 }

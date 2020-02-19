@@ -65,6 +65,20 @@ public final class OpenShiftUtils {
         }
     }
 
+    public static OpenShift getAnotherOpenShiftUtils(String namespace) {
+        final OpenShiftConfigBuilder openShiftConfigBuilder = new OpenShiftConfigBuilder()
+                .withMasterUrl(TestConfiguration.openShiftUrl())
+                .withTrustCerts(true)
+                .withRequestTimeout(120_000)
+                .withNamespace(namespace);
+        if (!TestConfiguration.openShiftToken().isEmpty()) {
+            //if token is provided, lets use it
+            //otherwise f8 client should be able to leverage ~/.kube/config or mounted secrets
+            openShiftConfigBuilder.withOauthToken(TestConfiguration.openShiftToken());
+        }
+        return new OpenShift(openShiftConfigBuilder.build());
+    }
+
     /**
      * @deprecated use OpenshiftUtils.getInstance()
      */
