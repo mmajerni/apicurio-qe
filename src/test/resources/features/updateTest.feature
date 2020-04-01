@@ -4,13 +4,21 @@
 Feature: Update scenario test
 
   @skip_scenario_template
-  @testOperatorUpdate
-  Scenario: test update operator
+  @testCustomeResourceUpdate
+  Scenario: test update custom resource
     When deploy another custom resource
     Then check that apicurito has 6 pods
-    And check that apicurito image is "mmajerni/apicurito-update:latest"
 
-    @testOperatorhub
-    Scenario: test operatorhub
-      When deploy apicurito into operatorhub and subscribe
-      Then check that apicurito operator is deployed and in running state
+  @testOperatorhub
+  Scenario: test operatorhub
+    When deploy apicurito into operatorhub and subscribe
+    Then check that apicurito operator is deployed and in running state
+
+
+  #TODO in 7.7.0.ER1 when another operator will be available
+  #@testUpdateOperator
+  #Scenario: test update operator
+  #  When deploy another operator
+  #  Then check that apicurito "operator" is "mmajerni/apicurito-operator-update:latest"
+  #  And check that apicurito "image" is "mmajerni/apicurito-update:latest"
+

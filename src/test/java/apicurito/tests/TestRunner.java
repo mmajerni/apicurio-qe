@@ -17,9 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RunWith(Cucumber.class)
 @CucumberOptions(
-        features = "classpath:features",
-        tags = {"not @manual", "not @wip", "not @ignore"},
-        plugin = {"pretty", "html:target/cucumber/cucumber-html", "junit:target/cucumber/cucumber-junit.xml", "json:target/cucumber/cucumber-report.json"})
+    features = "classpath:features",
+    tags = {"not @manual", "not @wip", "not @ignore"},
+    plugin = {"pretty", "html:target/cucumber/cucumber-html", "junit:target/cucumber/cucumber-junit.xml",
+        "json:target/cucumber/cucumber-report.json"})
 public class TestRunner {
 
     @BeforeClass
@@ -28,7 +29,7 @@ public class TestRunner {
         if (OpenShiftUtils.xtf().getProject(TestConfiguration.openShiftNamespace()) == null) {
             log.info("Creating new project " + TestConfiguration.openShiftNamespace());
             final String output = OpenShiftUtils.binary().execute(
-                    "new-project", TestConfiguration.openShiftNamespace()
+                "new-project", TestConfiguration.openShiftNamespace()
             );
             try {
                 Thread.sleep(10 * 1000);

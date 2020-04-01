@@ -1,7 +1,5 @@
 package apicurito.tests.utils.slenide;
 
-import apicurito.tests.configuration.TestConfiguration;
-
 import static com.codeborne.selenide.CollectionCondition.sizeGreaterThanOrEqual;
 import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.text;
@@ -13,10 +11,13 @@ import org.openqa.selenium.Keys;
 
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import io.cucumber.datatable.DataTable;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+
+import apicurito.tests.configuration.TestConfiguration;
+import apicurito.tests.utils.openshift.OpenShiftUtils;
+import io.cucumber.datatable.DataTable;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CommonUtils {
@@ -328,5 +329,27 @@ public class CommonUtils {
         }
         //element not found
         return null;
+    }
+
+    public static void waitForRollout(){
+        //Wait for Rollout until there is no unavailable pod
+        Integer tmp = Integer.MAX_VALUE;
+        while (tmp != null) {
+            //Wait for 5 seconds
+            try {
+                Thread.sleep(5000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            tmp = OpenShiftUtils.getInstance().apps().deployments().inNamespace(TestConfiguration.openShiftNamespace()).list().getItems().get(1)
+                .getStatus().getUnavailableReplicas();
+        }
+
+        //Wait another 15 seconds because of termination running pods
+        try {
+            Thread.sleep(15000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

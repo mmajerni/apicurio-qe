@@ -109,40 +109,37 @@ public class CommonSteps {
         String cr =
             "https://gist.githubusercontent.com/mmajerni/e47e14f2a1c2bf934219cb3d4508e81c/raw/ff59f25b5a37918f19c69d70931154c081b683fa" +
                 "/operatorUpdateTest.yaml";
-        ApicuritoTemplate.deployCr(cr);
 
-        //Wait for Rollout until there is no unavailable pod
-        Integer tmp = Integer.MAX_VALUE;
-        while (tmp != null) {
-            //Wait for 5 seconds
-            try {
-                Thread.sleep(5000L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            tmp = OpenShiftUtils.getInstance().apps().deployments().inNamespace(TestConfiguration.openShiftNamespace()).list().getItems().get(1)
-                .getStatus().getUnavailableReplicas();
-        }
-
-        //Wait another 15 seconds because of termination running pods
-        try {
-            Thread.sleep(15000L);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        ApicuritoTemplate.applyInOCP("Custom Resource", cr);
+        CommonUtils.waitForRollout();
     }
 
-    @When("check that apicurito image is {string}")
-    public void checkThatApicuritoImageIs(String image) {
+    @When("deploy another operator")
+    public void deployAnotherOperator() {
+        String operator =
+            "https://gist.githubusercontent.com/mmajerni/e7a4b5287f92c7ef228ba655883048be/raw/2eaaf61b377cf012dbf5c9bd4c8bb21447b6461f" +
+                "/apicuritoOperatorUpdate.yaml";
+        ApicuritoTemplate.applyInOCP("Operator", operator);
+        CommonUtils.waitForRollout();
+    }
+
+    /**
+     * @param podType operator || image
+     * @param value pod image
+     */
+    @When("check that apicurito {string} is {string}")
+    public void checkThatApicuritoImageIs(String podType, String value) {
+        String nameOfPod = "operator".equals(podType) ? Component.OPERATOR.getName() : Component.SERVICE.getName();
+
         List<Pod> pods = OpenShiftUtils.getInstance().getPods();
         String imageName = "";
         for (Pod pod : pods) {
-            if (pod.getMetadata().getName().contains(Component.SERVICE.getName())) {
+            if (pod.getMetadata().getName().contains(nameOfPod)) {
                 imageName = pod.getSpec().getContainers().get(0).getImage();
                 break;
             }
         }
-        assertThat(imageName).as("Apicurito has not container from %s", image).isEqualTo(image);
+        assertThat(imageName).as("Apicurito has not container from %s", value).isEqualTo(value);
     }
 
     /*
@@ -247,7 +244,7 @@ public class CommonSteps {
         }
         CommonUtils.getButtonWithText("Save", MainPageUtils.getMainPageRoot().$("#entity-editor-form")).click();
     }
-    
+
     @When("deploy apicurito into operatorhub and subscribe")
     public void deployApicuritoIntoOperatorhubAndSubscribe() {
         final String disableOH = "src/test/resources/operatorhubFiles/disableOH.yaml";
@@ -255,8 +252,8 @@ public class CommonSteps {
         final String operatorGroup = "src/test/resources/operatorhubFiles/operatorGroup.yaml";
         final String subscription = "src/test/resources/operatorhubFiles/subscription.yaml";
 
-        ApicuritoTemplate.applyOnOCP("Disable operators", "openshift-marketplace", disableOH);
-        ApicuritoTemplate.applyOnOCP("Operator source", "openshift-marketplace", operatorsource);
+        ApicuritoTemplate.applyInOCP("Disable operators", "openshift-marketplace", disableOH);
+        ApicuritoTemplate.applyInOCP("Operator source", "openshift-marketplace", operatorsource);
 
         OpenShift myOpenshift = OpenShiftUtils.getAnotherOpenShiftUtils("openshift-marketplace");
 
@@ -266,8 +263,8 @@ public class CommonSteps {
             .timeout(TimeUnit.MINUTES, 1)
             .waitFor();
 
-        ApicuritoTemplate.applyOnOCP("Operator group", "operatorhub", operatorGroup);
-        ApicuritoTemplate.applyOnOCP("Subscription", "operatorhub", subscription);
+        ApicuritoTemplate.applyInOCP("Operator group", "operatorhub", operatorGroup);
+        ApicuritoTemplate.applyInOCP("Subscription", "operatorhub", subscription);
     }
 
     @Then("check that apicurito operator is deployed and in running state")
