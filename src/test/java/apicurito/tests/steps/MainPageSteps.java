@@ -15,7 +15,7 @@ import java.util.List;
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
 import apicurito.tests.utils.slenide.OperationUtils;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.When;
 import io.cucumber.datatable.DataTable;
 import lombok.extern.slf4j.Slf4j;
 

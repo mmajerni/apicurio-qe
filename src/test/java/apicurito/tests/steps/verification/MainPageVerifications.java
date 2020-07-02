@@ -15,7 +15,7 @@ import java.util.List;
 
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
-import cucumber.api.java.en.Then;
+import io.cucumber.java.en.Then;
 import io.cucumber.datatable.DataTable;
 
 public class MainPageVerifications {

@@ -1,20 +1,24 @@
 package apicurito.tests.steps;
 
+import static com.codeborne.selenide.Condition.attribute;
+import static com.codeborne.selenide.Condition.enabled;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+
+import org.openqa.selenium.By;
+
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+
+import java.util.List;
+
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
 import apicurito.tests.utils.slenide.OperationUtils;
 import apicurito.tests.utils.slenide.PathUtils;
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.SelenideElement;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.When;
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.en.When;
 import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-
-import java.util.List;
-
-import static com.codeborne.selenide.Condition.*;
 
 @Slf4j
 public class OperationSteps {
