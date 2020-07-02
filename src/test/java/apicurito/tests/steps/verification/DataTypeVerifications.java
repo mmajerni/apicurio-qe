@@ -14,7 +14,7 @@ import com.codeborne.selenide.SelenideElement;
 import apicurito.tests.steps.DataTypeSteps;
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.DataTypeUtils;
-import cucumber.api.java.en.Then;
+import io.cucumber.java.en.Then;
 
 public class DataTypeVerifications {
 

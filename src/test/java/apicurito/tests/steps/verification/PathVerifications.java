@@ -5,7 +5,7 @@ import apicurito.tests.utils.slenide.MainPageUtils;
 import apicurito.tests.utils.slenide.PathUtils;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import cucumber.api.java.en.Then;
+import io.cucumber.java.en.Then;
 import org.openqa.selenium.By;
 
 import static com.codeborne.selenide.Condition.matchText;

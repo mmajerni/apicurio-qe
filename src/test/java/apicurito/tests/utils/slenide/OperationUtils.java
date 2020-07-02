@@ -1,16 +1,17 @@
 package apicurito.tests.utils.slenide;
 
-import com.codeborne.selenide.Condition;
-import com.codeborne.selenide.SelenideElement;
-import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-
+import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Condition.attribute;
-
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
+
+import org.openqa.selenium.By;
+
+import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.SelenideElement;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class OperationUtils {
@@ -35,7 +36,7 @@ public class OperationUtils {
         statusElement.$("#statusCodeDropDown").click();
         statusElement.$(By.className("dropdown-menu")).$$("a").filter(text(code)).first().click();
 
-        if (!responseDef.isEmpty()) {
+        if (responseDef != null && !responseDef.isEmpty()) {
             definitionElement.$("#refDropDown").click();
             definitionElement.$(By.className("dropdown-menu")).$$("a").filter(text(responseDef)).first().click();
         }

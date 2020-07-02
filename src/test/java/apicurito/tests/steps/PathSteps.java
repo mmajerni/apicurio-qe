@@ -3,7 +3,7 @@ package apicurito.tests.steps;
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.PathUtils;
 import com.codeborne.selenide.SelenideElement;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.When;
 import org.openqa.selenium.By;
 
 import static com.codeborne.selenide.Condition.visible;
