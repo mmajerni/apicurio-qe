@@ -85,7 +85,7 @@ public class ApicuritoTemplate {
         applyInOCP("Custom Resource", TestConfiguration.apicuritoOperatorCrUrl());
 
         if (TestConfiguration.apicuritoOperatorUiImage() != null) {
-            setTestEnvToOperator("APICURITO_IMAGE", TestConfiguration.apicuritoOperatorUiImage());
+            setTestEnvToOperator("RELATED_IMAGE_APICURITO", TestConfiguration.apicuritoOperatorUiImage());
         }
     }
 
@@ -129,8 +129,7 @@ public class ApicuritoTemplate {
 
         try {
             OpenShiftUtils.getInstance().customResourceDefinitions().delete();
-            //OCP4HACK - openshift-client 4.3.0 isn't supported with OCP4 and can't create/delete templates, following line can be removed later
-            OpenShiftUtils.binary().execute("delete", "template", "--all");
+
             OpenShiftUtils.getInstance().apps().statefulSets().inNamespace(TestConfiguration.openShiftNamespace()).delete();
             OpenShiftUtils.getInstance().apps().deployments().inNamespace(TestConfiguration.openShiftNamespace()).delete();
             OpenShiftUtils.getInstance().serviceAccounts().inNamespace(TestConfiguration.openShiftNamespace()).delete();
@@ -138,6 +137,8 @@ public class ApicuritoTemplate {
             // Probably user does not have permissions to delete.. a nice exception will be printed when deploying
         }
         try {
+            //OCP4HACK - openshift-client 4.3.0 isn't supported with OCP4 and can't create/delete templates, following line can be removed later
+            OpenShiftUtils.binary().execute("delete", "template", "--all");
             OpenShiftUtils.getInstance().clean();
 
             List<ReplicaSet> operatorReplicaSets =
