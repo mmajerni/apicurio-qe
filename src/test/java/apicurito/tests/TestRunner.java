@@ -43,7 +43,7 @@ public class TestRunner {
             ApicuritoTemplate.setInputStreams();
             ApicuritoTemplate.deploy();
             if (TestConfiguration.useOperator()) {
-                ApicuritoTemplate.waitForApicurito("apicurito_cr", 3, Component.SERVICE);
+                ApicuritoTemplate.waitForApicurito("component", 6, Component.SERVICE);
             } else {
                 ApicuritoTemplate.waitForApicurito("component", 1, Component.UI);
             }

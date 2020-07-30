@@ -317,7 +317,8 @@ public class MainPageSteps {
             if (!dataRow.get(2).equals("Delete")) {
                 SelenideElement se = CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-body")).$("input");
                 se.clear();
-                se.sendKeys(dataRow.get(3));
+                se.setValue(dataRow.get(3));
+
                 //CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-body")).$("input").sendKeys(dataRow.get(3));
                 CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-footer")).$(By.className("btn-primary")).click();
             }
@@ -363,7 +364,7 @@ public class MainPageSteps {
                     //Change value in input field
                     SelenideElement se = CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-body")).$("input");
                     se.clear();
-                    se.sendKeys(dataRow.get(4));
+                    se.setValue(dataRow.get(4));
                 }
                 CommonUtils.getAppRoot().shouldBe(visible, enabled).shouldNotHave(attribute("disabled")).$(By.className("modal-footer")).$(By.className("btn-primary")).click();
             }

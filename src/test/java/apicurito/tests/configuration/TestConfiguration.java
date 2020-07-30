@@ -79,7 +79,7 @@ public class TestConfiguration {
 
     public static String templateUrl() {
         return get()
-            .readValue(APICURITO_TEMPLATE_URL, "https://raw.githubusercontent.com/jboss-fuse/application-templates/master/fuse-apicurito.yml");
+            .readValue(APICURITO_TEMPLATE_URL, "https://raw.githubusercontent.com/jboss-fuse/application-templates/2.1.x.redhat-7-x/fuse-apicurito.yml");
     }
 
     public static String templateInputStreamUrl() {
