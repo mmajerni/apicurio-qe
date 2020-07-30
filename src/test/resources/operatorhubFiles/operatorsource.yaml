@@ -4,6 +4,8 @@ metadata:
   name: fuse-apicurito
   namespace: openshift-marketplace
 spec:
+  authorizationToken:
+    secretName: apicurito-secret
   type: appregistry
   endpoint: https://quay.io/cnr
   registryNamespace: mmajerni
