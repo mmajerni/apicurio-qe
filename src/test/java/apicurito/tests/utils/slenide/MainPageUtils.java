@@ -79,11 +79,11 @@ public class MainPageUtils {
 
         CommonUtils.getLabelWithName("name", entityForm).sendKeys(name);
 
-        if (!description.isEmpty()) {
+        if (description != null) {
             entityForm.$(By.id("description")).$(MainPageElements.TEXT_AREA).sendKeys(description);
         }
 
-        if (!example.isEmpty()) {
+        if (example != null) {
             entityForm.$$("div")
                     .filter(Condition.attribute("class", "form-group"))
                     .filter(matchesText("JSON Example"))

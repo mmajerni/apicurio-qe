@@ -336,7 +336,7 @@ public class MainPageSteps {
     @When("click on kebab menu and manage element")
     public void clickOnKebabMenuAndManageElement(DataTable table) {
         for (List<String> dataRow : table.cells()) {
-            if (dataRow.get(1).isEmpty()) {
+            if (dataRow.get(1) == null) {
                 //Usage for kebab for paths and data types
                 CommonUtils.getKebabButtonOnElement(CommonUtils.getPageElement(dataRow.get(0))).click();
             } else {
