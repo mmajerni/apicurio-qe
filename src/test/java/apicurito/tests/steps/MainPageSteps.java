@@ -15,7 +15,7 @@ import java.util.List;
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
 import apicurito.tests.utils.slenide.OperationUtils;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.When;
 import io.cucumber.datatable.DataTable;
 import lombok.extern.slf4j.Slf4j;
 
@@ -336,7 +336,7 @@ public class MainPageSteps {
     @When("click on kebab menu and manage element")
     public void clickOnKebabMenuAndManageElement(DataTable table) {
         for (List<String> dataRow : table.cells()) {
-            if (dataRow.get(1).isEmpty()) {
+            if (dataRow.get(1) == null) {
                 //Usage for kebab for paths and data types
                 CommonUtils.getKebabButtonOnElement(CommonUtils.getPageElement(dataRow.get(0))).click();
             } else {

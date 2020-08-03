@@ -10,17 +10,16 @@ import apicurito.tests.configuration.Component;
 import apicurito.tests.configuration.TestConfiguration;
 import apicurito.tests.configuration.templates.ApicuritoTemplate;
 import apicurito.tests.utils.openshift.OpenShiftUtils;
-import cucumber.api.CucumberOptions;
-import cucumber.api.junit.Cucumber;
+import io.cucumber.junit.CucumberOptions;
+import io.cucumber.junit.Cucumber;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RunWith(Cucumber.class)
 @CucumberOptions(
-        features = "classpath:features",
-        tags = {"not @manual", "not @wip", "not @ignore"},
-        plugin = {"pretty", "html:target/cucumber/cucumber-html", "junit:target/cucumber/cucumber-junit.xml",
-                "json:target/cucumber/cucumber-report.json"})
+    features = "classpath:features",
+    tags = "not @manual and not @wip and not @ignore",
+    plugin = {"pretty", "junit:target/cucumber/cucumber-junit.xml", "json:target/cucumber/cucumber-report.json"})
 public class TestRunner {
 
     @BeforeClass

@@ -7,7 +7,7 @@ import com.codeborne.selenide.SelenideElement;
 
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.DataTypeUtils;
-import cucumber.api.java.en.When;
+import io.cucumber.java.en.When;
 
 public class DataTypeSteps {
 

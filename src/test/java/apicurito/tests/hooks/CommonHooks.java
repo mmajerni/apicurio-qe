@@ -1,11 +1,12 @@
 package apicurito.tests.hooks;
 
-import apicurito.tests.configuration.TestConfiguration;
-import cucumber.api.Scenario;
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.Assume;
+
+import apicurito.tests.configuration.TestConfiguration;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CommonHooks {

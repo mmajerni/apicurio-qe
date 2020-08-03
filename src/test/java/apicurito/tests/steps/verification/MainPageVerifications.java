@@ -15,7 +15,7 @@ import java.util.List;
 
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
-import cucumber.api.java.en.Then;
+import io.cucumber.java.en.Then;
 import io.cucumber.datatable.DataTable;
 
 public class MainPageVerifications {
@@ -166,7 +166,7 @@ public class MainPageVerifications {
         for (List<String> dataRow : table.cells()) {
             ElementsCollection schemeElements = MainPageUtils.getMainPageRoot().$(MainPageElements.SECURITY_SECTION).$$("security-scheme-row").filter(text(dataRow.get(0))).filter(text(dataRow.get(1)));
             assertThat(schemeElements.size()).as("Scheme with name %s do not exist", dataRow.get(0)).isEqualTo(1);
-            if (!dataRow.get(2).isEmpty()) {
+            if (dataRow.get(2) != null) {
                 String description = schemeElements.first().$(MainPageElements.DESCRIPTION).getText();
                 assertThat(description).as("Description should be %s but is %s", dataRow.get(2), description).isEqualTo(dataRow.get(2));
             }

@@ -7,8 +7,8 @@ import apicurito.tests.utils.slenide.PathUtils;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import cucumber.api.java.en.And;
-import cucumber.api.java.en.Then;
+import io.cucumber.java.en.And;
+import io.cucumber.java.en.Then;
 import io.cucumber.datatable.DataTable;
 import org.openqa.selenium.By;
 

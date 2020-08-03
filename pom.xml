@@ -4,14 +4,14 @@
 
     <groupId>apicurio</groupId>
     <artifactId>apicurito-tests</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Apicurito tests</name>
 
     <properties>
         <java.version>1.8</java.version>
         <junit.version>4.12</junit.version>
-        <cucumber.version>4.2.3</cucumber.version>
+        <cucumber.version>6.2.2</cucumber.version>
         <maven.compiler.version>3.5</maven.compiler.version>
         <org.slfj.version>1.7.6</org.slfj.version>
         <log4j.over.slf4j.version>1.7.25</log4j.over.slf4j.version>
@@ -27,6 +27,8 @@
         <apache.http.commons.version>4.5.3</apache.http.commons.version>
         <guava.version>23.0</guava.version>
         <openshift.client.version>4.7.1</openshift.client.version>
+        <failsafe.plugin.version>2.22.0</failsafe.plugin.version>
+        <cluecumber.plugin.version>2.5.0</cluecumber.plugin.version>
 
         <!-- leave driver versions empty to use latest driver -->
         <!-- Find supported webdriver version for your chrome browser here:
@@ -173,9 +175,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven.compiler.version}</version>
                 <configuration>
-                    <includes>
-                        <include>apicurito.tests.TestRunner.class</include>
-                    </includes>
                     <encoding>UTF-8</encoding>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -234,6 +233,55 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${failsafe.plugin.version}</version>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>${failsafe.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>integration-test</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <goals>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includes>apicurito.tests.TestRunner</includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.trivago.rta</groupId>
+                <artifactId>cluecumber-report-plugin</artifactId>
+                <version>${cluecumber.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>report</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>reporting</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <logLevel>minimal</logLevel>
+                    <sourceJsonReportDirectory>${project.build.directory}/cucumber</sourceJsonReportDirectory>
+                    <generatedHtmlReportDirectory>${project.build.directory}/cucumber/cucumber-html</generatedHtmlReportDirectory>
+                </configuration>
             </plugin>
         </plugins>
     </build>

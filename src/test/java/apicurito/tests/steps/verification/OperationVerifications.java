@@ -3,7 +3,7 @@ package apicurito.tests.steps.verification;
 import apicurito.tests.utils.slenide.OperationUtils;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
-import cucumber.api.java.en.Then;
+import io.cucumber.java.en.Then;
 import org.openqa.selenium.By;
 
 import static com.codeborne.selenide.Condition.*;
