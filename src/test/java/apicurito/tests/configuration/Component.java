@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum Component {
 
     UI("apicurito-ui"),
-    SERVICE("apicurito-service"),
+    SERVICE("apicurito-service-ui"),
     OPERATOR("apicurito-operator");
 
     private final String name;
