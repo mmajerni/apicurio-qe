@@ -1,7 +1,7 @@
 @apicuritoTests
 @ui
-@basicTests
-Feature: Basic tests
+@smoke
+Feature: Basic smoke tests
 
   Background:
     Given delete API "tmp/download/openapi-spec.json"

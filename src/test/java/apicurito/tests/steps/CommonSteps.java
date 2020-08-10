@@ -9,13 +9,7 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.$$;
-import static org.junit.Assert.fail;
 
-import io.syndesis.qe.marketplace.openshift.OpenShiftConfiguration;
-import io.syndesis.qe.marketplace.openshift.OpenShiftService;
-import io.syndesis.qe.marketplace.openshift.OpenShiftUser;
-import io.syndesis.qe.marketplace.quay.QuayService;
-import io.syndesis.qe.marketplace.quay.QuayUser;
 import org.assertj.core.api.Condition;
 import org.openqa.selenium.By;
 
@@ -23,25 +17,18 @@ import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import apicurito.tests.configuration.Component;
 import apicurito.tests.configuration.TestConfiguration;
-import apicurito.tests.configuration.templates.ApicuritoTemplate;
-import apicurito.tests.utils.openshift.OpenShiftUtils;
 import apicurito.tests.utils.slenide.CommonUtils;
 import apicurito.tests.utils.slenide.ImportExportUtils;
 import apicurito.tests.utils.slenide.MainPageUtils;
 import apicurito.tests.utils.slenide.OperationUtils;
 import apicurito.tests.utils.slenide.PathUtils;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import cz.xtf.core.openshift.OpenShift;
-import io.cucumber.datatable.DataTable;
-import io.fabric8.kubernetes.api.model.Pod;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -68,11 +55,7 @@ public class CommonSteps {
 
     @Then("^sleep for (\\d+) seconds$")
     public void sleepFor(int seconds) {
-        try {
-            Thread.sleep(1000L * seconds);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        CommonUtils.sleepFor(seconds);
     }
 
     @When("^import API \"([^\"]*)\"$")
@@ -97,56 +80,6 @@ public class CommonSteps {
     @Then("^delete API \"([^\"]*)\"$")
     public void deleteAPI(String file) {
         new File(file).delete();
-    }
-
-    @When("check that apicurito has {int} pods")
-    public void checkThatApicuritoHasPods(int count) {
-        List<Pod> pods = OpenShiftUtils.getInstance().getPods();
-        int counter = 0;
-        for (Pod pod : pods) {
-            if (pod.getMetadata().getName().contains(Component.SERVICE.getName()) && pod.getStatus().getPhase().equals("Running")) {
-                ++counter;
-            }
-        }
-        assertThat(count).as("Apicurito should have %s pods but currently run %s", count, counter).isEqualTo(counter);
-    }
-
-    @When("deploy another custom resource")
-    public void deployAnotherCustomResource() {
-        String cr =
-            "https://gist.githubusercontent.com/mmajerni/e47e14f2a1c2bf934219cb3d4508e81c/raw/ff59f25b5a37918f19c69d70931154c081b683fa" +
-                "/operatorUpdateTest.yaml";
-
-        ApicuritoTemplate.applyInOCP("Custom Resource", cr);
-        CommonUtils.waitForRollout();
-    }
-
-    @When("deploy another operator")
-    public void deployAnotherOperator() {
-        String operator =
-            "https://gist.githubusercontent.com/mmajerni/e7a4b5287f92c7ef228ba655883048be/raw/2eaaf61b377cf012dbf5c9bd4c8bb21447b6461f" +
-                "/apicuritoOperatorUpdate.yaml";
-        ApicuritoTemplate.applyInOCP("Operator", operator);
-        CommonUtils.waitForRollout();
-    }
-
-    /**
-     * @param podType operator || image
-     * @param value pod image
-     */
-    @When("check that apicurito {string} is {string}")
-    public void checkThatApicuritoImageIs(String podType, String value) {
-        String nameOfPod = "operator".equals(podType) ? Component.OPERATOR.getName() : Component.SERVICE.getName();
-
-        List<Pod> pods = OpenShiftUtils.getInstance().getPods();
-        String imageName = "";
-        for (Pod pod : pods) {
-            if (pod.getMetadata().getName().contains(nameOfPod)) {
-                imageName = pod.getSpec().getContainers().get(0).getImage();
-                break;
-            }
-        }
-        assertThat(imageName).as("Apicurito has not container from %s", value).isEqualTo(value);
     }
 
     /*
@@ -250,105 +183,5 @@ public class CommonSteps {
             variablesArea.$$("textarea").filter(visible).first().sendKeys(dataRow.get(2));
         }
         CommonUtils.getButtonWithText("Save", MainPageUtils.getMainPageRoot().$("#entity-editor-form")).click();
-    }
-
-    @When("deploy apicurito into operatorhub and subscribe")
-    public void deployApicuritoIntoOperatorhubAndSubscribe() {
-        final String disableOH = "src/test/resources/operatorhubFiles/disableOH.yaml";
-        final String operatorsource = "src/test/resources/operatorhubFiles/operatorsource.yaml";
-        final String operatorGroup = "src/test/resources/operatorhubFiles/operatorGroup.yaml";
-        final String subscription = "src/test/resources/operatorhubFiles/subscription.yaml";
-
-        ApicuritoTemplate.applyInOCP("Disable operators", "openshift-marketplace", disableOH);
-        ApicuritoTemplate.applyInOCP("Operator source", "openshift-marketplace", operatorsource);
-
-        OpenShift myOpenshift = OpenShiftUtils.getAnotherOpenShiftUtils("openshift-marketplace");
-
-        myOpenshift.waiters()
-            .areExactlyNPodsReady(1, "marketplace.operatorSource", "fuse-apicurito")
-            .interval(TimeUnit.SECONDS, 2)
-            .timeout(TimeUnit.MINUTES, 1)
-            .waitFor();
-
-        ApicuritoTemplate.applyInOCP("Operator group", "operatorhub", operatorGroup);
-        ApicuritoTemplate.applyInOCP("Subscription", "operatorhub", subscription);
-    }
-
-    @Then("check that apicurito operator is deployed and in running state")
-    public void checkThatApicuritoOperatorIsDeployedAndInRunningState() {
-        OpenShiftUtils.xtf().waiters()
-            .areExactlyNPodsReady(1, "name", "apicurito-operator")
-            .interval(TimeUnit.SECONDS, 2)
-            .timeout(TimeUnit.MINUTES, 3)
-            .waitFor();
-    }
-
-    @Given("deploy operator from operatorhub")
-    public void deployOperatorHub() {
-        QuayUser quayUser = new QuayUser(
-                TestConfiguration.getQuayUsername(),
-                TestConfiguration.getQuayPassword(),
-                TestConfiguration.getQuayNamespace(),
-                TestConfiguration.getQuayToken()
-        );
-
-        QuayService quayService = new QuayService(
-                quayUser,
-                ApicuritoTemplate.getOperatorImage(),
-                null
-        );
-        String quayProject = null;
-        try {
-            quayProject = quayService.createQuayProject();
-        } catch (Exception e) {
-            log.error("Could not create quay project", e);
-            fail("Could not create quay project");
-        }
-
-        OpenShiftUser adminUser = new OpenShiftUser(
-                TestConfiguration.openshiftUsername(),
-                TestConfiguration.openshiftPassword(),
-                TestConfiguration.openShiftUrl()
-        );
-
-        OpenShiftConfiguration ocpConfig = OpenShiftConfiguration.builder()
-                .namespace(TestConfiguration.openShiftNamespace())
-                .pullSecretName("apicurito-pullsecret")
-                .pullSecret(TestConfiguration.apicuritoPullSecret())
-                .quayOpsrcToken(TestConfiguration.getQuayOpsrcToken())
-                .installedCSV(quayService.getInstalledCSV())
-                .build();
-
-        OpenShiftService ocpService = new OpenShiftService(
-                TestConfiguration.getQuayNamespace(),
-                quayService.getPackageName(),
-                ocpConfig,
-                adminUser,
-                null
-        );
-
-        try {
-            ocpService.deployOperator();
-        } catch (IOException e) {
-            log.error("Could not deploy operator into openshift", e);
-            fail("Could not deploy operator into openshift" + e.getMessage());
-        }
-
-        OpenShiftUtils.getInstance().serviceAccounts()
-                .inNamespace(TestConfiguration.openShiftNamespace())
-                .withName("apicurito")
-                .edit()
-                .addNewImagePullSecret("apicurito-pullsecret")
-                .done();
-
-        //Delete operator source and clean quay project.
-        ocpService.deleteOpsrcToken();
-        ocpService.deleteOperatorSource();
-
-        try {
-            quayService.deleteQuayProject();
-        } catch (IOException e) {
-            fail("Fail during cleanup of quay project" +  e.getMessage());
-        }
     }
 }

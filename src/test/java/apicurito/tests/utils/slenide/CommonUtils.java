@@ -15,7 +15,6 @@ import com.codeborne.selenide.SelenideElement;
 import java.util.List;
 
 import apicurito.tests.configuration.TestConfiguration;
-import apicurito.tests.utils.openshift.OpenShiftUtils;
 import io.cucumber.datatable.DataTable;
 import lombok.extern.slf4j.Slf4j;
 
@@ -99,11 +98,7 @@ public class CommonUtils {
         section.$(CommonElements.TEXT_AREA).sendKeys(Keys.DELETE);
         section.$(CommonElements.TEXT_AREA).sendKeys(value);
 
-        try {
-            Thread.sleep(1000L);    // firefox needs at least second to process EXAMPLE
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        CommonUtils.sleepFor(1); // firefox needs at least second to process EXAMPLE
 
         getButtonWithTitle("Save changes.", section).click();
     }
@@ -331,23 +326,9 @@ public class CommonUtils {
         return null;
     }
 
-    public static void waitForRollout(){
-        //Wait for Rollout until there is no unavailable pod
-        Integer tmp = Integer.MAX_VALUE;
-        while (tmp != null) {
-            //Wait for 5 seconds
-            try {
-                Thread.sleep(5000L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            tmp = OpenShiftUtils.getInstance().apps().deployments().inNamespace(TestConfiguration.openShiftNamespace()).list().getItems().get(1)
-                .getStatus().getUnavailableReplicas();
-        }
-
-        //Wait another 15 seconds because of termination running pods
+    public static void sleepFor(int seconds){
         try {
-            Thread.sleep(15000L);
+            Thread.sleep(1000L * seconds);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

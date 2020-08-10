@@ -94,11 +94,7 @@ public class MainPageUtils {
             entityForm.$$(By.className("create-option")).filter(text("REST Resource")).first().click();
         }
 
-        try {
-            Thread.sleep(1000L);    // firefox needs at least second to process EXAMPLE
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        CommonUtils.sleepFor(1); // firefox needs at least second to process EXAMPLE
 
         CommonUtils.getButtonWithText("Save", entityForm).click();
     }
