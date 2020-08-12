@@ -18,6 +18,7 @@
         <lombok.version>1.16.18</lombok.version>
         <logback.classic.version>1.2.3</logback.classic.version>
         <xtf.utilities.version>0.14</xtf.utilities.version>
+        <jackson.version>2.10.3</jackson.version>
         <assertj.version>3.11.1</assertj.version>
         <commons-lang3.version>3.7</commons-lang3.version>
         <selenide.version>5.6.0</selenide.version>
@@ -25,7 +26,8 @@
         <maven.clean.plugin.version>3.0.0</maven.clean.plugin.version>
         <apache.http.commons.version>4.5.3</apache.http.commons.version>
         <guava.version>23.0</guava.version>
-        <openshift.client.version>4.3.0</openshift.client.version>
+        <openshift.client.version>4.7.1</openshift.client.version>
+        <org.json.version>20190722</org.json.version>
 
         <!-- leave driver versions empty to use latest driver -->
         <!-- Find supported webdriver version for your chrome browser here:
@@ -120,6 +122,18 @@
             <groupId>io.fabric8</groupId>
             <artifactId>openshift-client</artifactId>
             <version>${openshift.client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${org.json.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
         </dependency>
 
     </dependencies>
