@@ -306,15 +306,15 @@ public class CommonSteps {
         }
 
         OpenShiftUser adminUser = new OpenShiftUser(
-                TestConfiguration.getOpenshiftUsername(),
-                TestConfiguration.getOpenshiftPassword(),
+                TestConfiguration.openshiftUsername(),
+                TestConfiguration.openshiftPassword(),
                 TestConfiguration.openShiftUrl()
         );
 
         OpenShiftConfiguration ocpConfig = OpenShiftConfiguration.builder()
                 .namespace(TestConfiguration.openShiftNamespace())
                 .pullSecretName("apicurito-pullsecret")
-                .pullSecret(TestConfiguration.getPullSecret())
+                .pullSecret(TestConfiguration.apicuritoPullSecret())
                 .quayOpsrcToken(TestConfiguration.getQuayOpsrcToken())
                 .installedCSV(quayService.getInstalledCSV())
                 .build();

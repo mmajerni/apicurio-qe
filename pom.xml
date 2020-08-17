@@ -29,6 +29,7 @@
         <openshift.client.version>4.7.1</openshift.client.version>
         <failsafe.plugin.version>2.22.0</failsafe.plugin.version>
         <cluecumber.plugin.version>2.5.0</cluecumber.plugin.version>
+        <org.json.version>20190722</org.json.version>
 
         <!-- leave driver versions empty to use latest driver -->
         <!-- Find supported webdriver version for your chrome browser here:
@@ -123,6 +124,12 @@
             <groupId>io.fabric8</groupId>
             <artifactId>openshift-client</artifactId>
             <version>${openshift.client.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${org.json.version}</version>
         </dependency>
 
         <dependency>
