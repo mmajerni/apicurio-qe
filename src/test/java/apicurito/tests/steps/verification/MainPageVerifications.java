@@ -107,11 +107,8 @@ public class MainPageVerifications {
      */
     @Then("^check that path \"([^\"]*)\" \"([^\"]*)\" created$")
     public void checkThatPathIsCreated(String expectedPathName, String isCreated) {
-        try {
-            Thread.sleep(1000L);        //need to wait at least for a second because of Stale Element Reference Exception
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        CommonUtils.sleepFor(1); //need to wait at least for a second because of Stale Element Reference Exception
+
         ElementsCollection paths = MainPageUtils.getMainPageRoot().$$(MainPageElements.SECTION).filter(attribute("label", "Paths")).first()
                 .$$(By.className("api-path")).filter(exactText(expectedPathName));
 

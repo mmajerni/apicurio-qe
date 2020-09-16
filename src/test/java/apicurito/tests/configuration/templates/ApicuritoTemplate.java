@@ -1,21 +1,10 @@
 package apicurito.tests.configuration.templates;
 
-import apicurito.tests.configuration.Component;
-import apicurito.tests.configuration.TestConfiguration;
-import apicurito.tests.utils.HttpUtils;
-import apicurito.tests.utils.openshift.OpenShiftUtils;
-import cz.xtf.core.waiting.WaiterException;
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.KubernetesList;
-import io.fabric8.kubernetes.api.model.apps.Deployment;
-import io.fabric8.kubernetes.api.model.apps.ReplicaSet;
-import io.fabric8.kubernetes.client.KubernetesClientException;
-import io.fabric8.openshift.api.model.Template;
-import lombok.extern.slf4j.Slf4j;
-import org.yaml.snakeyaml.Yaml;
+import static org.assertj.core.api.Assertions.fail;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,7 +22,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.fail;
+import apicurito.tests.configuration.Component;
+import apicurito.tests.configuration.TestConfiguration;
+import apicurito.tests.utils.HttpUtils;
+import apicurito.tests.utils.openshift.OpenShiftUtils;
+import apicurito.tests.utils.slenide.ConfigurationOCPUtils;
+import cz.xtf.core.waiting.WaiterException;
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.KubernetesList;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.ReplicaSet;
+import io.fabric8.kubernetes.client.KubernetesClientException;
+import io.fabric8.openshift.api.model.Template;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ApicuritoTemplate {
@@ -165,10 +166,10 @@ public class ApicuritoTemplate {
     private static void deployUsingGoOperator() {
         log.info("Deploying using GO operator");
 
-        createInOCP("CRD", TestConfiguration.apicuritoOperatorCrdUrl());
-        createInOCP("Service", TestConfiguration.apicuritoOperatorServiceUrl());
-        createInOCP("Role", TestConfiguration.apicuritoOperatorRoleUrl());
-        createInOCP("Role binding", TestConfiguration.apicuritoOperatorRoleBindingUrl());
+        ConfigurationOCPUtils.createInOCP("CRD", TestConfiguration.apicuritoOperatorCrdUrl());
+        ConfigurationOCPUtils.createInOCP("Service", TestConfiguration.apicuritoOperatorServiceUrl());
+        ConfigurationOCPUtils.createInOCP("Role", TestConfiguration.apicuritoOperatorRoleUrl());
+        ConfigurationOCPUtils.createInOCP("Role binding", TestConfiguration.apicuritoOperatorRoleBindingUrl());
 
         // if operator image url was specified, use this image
         if (TestConfiguration.apicuritoOperatorImageUrl() != null) {
@@ -178,55 +179,20 @@ public class ApicuritoTemplate {
             OpenShiftUtils.addImagePullSecretToServiceAccount("default", "apicurito-pull-secret");
             OpenShiftUtils.addImagePullSecretToServiceAccount("apicurito", "apicurito-pull-secret");
 
-            setTestEnvToOperator("RELATED_IMAGE_APICURITO_OPERATOR", TestConfiguration.apicuritoOperatorImageUrl());
+            ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_APICURITO_OPERATOR", TestConfiguration.apicuritoOperatorImageUrl());
         } else {
-            createInOCP("Operator", TestConfiguration.apicuritoOperatorDeploymentUrl());
+            ConfigurationOCPUtils.createInOCP("Operator", TestConfiguration.apicuritoOperatorDeploymentUrl());
         }
 
         // as this testsuite is not testing generator, set it to empty string
         // when not set to empty string, there is ImagePullBackOff when trying to access private registry
-        setTestEnvToOperator("RELATED_IMAGE_GENERATOR", "");
+        ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_GENERATOR", "");
 
         if (TestConfiguration.apicuritoUiImageUrl() != null) {
-            setTestEnvToOperator("RELATED_IMAGE_APICURITO", TestConfiguration.apicuritoUiImageUrl());
+            ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_APICURITO", TestConfiguration.apicuritoUiImageUrl());
         }
 
-        applyInOCP("Custom Resource", TestConfiguration.apicuritoOperatorCrUrl());
-    }
-
-    private static void setTestEnvToOperator(String nameOfEnv, String valueOfEnv) {
-        log.info("Setting test ENV: " + nameOfEnv + "=" + valueOfEnv);
-        final String output = OpenShiftUtils.binary().execute(
-                "set",
-                "env",
-                "deployment",
-                "apicurito-operator",
-                nameOfEnv + "=" + valueOfEnv
-        );
-    }
-
-    private static void createInOCP(String itemName, String item) {
-        log.info("Creating " + itemName + " from: " + item);
-
-        final String output = OpenShiftUtils.binary().execute(
-                "create",
-                "-n", TestConfiguration.openShiftNamespace(),
-                "-f", item
-        );
-    }
-
-    public static void applyInOCP(String itemName, String item) {
-        log.info("Applying {} from: {}", itemName, item);
-        final String output = OpenShiftUtils.binary().execute(
-                "apply", "-n", TestConfiguration.openShiftNamespace(), "-f", item
-        );
-    }
-
-    public static void applyInOCP(String itemName, String namespace, String item) {
-        log.info("Applying {} from: {}", itemName, item);
-        final String output = OpenShiftUtils.binary().execute(
-                "apply", "-n", namespace, "-f", item
-        );
+        ConfigurationOCPUtils.applyInOCP("Custom Resource", TestConfiguration.apicuritoOperatorCrUrl());
     }
 
     public static String getOperatorImage() {
@@ -300,10 +266,13 @@ public class ApicuritoTemplate {
         }
     }
 
-    public static void cleanOcpAfterOperatorhubTest() {
-        final String output = OpenShiftUtils.binary().execute("delete", "project", "operatorhub");
-        final String output2 = OpenShiftUtils.binary().execute("delete", "operatorsource", "fuse-apicurito", "-n", "openshift-marketplace");
-        String available = "src/test/resources/operatorhubFiles/availableOH.yaml";
-        ApicuritoTemplate.applyInOCP("Available operators", "openshift-marketplace", available);
+    public static void reinstallApicurito(){
+        setImageStreams();
+        deploy();
+        if (TestConfiguration.useOperator()) {
+            waitForApicurito("component", 6, Component.SERVICE);
+        } else {
+            waitForApicurito("component", 1, Component.UI);
+        }
     }
 }
