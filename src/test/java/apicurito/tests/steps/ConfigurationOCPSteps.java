@@ -99,7 +99,7 @@ public class ConfigurationOCPSteps {
     }
 
     @When("deploy operator from operatorhub")
-    public void deployOperatorHub() {
+    public void deployOperatorHub() throws IOException{
         QuayUser quayUser = new QuayUser(
             TestConfiguration.getQuayUsername(),
             TestConfiguration.getQuayPassword(),
