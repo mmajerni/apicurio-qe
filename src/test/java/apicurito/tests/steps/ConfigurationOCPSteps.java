@@ -158,9 +158,9 @@ public class ConfigurationOCPSteps {
 
         //Delete operator source and clean quay project.
         ocpService.deleteOpsrcToken();
-        ocpService.deleteOperatorSource();
 
         try {
+            ocpService.deleteOperatorSource();
             quayService.deleteQuayProject();
         } catch (IOException e) {
             fail("Fail during cleanup of quay project" +  e.getMessage());
