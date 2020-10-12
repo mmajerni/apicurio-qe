@@ -268,6 +268,7 @@ public class ApicuritoTemplate {
 
     public static void reinstallApicurito(){
         setImageStreams();
+        OpenShiftUtils.createPullSecret();
         deploy();
         if (TestConfiguration.useOperator()) {
             waitForApicurito("component", 6, Component.SERVICE);
