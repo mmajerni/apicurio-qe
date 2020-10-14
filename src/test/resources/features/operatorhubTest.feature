@@ -10,6 +10,7 @@ Feature: OperatorHub installation test
     When patch ClusterServiceVersion with UI image "mmajerni/apiui:latest"
     And deploy "first" custom resource
     Then check that apicurito "image" is "mmajerni/apiui:latest"
-    And check that apicurito has 4 pods
+    And check that "apicurito-service-generator" has 4 pods
+    And check that "apicurito-service-ui" has 4 pods
     Then clean openshift after operatorhub test
     Then reinstall apicurito
