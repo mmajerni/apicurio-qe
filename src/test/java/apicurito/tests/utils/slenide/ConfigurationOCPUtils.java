@@ -55,7 +55,7 @@ public class ConfigurationOCPUtils {
             "set",
             "env",
             "deployment",
-            "apicurito-operator",
+            "fuse-apicurito",
             nameOfEnv + "=" + valueOfEnv
         );
     }
