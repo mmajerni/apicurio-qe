@@ -168,17 +168,19 @@ public class ApicuritoTemplate {
 
         ConfigurationOCPUtils.createInOCP("CRD", TestConfiguration.apicuritoOperatorCrdUrl());
         ConfigurationOCPUtils.createInOCP("Service", TestConfiguration.apicuritoOperatorServiceUrl());
+        ConfigurationOCPUtils.createInOCP("Cluster Role", TestConfiguration.apicuritoOperatorClusterRoleUrl());
+        ConfigurationOCPUtils.createInOCP("Cluster Role binding", TestConfiguration.apicuritoOperatorClusterRoleBindingUrl());
         ConfigurationOCPUtils.createInOCP("Role", TestConfiguration.apicuritoOperatorRoleUrl());
         ConfigurationOCPUtils.createInOCP("Role binding", TestConfiguration.apicuritoOperatorRoleBindingUrl());
+
+
+        // Add pull secret to both apicurito and default service accounts - apicurito for operator, default for UI image
+        OpenShiftUtils.addImagePullSecretToServiceAccount("default", "apicurito-pull-secret");
+        OpenShiftUtils.addImagePullSecretToServiceAccount("apicurito", "apicurito-pull-secret");
 
         // if operator image url was specified, use this image
         if (TestConfiguration.apicuritoOperatorImageUrl() != null) {
             OpenShiftUtils.getInstance().apps().deployments().create(getUpdatedOperatorDeployment());
-
-            // Add pull secret to both apicurito and default service accounts - apicurito for operator, default for UI image
-            OpenShiftUtils.addImagePullSecretToServiceAccount("default", "apicurito-pull-secret");
-            OpenShiftUtils.addImagePullSecretToServiceAccount("apicurito", "apicurito-pull-secret");
-
             ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_APICURITO_OPERATOR", TestConfiguration.apicuritoOperatorImageUrl());
         } else {
             ConfigurationOCPUtils.createInOCP("Operator", TestConfiguration.apicuritoOperatorDeploymentUrl());
@@ -211,6 +213,8 @@ public class ApicuritoTemplate {
 
         try {
             OpenShiftUtils.getInstance().customResourceDefinitions().withName("apicuritos.apicur.io").delete();
+            OpenShiftUtils.binary().execute("delete", "ClusterRole", "apicurito");
+            OpenShiftUtils.binary().execute("delete", "ClusterRoleBinding", "apicurito");
             //OCP4HACK - openshift-client 4.3.0 isn't supported with OCP4 and can't create/delete templates, following line can be removed later
             OpenShiftUtils.binary().execute("delete", "template", "--all", "--namespace", TestConfiguration.openShiftNamespace());
             OpenShiftUtils.getInstance().apps().statefulSets().inNamespace(TestConfiguration.openShiftNamespace()).delete();
