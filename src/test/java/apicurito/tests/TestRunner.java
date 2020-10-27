@@ -39,11 +39,10 @@ public class TestRunner {
             }
         }
 
-        if (!createdProject) {
-            ApicuritoTemplate.cleanNamespace();
-        }
-
-        if (Boolean.valueOf(TestConfiguration.doReinstall())) {
+        if (Boolean.parseBoolean(TestConfiguration.doReinstall())) {
+            if (!createdProject) {
+                ApicuritoTemplate.cleanNamespace();
+            }
             ApicuritoTemplate.reinstallApicurito();
         }
 
