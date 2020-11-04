@@ -7,7 +7,8 @@ public enum Component {
 
     UI("apicurito-ui"),
     SERVICE("apicurito-service-ui"),
-    OPERATOR("apicurito-operator");
+    OPERATOR("fuse-apicurito"),
+    GENERATOR("apicurito-service-generator");
 
     private final String name;
 

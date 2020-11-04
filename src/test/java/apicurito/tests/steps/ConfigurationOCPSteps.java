@@ -12,6 +12,7 @@ import io.syndesis.qe.marketplace.quay.QuayUser;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import apicurito.tests.configuration.Component;
@@ -27,17 +28,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ConfigurationOCPSteps {
 
-    @When("check that apicurito has {int} pods")
-    public void checkThatApicuritoHasPods(int count) {
-        log.info("Checking that Apicurito has exatly " + count + " pods");
+    @When("check that {string} has {int} pods")
+    public void checkThatComponentHasPods(String name, int count) {
+        log.info("Checking that " + name + " has exatly " + count + " pods");
         List<Pod> pods = OpenShiftUtils.getInstance().getPods();
         int counter = 0;
         for (Pod pod : pods) {
-            if (pod.getMetadata().getName().contains(Component.SERVICE.getName()) && pod.getStatus().getPhase().equals("Running")) {
+            if (pod.getMetadata().getName().contains(name) && pod.getStatus().getPhase().equals("Running")) {
                 ++counter;
             }
         }
-        assertThat(count).as("Apicurito should have %s pods but currently run %s", count, counter).isEqualTo(counter);
+        assertThat(count).as(name + " should have %s pods but currently run %s", count, counter).isEqualTo(counter);
     }
 
     @When("deploy {string} custom resource")
@@ -207,5 +208,38 @@ public class ConfigurationOCPSteps {
     public void reinstallApicurito() {
         ApicuritoTemplate.cleanNamespace();
         ApicuritoTemplate.reinstallApicurito();
+    }
+
+    @Then("check that metering labels have correct values for \"([^\"]*)\"$")
+    public void checkThatMeteringLabelsHaveCorrectValues(Component component) {
+        final String version = Double.toString(Double.parseDouble(TestConfiguration.APICURITO_IMAGE_VERSION) + 6);
+        final String company = "Red_Hat";
+        final String prodName = "Red_Hat_Integration";
+        final String componentName = "Fuse";
+        final String subcomponent_t = "infrastructure";
+
+        List<Pod> pods = OpenShiftUtils.getInstance().getPods();
+
+        for (Pod p : pods) {
+            if (p.getStatus().getPhase().contains("Running") && p.getMetadata().getName().contains(component.getName())) {
+                Map<String, String> labels = p.getMetadata().getLabels();
+                assertThat(labels).containsKey("com.company");
+                assertThat(labels).containsKey("rht.prod_name");
+                assertThat(labels).containsKey("rht.prod_ver");
+                assertThat(labels).containsKey("rht.comp");
+                assertThat(labels).containsKey("rht.comp_ver");
+                assertThat(labels).containsKey("rht.subcomp");
+                assertThat(labels).containsKey("rht.subcomp_t");
+
+                assertThat(labels.get("com.company")).isEqualTo(company);
+                assertThat(labels.get("rht.prod_name")).isEqualTo(prodName);
+                assertThat(labels.get("rht.prod_ver")).isEqualTo(version);
+                assertThat(labels.get("rht.comp")).isEqualTo(componentName);
+                assertThat(labels.get("rht.comp_ver")).isEqualTo(version);
+                assertThat(labels.get("rht.subcomp")).isEqualTo(component.getName());
+                assertThat(labels.get("rht.subcomp_t")).isEqualTo(subcomponent_t);
+
+            }
+        }
     }
 }

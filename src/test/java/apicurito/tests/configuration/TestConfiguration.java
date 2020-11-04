@@ -12,7 +12,7 @@ import java.util.Properties;
 @Slf4j
 public class TestConfiguration {
 
-    public static final String APICURITO_IMAGE_VERSION = "2.0";
+    public static final String APICURITO_IMAGE_VERSION = "1.8";
 
     public static final String OPENSHIFT_URL = "apicurito.config.openshift.url";
     public static final String OPENSHIFT_TOKEN = "apicurito.config.openshift.token";

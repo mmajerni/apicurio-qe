@@ -5,7 +5,8 @@ Feature: Update scenario test
   @updateCustomResource
   Scenario: test update custom resource
     When deploy "second" custom resource
-    Then check that apicurito has 4 pods
+    Then check that "apicurito-service-generator" has 4 pods
+    And check that "apicurito-service-ui" has 4 pods
     Then reinstall apicurito
 
   @updateOperator
