@@ -1,6 +1,6 @@
 @apicuritoTests
 @ui
-@smoke
+@smokeTests
 Feature: Basic smoke tests
 
   Background:
