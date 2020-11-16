@@ -90,7 +90,7 @@ public class CustomWebDriverProvider implements WebDriverProvider {
 
         ChromeOptions options = new ChromeOptions();
         options.setExperimentalOption("prefs", preferences);
-        options.addArguments("start-maximized", "--no-sandbox");
+        options.addArguments("--no-sandbox");
         options.setCapability("acceptInsecureCerts", true);
 
         /* this version of constructor is deprecated :(
