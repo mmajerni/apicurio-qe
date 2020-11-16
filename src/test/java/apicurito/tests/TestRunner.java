@@ -52,7 +52,7 @@ public class TestRunner {
         //Configuration.browser = TestConfiguration.apicuritoBrowser();
         Configuration.browser = "apicurito.tests.configuration.CustomWebDriverProvider";
         //TODO temporary workaround for jenkins job
-        //Configuration.browserSize = "1920x1080";
+        Configuration.browserSize = "1920x1080";
     }
 
     @AfterClass
