@@ -224,7 +224,7 @@ public class TestConfiguration {
         }
         if (props.getProperty(APICURITO_OPERATOR_CR_URL) == null) {
             props.setProperty(APICURITO_OPERATOR_CR_URL, String.format(
-                    "https://raw.githubusercontent.com/jboss-fuse/apicurio-operators/master/apicurito/deploy/crs/apicur_v1alpha1_apicurito_cr.yaml"));
+                    "https://gist.githubusercontent.com/mmajerni/2eff0ab14be593e7ac1680a5a59a527c/raw/d84cc9b0d2de5b05befdcc156f420e3442e0d268/apicr.yaml"));
         }
         if (props.getProperty(APICURITO_OPERATOR_SERVICE_URL) == null) {
             props.setProperty(APICURITO_OPERATOR_SERVICE_URL,
