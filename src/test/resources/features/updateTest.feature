@@ -12,6 +12,6 @@ Feature: Update scenario test
   @updateOperator
   Scenario: test update operator
     When deploy another operator with ui image "mmajerni/apiuiupdate:latest"
-    Then check that apicurito "operator" is "mmajerni/apiopupdate:latest"
+    Then check that apicurito "operator" is "mmajerni/apicurito-update-operator8:latest"
     And check that apicurito "image" is "mmajerni/apiuiupdate:latest"
     Then reinstall apicurito
