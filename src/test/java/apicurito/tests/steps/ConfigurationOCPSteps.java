@@ -62,7 +62,7 @@ public class ConfigurationOCPSteps {
     public void deployAnotherOperator(String uiImage) {
         log.info("Deploying another operator with UI image: " + uiImage);
         String operator =
-            "https://gist.githubusercontent.com/mmajerni/e7a4b5287f92c7ef228ba655883048be/raw/1415804484dd9705b5ffecccbbf586aa5496ce3b/" +
+            "https://gist.githubusercontent.com/mmajerni/e7a4b5287f92c7ef228ba655883048be/raw/f0bdb833c9092f7b4d3057b242790a5687e3d403/" +
                 "apicuritoOperatorUpdate.yaml";
         ConfigurationOCPUtils.applyInOCP("Operator", operator);
         ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_APICURITO", uiImage);

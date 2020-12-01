@@ -275,7 +275,7 @@ public class ApicuritoTemplate {
         OpenShiftUtils.createPullSecret();
         deploy();
         if (TestConfiguration.useOperator()) {
-            waitForApicurito("component", 2, Component.SERVICE);
+            waitForApicurito("component", 6, Component.SERVICE);
         } else {
             waitForApicurito("component", 1, Component.UI);
         }
