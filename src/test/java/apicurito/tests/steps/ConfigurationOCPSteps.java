@@ -26,6 +26,8 @@ import java.util.concurrent.TimeoutException;
 import apicurito.tests.configuration.Component;
 import apicurito.tests.configuration.ReleaseSpecificParameters;
 import apicurito.tests.configuration.TestConfiguration;
+import apicurito.tests.configuration.templates.ApicuritoInstall;
+import apicurito.tests.configuration.templates.ApicuritoOperator;
 import apicurito.tests.configuration.templates.ApicuritoTemplate;
 import apicurito.tests.utils.HttpUtils;
 import apicurito.tests.utils.openshift.OpenShiftUtils;
@@ -62,7 +64,7 @@ public class ConfigurationOCPSteps {
 
         log.info("Waiting for Apicurito pods");
         if ("first".equals(sequenceNumber)) {
-            ApicuritoTemplate.waitForApicurito("component", 4, Component.SERVICE);
+            ApicuritoInstall.waitForApicurito("component", 4, Component.SERVICE);
         } else {
             ConfigurationOCPUtils.waitForRollout();
         }
@@ -189,7 +191,7 @@ public class ConfigurationOCPSteps {
 
     @When("delete running instance of apicurito")
     public void deleteRunningInstanceOfApicurito() {
-        ApicuritoTemplate.cleanNamespace();
+        ApicuritoInstall.cleanNamespace();
     }
 
     @Then("clean openshift after operatorhub test")
@@ -204,8 +206,8 @@ public class ConfigurationOCPSteps {
 
     @Then("reinstall apicurito")
     public void reinstallApicurito() {
-        ApicuritoTemplate.cleanNamespace();
-        ApicuritoTemplate.reinstallApicurito();
+        ApicuritoInstall.cleanNamespace();
+        ApicuritoInstall.reinstallApicurito();
     }
 
     @Then("check that metering labels have correct values for \"([^\"]*)\"$")
@@ -267,7 +269,7 @@ public class ConfigurationOCPSteps {
         OpenShiftUtils.addImagePullSecretToServiceAccount("apicurito", "apicurito-pull-secret");
 
         OpenShiftUtils.getInstance().apps().deployments()
-            .create(ApicuritoTemplate.getUpdatedOperatorDeployment(ReleaseSpecificParameters.OLD_OPERATOR_URL));
+            .create(ApicuritoOperator.getUpdatedOperatorDeployment(ReleaseSpecificParameters.OLD_OPERATOR_URL));
         ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_APICURITO_OPERATOR", ReleaseSpecificParameters.OLD_OPERATOR_URL);
         ConfigurationOCPUtils.applyInOCP("Custom Resource", TestConfiguration.apicuritoOperatorCrUrl());
 
