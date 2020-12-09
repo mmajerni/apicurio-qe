@@ -12,13 +12,10 @@ import java.util.Properties;
 @Slf4j
 public class TestConfiguration {
 
-    public static final String APICURITO_IMAGE_VERSION = "1.8";
-
     public static final String OPENSHIFT_URL = "apicurito.config.openshift.url";
     public static final String OPENSHIFT_TOKEN = "apicurito.config.openshift.token";
     public static final String OPENSHIFT_NAMESPACE = "apicurito.config.openshift.namespace";
     public static final String OPENSHIFT_NAMESPACE_CLEANUP_AFTER = "apicurito.config.openshift.namespace.cleanup.after";
-    public static final String OPENSHIFT_ROUTE_SUFFIX = "apicurito.config.openshift.route.suffix";
     public static final String OPENSHIFT_REINSTALL = "apicurito.config.openshift.reinstall";
 
     public static final String APICURITO_TEMPLATE_URL = "apicurito.config.template.url";
@@ -33,17 +30,19 @@ public class TestConfiguration {
     public static final String APICURITO_USE_OPERATOR = "apicurito.config.use.operator";
     public static final String APICURITO_OPERATOR_CRD_URL = "apicurito.config.operator.crd";
     public static final String APICURITO_OPERATOR_DEPLOYMENT_URL = "apicurito.config.operator.url";
-    public static final String APICURITO_OPERATOR_IMAGE_URL = "apicurito.config.operator.image.url";
-    public static final String APICURITO_OPERATOR_METADATA_URL = "apicurito.config.operator.metadata.url";
     public static final String APICURITO_OPERATOR_SERVICE_URL = "apicurito.config.operator.service";
     public static final String APICURITO_OPERATOR_ROLE_URL = "apicurito.config.operator.role";
     public static final String APICURITO_OPERATOR_ROLE_BINDING_URL = "apicurito.config.operator.rolebinding";
     public static final String APICURITO_OPERATOR_CLUSTER_ROLE_URL = "apicurito.config.operator.cluster.role";
     public static final String APICURITO_OPERATOR_CLUSTER_ROLE_BINDING_URL = "apicurito.config.operator.cluster.rolebinding";
     public static final String APICURITO_OPERATOR_CR_URL = "apicurito.config.operator.cr";
-    public static final String APICURITO_DEPLOY_OPERATORHUB = "apicurito.config.deploy.operatorhub";
-    public static final String APICURITO_UI_IMAGE_URL = "apicurito.config.ui.image.url";
+
     public static final String APICURITO_PULL_SECRET = "apicurito.config.pull.secret";
+
+    public static final String APICURITO_OPERATOR_IMAGE_URL = "apicurito.config.operator.image.url";
+    public static final String APICURITO_UI_IMAGE_URL = "apicurito.config.ui.image.url";
+    public static final String APICURITO_OPERATOR_METADATA_URL = "apicurito.config.operator.metadata.url";
+    public static final String APICURITO_GENERATOR_IMAGE_URL = "apicurito.config.generator.image.url";
 
     public static final String APICURITO_UI_USERNAME = "apicurito.config.ui.username";
     public static final String APICURITO_UI_PASSWORD = "apicurito.config.ui.password";
@@ -94,24 +93,17 @@ public class TestConfiguration {
 
     public static String templateUrl() {
         return get()
-            .readValue(APICURITO_TEMPLATE_URL, "https://raw.githubusercontent.com/jboss-fuse/application-templates/2.1.x.redhat-7-x/fuse-apicurito.yml");
+            .readValue(APICURITO_TEMPLATE_URL,
+                ReleaseSpecificParameters.APICURITO_TEMPLATE_URL);
     }
 
     public static String templateImageStreamUrl() {
         return get()
-                .readValue(APICURITO_IS_TEMPLATE_URL, "https://raw.githubusercontent.com/jboss-fuse/application-templates/master/fis-image-streams.json");
-    }
-
-    public static String openShiftRouteSuffix() {
-        return get().readValue(OPENSHIFT_ROUTE_SUFFIX);
+            .readValue(APICURITO_IS_TEMPLATE_URL, ReleaseSpecificParameters.APICURITO_IS_TEMPLATE_URL);
     }
 
     public static boolean useOperator() {
         return Boolean.parseBoolean(get().readValue(APICURITO_USE_OPERATOR));
-    }
-
-    public static boolean deployOperatorHub() {
-        return Boolean.parseBoolean(get().readValue(APICURITO_DEPLOY_OPERATORHUB, "false"));
     }
 
     public static String apicuritoOperatorCrdUrl() {
@@ -132,6 +124,10 @@ public class TestConfiguration {
 
     public static String apicuritoOperatorMetadataUrl() {
         return get().readValue(APICURITO_OPERATOR_METADATA_URL);
+    }
+
+    public static String apicuritoGeneratorImageUrl() {
+        return get().readValue(APICURITO_GENERATOR_IMAGE_URL);
     }
 
     public static String apicuritoOperatorServiceUrl() {
@@ -230,11 +226,11 @@ public class TestConfiguration {
         }
         if (props.getProperty(APICURITO_OPERATOR_DEPLOYMENT_URL) == null) {
             props.setProperty(APICURITO_OPERATOR_DEPLOYMENT_URL,
-                String.format("https://raw.githubusercontent.com/jboss-fuse/apicurio-operators/master/apicurito/deploy/operator.yaml"));
+                    String.format("https://raw.githubusercontent.com/jboss-fuse/apicurio-operators/master/apicurito/deploy/operator.yaml"));
         }
         if (props.getProperty(APICURITO_OPERATOR_CR_URL) == null) {
             props.setProperty(APICURITO_OPERATOR_CR_URL, String.format(
-                    "https://gist.githubusercontent.com/mmajerni/2eff0ab14be593e7ac1680a5a59a527c/raw/d84cc9b0d2de5b05befdcc156f420e3442e0d268/apicr.yaml"));
+                    "https://raw.githubusercontent.com/jboss-fuse/apicurio-operators/master/apicurito/deploy/crs/apicur_v1alpha1_apicurito_cr.yaml"));
         }
         if (props.getProperty(APICURITO_OPERATOR_SERVICE_URL) == null) {
             props.setProperty(APICURITO_OPERATOR_SERVICE_URL,
@@ -251,11 +247,12 @@ public class TestConfiguration {
 
         if (props.getProperty(APICURITO_OPERATOR_CLUSTER_ROLE_URL) == null) {
             props.setProperty(APICURITO_OPERATOR_CLUSTER_ROLE_URL,
-                String.format("https://raw.githubusercontent.com/jboss-fuse/apicurio-operators/master/apicurito/deploy/cluster_role.yaml"));
+                    String.format("https://raw.githubusercontent.com/jboss-fuse/apicurio-operators/master/apicurito/deploy/cluster_role.yaml"));
         }
         if (props.getProperty(APICURITO_OPERATOR_CLUSTER_ROLE_BINDING_URL) == null) {
             props.setProperty(APICURITO_OPERATOR_CLUSTER_ROLE_BINDING_URL,
-                String.format("https://gist.githubusercontent.com/mmajerni/2e75561d5511fd94829ca71929e955d9/raw/39f40e0f26674830bf7f4dd2c525bfd1395c12c5/cluster_role_binding.yaml"));
+                String.format(
+                    "https://raw.githubusercontent.com/jboss-fuse/apicurio-operators/master/apicurito/deploy/cluster_role_binding.yaml"));
         }
 
         props.setProperty(APICURITO_USE_OPERATOR, "true");

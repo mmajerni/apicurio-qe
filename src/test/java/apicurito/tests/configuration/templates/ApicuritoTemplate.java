@@ -4,14 +4,12 @@ import static org.assertj.core.api.Assertions.fail;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -23,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import apicurito.tests.configuration.Component;
+import apicurito.tests.configuration.ReleaseSpecificParameters;
 import apicurito.tests.configuration.TestConfiguration;
 import apicurito.tests.utils.HttpUtils;
 import apicurito.tests.utils.openshift.OpenShiftUtils;
@@ -55,11 +54,11 @@ public class ApicuritoTemplate {
      *
      * @return Deployment containing the correct image
      */
-    public static Deployment getUpdatedOperatorDeployment() {
+    public static Deployment getUpdatedOperatorDeployment(String operatorUrl) {
         try (InputStream is = new URL(TestConfiguration.apicuritoOperatorDeploymentUrl()).openStream()) {
             Deployment deployment = OpenShiftUtils.getInstance().apps().deployments().load(is).get();
             // containers should contain only one object - get(0)
-            deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(TestConfiguration.apicuritoOperatorImageUrl());
+            deployment.getSpec().getTemplate().getSpec().getContainers().get(0).setImage(operatorUrl);
             return deployment;
         } catch (IOException e) {
             throw new IllegalArgumentException("Unable to read apicurito operator deployment", e);
@@ -68,7 +67,7 @@ public class ApicuritoTemplate {
 
     /**
      * Apply image stream
-     * If Apicurito UI image is set in properties, add it with the TestConfiguration.APICURITO_IMAGE_VERSION tag
+     * If Apicurito UI image is set in properties, add it with the ReleaseSpecificParameters.APICURITO_IMAGE_VERSION tag
      */
     public static void setImageStreams() {
         TestConfiguration.printDivider("Setting up image streams");
@@ -81,7 +80,7 @@ public class ApicuritoTemplate {
             JSONArray imagestreams =
                 new JSONObject(HttpUtils.doGetRequest(TestConfiguration.templateImageStreamUrl()).body().string()).getJSONArray("items");
                 for (int i = 0; i < imagestreams.length(); i++) {
-                    if ("apicurito-ui".equals(imagestreams.getJSONObject(i).getJSONObject("metadata").getString("name"))){
+                    if ("apicurito-ui".equals(imagestreams.getJSONObject(i).getJSONObject("metadata").getString("name"))) {
                         imageStream = Optional.of(imagestreams.getJSONObject(i));
                         break;
                     }
@@ -123,7 +122,7 @@ public class ApicuritoTemplate {
             OpenShiftUtils.binary().execute(
                 "tag",
                 TestConfiguration.apicuritoUiImageUrl(),
-                "apicurito-ui:" + TestConfiguration.APICURITO_IMAGE_VERSION
+                "apicurito-ui:" + ReleaseSpecificParameters.APICURITO_IMAGE_VERSION
             );
         }
     }
@@ -143,14 +142,14 @@ public class ApicuritoTemplate {
         Template template = getTemplate();
         // set params
         Map<String, String> templateParams = new HashMap<>();
-        templateParams.put("ROUTE_HOSTNAME", TestConfiguration.openShiftNamespace() + "." + TestConfiguration.openShiftRouteSuffix());
-        log.info("Deploying on address: https://" + TestConfiguration.openShiftNamespace() + "." + TestConfiguration.openShiftRouteSuffix());
+        templateParams.put("ROUTE_HOSTNAME", TestConfiguration.apicuritoUrl().substring(8));
+        log.info("Deploying on address: https://" + TestConfiguration.apicuritoUrl().substring(8));
         templateParams.put("OPENSHIFT_MASTER", TestConfiguration.openShiftUrl());
         templateParams.put("OPENSHIFT_PROJECT", TestConfiguration.openShiftNamespace());
         templateParams.put("IMAGE_STREAM_NAMESPACE", TestConfiguration.openShiftNamespace());
 
         if (TestConfiguration.apicuritoUiImageUrl() != null) {
-            templateParams.put("APP_VERSION", TestConfiguration.APICURITO_IMAGE_VERSION);
+            templateParams.put("APP_VERSION", ReleaseSpecificParameters.APICURITO_IMAGE_VERSION);
 
             // add apicurito-pull-secret to default SA so the pod can pull the image with provided pull secret
             OpenShiftUtils.addImagePullSecretToServiceAccount("default", "apicurito-pull-secret");
@@ -173,39 +172,27 @@ public class ApicuritoTemplate {
         ConfigurationOCPUtils.createInOCP("Role", TestConfiguration.apicuritoOperatorRoleUrl());
         ConfigurationOCPUtils.createInOCP("Role binding", TestConfiguration.apicuritoOperatorRoleBindingUrl());
 
-
         // Add pull secret to both apicurito and default service accounts - apicurito for operator, default for UI image
         OpenShiftUtils.addImagePullSecretToServiceAccount("default", "apicurito-pull-secret");
         OpenShiftUtils.addImagePullSecretToServiceAccount("apicurito", "apicurito-pull-secret");
 
         // if operator image url was specified, use this image
         if (TestConfiguration.apicuritoOperatorImageUrl() != null) {
-            OpenShiftUtils.getInstance().apps().deployments().create(getUpdatedOperatorDeployment());
+            OpenShiftUtils.getInstance().apps().deployments().create(getUpdatedOperatorDeployment(TestConfiguration.apicuritoOperatorImageUrl()));
             ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_APICURITO_OPERATOR", TestConfiguration.apicuritoOperatorImageUrl());
         } else {
             ConfigurationOCPUtils.createInOCP("Operator", TestConfiguration.apicuritoOperatorDeploymentUrl());
         }
 
-        // as this testsuite is not testing generator, set it to empty string
-        // when not set to empty string, there is ImagePullBackOff when trying to access private registry
-        ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_GENERATOR", "");
+        if (TestConfiguration.apicuritoGeneratorImageUrl() != null) {
+            ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_GENERATOR", TestConfiguration.apicuritoGeneratorImageUrl());
+        }
 
         if (TestConfiguration.apicuritoUiImageUrl() != null) {
             ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_APICURITO", TestConfiguration.apicuritoUiImageUrl());
         }
 
         ConfigurationOCPUtils.applyInOCP("Custom Resource", TestConfiguration.apicuritoOperatorCrUrl());
-    }
-
-    public static String getOperatorImage() {
-        try {
-            String deploymentConfig = HttpUtils.readFileFromURL(new URL(TestConfiguration.apicuritoOperatorDeploymentUrl()));
-            Map<String, Object> deployment = new Yaml().load(deploymentConfig);
-            return ((Map<String, String>) ((Map<String, List<Map>>) ((Map<String, Map>) deployment.get("spec")).get("template").get("spec")).get("containers").get(0)).get("image");
-        } catch (MalformedURLException e) {
-            log.error("Proper URL was not supplied", e);
-            return null;
-        }
     }
 
     public static void cleanNamespace() {
@@ -270,12 +257,12 @@ public class ApicuritoTemplate {
         }
     }
 
-    public static void reinstallApicurito(){
+    public static void reinstallApicurito() {
         setImageStreams();
         OpenShiftUtils.createPullSecret();
         deploy();
         if (TestConfiguration.useOperator()) {
-            waitForApicurito("component", 6, Component.SERVICE);
+            waitForApicurito("component", 2, Component.SERVICE);
         } else {
             waitForApicurito("component", 1, Component.UI);
         }
