@@ -270,9 +270,9 @@ Feature: Path tests
     When import API "src/test/resources/preparedAPIs/paramsAndSecurity.json"
     And select path "/first/{id}"
 
-    And create path parameter "id"
-    And set description "parameter id desc" for path parameter "id"
-    And set path parameter type "File" for path parameter "id"
+    And create path parameter "id" on "path" page
+    And set description "parameter id desc" for path parameter "id" on "path" page
+    And set path parameter type "File" for path parameter "id" on "path" page
 
     Then save API as "json" and close editor
     When import API "tmp/download/openapi-spec.json"
@@ -280,8 +280,8 @@ Feature: Path tests
     And select path "/first/{id}"
 
     Then check that path parameter "id" is created for path "/first/{id}"
-    And check that path parameter "id" has description "parameter id desc"
-    And check that path parameter "id" has "type" type with value "File"
+    And check that path parameter "id" on "path" page has description "parameter id desc"
+    And check that path parameter "id" on "path" page has "type" type with value "File"
 
   @overridePathParameter
   Scenario: override path parameter
@@ -289,7 +289,7 @@ Feature: Path tests
     And select path "/first/{id}/{name}{email}"
 
     And override parameter "id"
-    And set description "override parameter id desc" for override path parameter "id" in operation
+    And set description "override parameter id desc" for path parameter "id" on "operations" page
 
     Then save API as "json" and close editor
     When import API "tmp/download/openapi-spec.json"
@@ -299,7 +299,25 @@ Feature: Path tests
     Then check that path parameter "id" is overridden
     And check that overridden path parameter "id" has description "override parameter id desc"
 
-    #TODO Add test -> create path parameter in operation
+  @createPathParameterInOperation
+  Scenario: create path parameter in operation
+    When import API "src/test/resources/preparedAPIs/paramsAndSecurity.json"
+    And select path "/first/{id}/{name}{email}"
+
+    And select operation "GET"
+    And create path parameter "name" on "operations" page
+    And set description "parameter name desc" for path parameter "name" on "operations" page
+    And set path parameter type "String" for path parameter "name" on "operations" page
+
+    Then save API as "json" and close editor
+    When import API "tmp/download/openapi-spec.json"
+
+    And select path "/first/{id}/{name}{email}"
+
+    Then check that path parameter "name" is created in operation
+    And check that path parameter "name" on "operations" page has description "parameter name desc"
+    And check that path parameter "name" on "operations" page has "type" type with value "String"
+
 
   @createPathQP
   Scenario: create query parameter on path page
@@ -427,15 +445,17 @@ Feature: Path tests
     When import API "src/test/resources/preparedAPIs/paramsAndSecurity.json"
     And select path "/first/{id}/{name}{email}"
 
-    And create path parameter "email"
-    And set description "parameter email desc" for path parameter "email"
-    And set path parameter type "String" for path parameter "email"
-    And set path parameter type as "Byte" for path parameter "email"
+    And create path parameter "email" on "path" page
+    And set description "parameter email desc" for path parameter "email" on "path" page
+    And set path parameter type "String" for path parameter "email" on "path" page
+    And set path parameter type as "Byte" for path parameter "email" on "path" page
 
     And select operation "GET"
     And override parameter "email"
-    And set description "override parameter email desc" for override path parameter "email" in operation
-    #TODO create parameter in operation
+    And set description "override parameter email desc" for path parameter "email" on "operations" page
+    And create path parameter "name" on "operations" page
+    And set description "parameter name desc" for path parameter "name" on "operations" page
+    And set path parameter type "String" for path parameter "name" on "operations" page
 
     Then save API as "json" and close editor
     When import API "tmp/download/openapi-spec.json"
@@ -443,15 +463,19 @@ Feature: Path tests
     And select path "/first/{id}/{name}{email}"
 
     Then check that path parameter "email" is created for path "/first/{id}/{name}{email}"
-    And check that path parameter "email" has description "parameter email desc"
+    And check that path parameter "email" on "path" page has description "parameter email desc"
 
-    And check that path parameter "email" has "type" type with value "String"
-    And check that path parameter "email" has "as" type with value "Byte"
+    And check that path parameter "email" on "path" page has "type" type with value "String"
+    And check that path parameter "email" on "path" page has "as" type with value "Byte"
 
     And select operation "GET"
 
     And check that path parameter "email" is overridden
     And check that overridden path parameter "email" has description "override parameter email desc"
+
+    And check that path parameter "name" is created in operation
+    And check that path parameter "name" on "operations" page has description "parameter name desc"
+    And check that path parameter "name" on "operations" page has "type" type with value "String"
 
   @createPathCP
   Scenario: create cookie parameter on path page
