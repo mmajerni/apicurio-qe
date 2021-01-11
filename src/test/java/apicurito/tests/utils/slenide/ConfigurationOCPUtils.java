@@ -2,16 +2,11 @@ package apicurito.tests.utils.slenide;
 
 import static org.assertj.core.api.Assertions.fail;
 
-import org.yaml.snakeyaml.Yaml;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import apicurito.tests.configuration.Component;
 import apicurito.tests.configuration.TestConfiguration;
-import apicurito.tests.utils.HttpUtils;
 import apicurito.tests.utils.openshift.OpenShiftUtils;
 import io.fabric8.kubernetes.api.model.apps.ReplicaSet;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +21,10 @@ public class ConfigurationOCPUtils {
             fail("TIMEOUT 2 minutes : Failed to load 2 replica sets");
         }
 
-        log.info("Waiting for exactly 3 running Apicurito UI pods.");
-        //Wait 3 minutes for 3 running pods
-        if (!areExactlyThreeUiPodsRunning()) {
-            fail("TIMEOUT 3 minutes: Failed to load 3 running Apicurito pods");
+        log.info("Waiting for exactly 1 running Apicurito UI pod.");
+        //Wait 3 minutes for 1 running pods
+        if (!areExactlyOneUiPodRunning()) {
+            fail("TIMEOUT 3 minutes: Failed to load 1 running Apicurito pod");
         }
     }
 
@@ -77,32 +72,12 @@ public class ConfigurationOCPUtils {
         );
     }
 
-    public static void applyInOCP(String itemName, String namespace, String item) {
-        log.info("Applying {} from: {}", itemName, item);
-        final String output = OpenShiftUtils.binary().execute(
-            "apply", "-n", namespace, "-f", item
-        );
-    }
-
-    public static String getOperatorImage() {
-        log.info("Getting operator image from operator deployment file");
-        try {
-            String deploymentConfig = HttpUtils.readFileFromURL(new URL(TestConfiguration.apicuritoOperatorDeploymentUrl()));
-            Map<String, Object> deployment = new Yaml().load(deploymentConfig);
-            return ((Map<String, String>) ((Map<String, List<Map>>) ((Map<String, Map>) deployment.get("spec")).get("template").get("spec"))
-                .get("containers").get(0)).get("image");
-        } catch (MalformedURLException e) {
-            log.error("Proper URL was not supplied", e);
-            return null;
-        }
-    }
-
     private static List<ReplicaSet> getApicuritoUIreplicaSets() {
         List<ReplicaSet> uiRs = new ArrayList<>();
 
         List<ReplicaSet> listRs = OpenShiftUtils.getInstance().apps().replicaSets().list().getItems();
         for (ReplicaSet rs : listRs) {
-            if ("apicurito-service-ui".equals(rs.getMetadata().getOwnerReferences().get(0).getName())) {
+            if (Component.SERVICE.getName().equals(rs.getMetadata().getOwnerReferences().get(0).getName())) {
                 uiRs.add(rs);
             }
         }
@@ -122,7 +97,7 @@ public class ConfigurationOCPUtils {
         return false;
     }
 
-    private static boolean areExactlyThreeUiPodsRunning() {
+    private static boolean areExactlyOneUiPodRunning() {
         List<ReplicaSet> uiRs = new ArrayList<>();
         int counter = 0;
 
@@ -131,7 +106,7 @@ public class ConfigurationOCPUtils {
             uiRs = getApicuritoUIreplicaSets();
             CommonUtils.sleepFor(10);
 
-            if (uiRs.get(0).getStatus().getReplicas() + uiRs.get(1).getStatus().getReplicas() == 3) {
+            if (uiRs.get(0).getStatus().getReplicas() + uiRs.get(1).getStatus().getReplicas() == 1) {
                 return true;
             }
             ++counter;

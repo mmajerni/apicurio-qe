@@ -1,69 +1,126 @@
 # Apicurito tests
 
+This repository contains tests for Apicurito. It tests both Apicurito UI image and Apicurito Operator image.
+It supports both installation methods:
+- Template installation (tests only UI image)
+- Operator installation (tests both UI and Operator image)
 
+There is also one test which tests installation from OperatorHub. It requires an extra configuration.
 
-## Overriding options
+## Test.properties file
 
-The Cucumber runtime parses command line options to know what features to run, where the glue code lives, what plugins to use etc.
-When you use the JUnit runner, these options are generated from the `@CucumberOptions` annotation on your test.
+These tests require `test.properties` file to work. Create it in top folder with following parameters:
 
-Sometimes it can be useful to override these options without changing or recompiling the JUnit class. This can be done with the
-`cucumber.options` system property. The general form is:
-
-Using Maven:
-
-    mvn -Dcucumber.options="..." test
-
-
-Let's look at some things you can do with `cucumber.options`. Try this:
-
-    -Dcucumber.options="--help"
-
-That should list all the available options.
-
-*IMPORTANT*
-
-When you override options with `-Dcucumber.options`, you will completely override whatever options are hard-coded in
-your `@CucumberOptions` or in the script calling `cucumber.api.cli.Main`. There is one exception to this rule, and that
-is the `--plugin` option. This will not _override_, but _add_ a plugin. The reason for this is to make it easier
-for 3rd party tools (such as [Cucumber Pro](https://cucumber.pro/)) to automatically configure additional plugins by appending arguments to a `cucumber.properties`
-file.
-
-### Run a subset of Features or Scenarios
-
-Specify a particular scenario by *line* (and use the pretty plugin, which prints the scenario back)
-
-    -Dcucumber.options="classpath:skeleton/belly.feature:4 --plugin pretty"
-
-This works because Maven puts `./src/test/resources` on your `classpath`.
-You can also specify files to run by filesystem path:
-
-    -Dcucumber.options="src/test/resources/skeleton/belly.feature:4 --plugin pretty"
-
-You can also specify what to run by *tag*:
-
-    -Dcucumber.options="--tags @bar --plugin pretty"
-
-### Specify a different formatter:
-
-For example a JUnit formatter:
-
-    -Dcucumber.options="--plugin junit:target/cucumber-junit-report.xml"
-
-
-
-
-
-
-
-## PROPERTIES
-Inside file ``test.properties``:
-
+- Require parameters:
 ```
-apicurito.config.openshift.url=https://{minishift ip}:8443
-apicurito.config.openshift.namespace=apicurito
-apicurito.config.openshift.namespace.cleanup.after=false
-apicurito.config.openshift.route.suffix={minishift ip}.nip.io
-apicurito.config.ui.url=https://{namespace}.{minishift ip}.nip.io
-apicurito.config.openshift.reinstall=true
+apicurito.config.openshift.url=
+apicurito.config.ui.url=
+apicurito.config.ui.username=
+apicurito.config.ui.password=
 ```
+
+- Optional parameters:
+```
+apicurito.config.openshift.namespace=
+apicurito.config.openshift.namespace.cleanup.after=
+apicurito.config.openshift.reinstall=
+apicurito.config.ui.browser=
+apicurito.config.use.operator=
+apicurito.config.operator.image.url=
+apicurito.config.ui.image.url=
+apicurito.config.generator.image.url=
+apicurito.config.operator.metadata.url=
+apicurito.config.pull.secret=
+
+apicurito.config.quay.username=
+apicurito.config.quay.password=
+apicurito.config.quay.namespace=
+apicurito.config.quay.auth.token=
+apicurito.config.quay.opsrc.token=
+apicurito.config.quay.pull.secret=
+```
+
+#### Description of parameters
+**apicurito.config.openshift.url** must contains url to OCP API i.e.
+- https://api.crc.testing:6443
+- https://192.168.42.155:8443
+- https://api.my.openshift.com:6443
+
+
+**apicurito.config.ui.url** must contains url to Apicurito route in format:
+`https://${APICURITO_POD_NAME}-${APICURITO_NAMESPACE}.apps.${OPENSHIFT_URL}`
+
+**INFO**: For various OCP instances may route differs.
+- Examples:
+  - https://apicurito-service-ui-apicurito.apps.my.openshift.com
+  - https://apicurito-service-ui-apicurito.apps-crc.testing
+  - https://apicurito-service-ui-apicurito.192.168.42.155.nip.io
+- Note:
+  - ${APICURITO_POD_NAME} depends on metadata name in CR.
+  - ${APICURITO_NAMESPACE} is **apicurito** by default but can be changed
+
+**apicurito.config.ui.username** must contain user name of user with admin rights
+
+**apicurito.config.ui.password** must contain the password for user defined above
+
+**apicurito.config.openshift.namespace** can override namespace where apicurito will be installed. Default value is apicurito.
+
+**apicurito.config.openshift.namespace.cleanup.after** if set to true it will delete Apicurito and clean openshift namespace. Default value is false.
+
+**apicurito.config.openshift.reinstall** if set to true reinstall Apicurito before tests, otherwise it will keep already installed Apicurito. Default value is true.
+
+**apicurito.config.ui.browser** set to change browser for UI tests.
+- Supported options:
+[ firefox | chrome ]. Default is firefox.
+
+**apicurito.config.use.operator** if set to true it will install Apicurito via operator installation method otherwise it will install via template installation. Default value is true.
+
+**apicurito.config.pull.secret** secret is needed for the following images which are stored at quay.io.
+
+**apicurito.config.operator.image.url** can override the default operator image which is defined in the operator.yaml file.
+- Examples:
+  - quay.io/redhat/apicurito-operator:1.8-x
+  - docker.io/redhat/apicurito-operator:1.8-x
+
+**apicurito.config.ui.image.url** can override the default ui image which is defined in the operator or in operator.yaml as RELATED_IMAGE_UI.
+- Examples:
+  - quay.io/redhat/apicurito-ui:1.8-x
+  - docker.io/redhat/apicurito-ui:1.8-x
+- **Note**: This parameter is required if Apicurito is installed via template installation.
+
+**apicurito.config.generator.image.url** can override the default generator image which is defined in the operator or in operator.yaml as RELATED_IMAGE_GENERATOR.
+- Examples:
+  - quay.io/redhat/apicurito-generator:1.8-x
+  - docker.io/redhat/apicurito-generator:1.8-x
+
+**apicurito.config.operator.metadata.url** is an url to image which contains metadata for installation Apicurito via operatorhub. Needed only for **@operatorhub** test.
+- Examples:
+  - registry.redhat.io/fuse7/fuse-apicurito-operator-bundle:1.8-x
+  - registry-proxy.engineering.redhat.com/rh-osbs/fuse7-fuse-apicurito-operator-metadata:1.8-x
+
+**apicurito.config.quay.username** Needed only for **@operatorhub** test. Specify quay username.
+
+**apicurito.config.quay.password** Needed only for **@operatorhub** test. Specify quay password for user above.
+
+**apicurito.config.quay.namespace** Needed only for **@operatorhub** test. Specify quay namespace where operator index will be stored.
+
+**apicurito.config.quay.auth.token** Needed only for **@operatorhub** test. Specify quay auth token for user above.
+
+**apicurito.config.quay.opsrc.token** Needed only for **@operatorhub** test. Specify quay OperatorSource token for user above.
+
+**apicurito.config.quay.pull.secret** Needed only for **@operatorhub** test. Specify quay pull secret for stored operator index.
+
+## How to run tests
+
+- From CLI:
+  - From top folder run `mvn clean test`
+
+- From IntelliJ IDEA:
+  - Run **TestRunner** class as JUnit tests
+
+#### Run subset of the tests
+
+If you want to run just subset of tests add option `-Dcucumber.filter.tags="@tag1 or @tag2"`
+- Examples:
+  - CLI: `mvn clean test -Dcucumber.filter.tags="@smokeTests or @pathsTests"`
+  - IDEA: Set VM options to: `-ea -Dcucumber.filter.tags="@smokeTests or @pathsTests"`
