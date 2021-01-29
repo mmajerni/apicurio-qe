@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import com.codeborne.selenide.Configuration;
 
 import apicurito.tests.configuration.TestConfiguration;
+import apicurito.tests.configuration.templates.ApicuritoInstall;
 import apicurito.tests.configuration.templates.ApicuritoTemplate;
 import apicurito.tests.utils.openshift.OpenShiftUtils;
 import apicurito.tests.utils.slenide.CommonUtils;
@@ -41,9 +42,9 @@ public class TestRunner {
 
         if (Boolean.parseBoolean(TestConfiguration.doReinstall())) {
             if (!createdProject) {
-                ApicuritoTemplate.cleanNamespace();
+                ApicuritoInstall.cleanNamespace();
             }
-            ApicuritoTemplate.reinstallApicurito();
+            ApicuritoInstall.reinstallApicurito();
         }
 
         //set up Selenide
