@@ -17,9 +17,9 @@ spec:
         com.company: Red_Hat
         name: fuse-apicurito
         rht.comp: Fuse
-        rht.comp_ver: "7.9"
+        rht.comp_ver: "7.8"
         rht.prod_name: Red_Hat_Integration
-        rht.prod_ver: "7.9"
+        rht.prod_ver: "7.8"
         rht.subcomp: fuse-apicurito
         rht.subcomp_t: infrastructure
     spec:
@@ -30,14 +30,14 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: RELATED_IMAGE_APICURITO_OPERATOR
-              value: registry-proxy.engineering.redhat.com/rh-osbs/fuse7-fuse-apicurito-rhel8-operator:1.9-10
+              value: quay.io/rh_integration/fuse-apicurito-rhel7-operator:1.8-20
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: fuse-apicurito
-          image: registry-proxy.engineering.redhat.com/rh-osbs/fuse7-fuse-apicurito-rhel8-operator:1.9-10
+          image: quay.io/rh_integration/fuse-apicurito-rhel7-operator:1.8-20
           imagePullPolicy: Always
           name: fuse-apicurito
           resources: {}

@@ -63,6 +63,7 @@ public class ConfigurationOCPUtils {
             "-n", TestConfiguration.openShiftNamespace(),
             "-f", item
         );
+        log.info("OutputL:" + output);
     }
 
     public static void applyInOCP(String itemName, String item) {
@@ -70,6 +71,7 @@ public class ConfigurationOCPUtils {
         final String output = OpenShiftUtils.binary().execute(
             "apply", "-n", TestConfiguration.openShiftNamespace(), "-f", item
         );
+        log.info("OutputL:" + output);
     }
 
     private static List<ReplicaSet> getApicuritoUIreplicaSets() {

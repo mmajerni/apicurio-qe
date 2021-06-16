@@ -232,6 +232,9 @@ public class TestConfiguration {
                     "https://raw.githubusercontent.com/jboss-fuse/apicurio-operators/master/apicurito/config/crd/deprecated/apicur.io_apicuritoes" +
                         ".yaml"));
             } else {
+//                props.setProperty(APICURITO_OPERATOR_CRD_URL, String.format(
+//                        "https://raw.githubusercontent.com/jboss-fuse/apicurio-operators/master/apicurito/config/crd/deprecated/apicur.io_apicuritoes" +
+//                                ".yaml"));
                 props.setProperty(APICURITO_OPERATOR_CRD_URL, String.format(
                     "https://raw.githubusercontent.com/jboss-fuse/apicurio-operators/master/apicurito/config/crd/bases/apicur.io_apicuritoes.yaml"));
             }

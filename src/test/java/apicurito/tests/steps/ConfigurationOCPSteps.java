@@ -269,11 +269,12 @@ public class ConfigurationOCPSteps {
         OpenShiftUtils.addImagePullSecretToServiceAccount("default", "apicurito-pull-secret");
         OpenShiftUtils.addImagePullSecretToServiceAccount("apicurito", "apicurito-pull-secret");
 
-        OpenShiftUtils.getInstance().apps().deployments()
-            .create(ApicuritoOperator.getUpdatedOperatorDeployment(ReleaseSpecificParameters.OLD_OPERATOR_URL));
-        ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_APICURITO_OPERATOR", ReleaseSpecificParameters.OLD_OPERATOR_URL);
+//        OpenShiftUtils.getInstance().apps().deployments()
+//            .create(ApicuritoOperator.getUpdatedOperatorDeployment(ReleaseSpecificParameters.OLD_OPERATOR_URL));
+        ConfigurationOCPUtils.createInOCP("Operator yaml", String.format("src/test/resources/generatedFiles/old-deployment.yaml"));
+        //ConfigurationOCPUtils.setTestEnvToOperator("RELATED_IMAGE_APICURITO_OPERATOR", ReleaseSpecificParameters.OLD_OPERATOR_URL);
         ConfigurationOCPUtils.applyInOCP("Custom Resource", TestConfiguration.apicuritoOperatorCrUrl());
 
-        ApicuritoTemplate.waitForApicurito("component", 2, Component.SERVICE);
+        ApicuritoTemplate.waitForApicurito("component", 6, Component.SERVICE);
     }
 }
